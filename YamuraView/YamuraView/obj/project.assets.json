@@ -1,0 +1,183 @@
+{
+  "version": 3,
+  "targets": {
+    "net9.0-windows7.0": {
+      "Win32Interop.Gdi32/1.0.1": {
+        "type": "package",
+        "dependencies": {
+          "Win32Interop.User32": "1.0.1"
+        },
+        "compile": {
+          "lib/Win32Interop.Gdi32.dll": {}
+        },
+        "runtime": {
+          "lib/Win32Interop.Gdi32.dll": {}
+        }
+      },
+      "Win32Interop.User32/1.0.1": {
+        "type": "package",
+        "compile": {
+          "lib/Win32Interop.User32.dll": {}
+        },
+        "runtime": {
+          "lib/Win32Interop.User32.dll": {}
+        }
+      },
+      "YamuraViewControls/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v9.0",
+        "dependencies": {
+          "Win32Interop.Gdi32": "1.0.1",
+          "Win32Interop.User32": "1.0.1"
+        },
+        "compile": {
+          "bin/placeholder/YamuraViewControls.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/YamuraViewControls.dll": {}
+        },
+        "frameworkReferences": [
+          "Microsoft.WindowsDesktop.App.WindowsForms"
+        ]
+      }
+    }
+  },
+  "libraries": {
+    "Win32Interop.Gdi32/1.0.1": {
+      "sha512": "+rtmt0ae7tRfBIEb7kPlw2cWNABLUp5JLqIPi7rMK3HQLWdWIs8T3iEwki2SCSdRHmDSH5S34HE+ytxRsUDEhQ==",
+      "type": "package",
+      "path": "win32interop.gdi32/1.0.1",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "Win32Interop.Gdi32.1.0.1.nupkg.sha512",
+        "Win32Interop.Gdi32.nuspec",
+        "lib/Win32Interop.Gdi32.XML",
+        "lib/Win32Interop.Gdi32.dll",
+        "lib/Win32Interop.Gdi32.pdb"
+      ]
+    },
+    "Win32Interop.User32/1.0.1": {
+      "sha512": "GrtMD4QYCys/wHKDrvIM62YJJQCeQfPkCK7kYN+dlcz+jVTi2Abtsy+4rzfFzHfhYWpBeA3EoXzqQAJVfN9N/w==",
+      "type": "package",
+      "path": "win32interop.user32/1.0.1",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "Win32Interop.User32.1.0.1.nupkg.sha512",
+        "Win32Interop.User32.nuspec",
+        "lib/Win32Interop.User32.dll",
+        "lib/Win32Interop.User32.pdb"
+      ]
+    },
+    "YamuraViewControls/1.0.0": {
+      "type": "project",
+      "path": "../YamuraViewControls/YamuraViewControls.csproj",
+      "msbuildProject": "../YamuraViewControls/YamuraViewControls.csproj"
+    }
+  },
+  "projectFileDependencyGroups": {
+    "net9.0-windows7.0": [
+      "YamuraViewControls >= 1.0.0"
+    ]
+  },
+  "packageFolders": {
+    "C:\\Users\\bbsmi\\.nuget\\packages\\": {},
+    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
+  },
+  "project": {
+    "version": "1.0.0",
+    "restore": {
+      "projectUniqueName": "E:\\GitHub\\YamuraViewV9\\YamuraView\\YamuraView\\YamuraView.csproj",
+      "projectName": "YamuraView",
+      "projectPath": "E:\\GitHub\\YamuraViewV9\\YamuraView\\YamuraView\\YamuraView.csproj",
+      "packagesPath": "C:\\Users\\bbsmi\\.nuget\\packages\\",
+      "outputPath": "E:\\GitHub\\YamuraViewV9\\YamuraView\\YamuraView\\obj\\",
+      "projectStyle": "PackageReference",
+      "fallbackFolders": [
+        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+      ],
+      "configFilePaths": [
+        "C:\\Users\\bbsmi\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+      ],
+      "originalTargetFrameworks": [
+        "net9.0-windows"
+      ],
+      "sources": {
+        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+        "C:\\Program Files\\dotnet\\library-packs": {},
+        "https://api.nuget.org/v3/index.json": {}
+      },
+      "frameworks": {
+        "net9.0-windows7.0": {
+          "targetAlias": "net9.0-windows",
+          "projectReferences": {
+            "E:\\GitHub\\YamuraViewV9\\YamuraView\\YamuraViewControls\\YamuraViewControls.csproj": {
+              "projectPath": "E:\\GitHub\\YamuraViewV9\\YamuraView\\YamuraViewControls\\YamuraViewControls.csproj"
+            }
+          }
+        }
+      },
+      "warningProperties": {
+        "warnAsError": [
+          "NU1605"
+        ]
+      },
+      "restoreAuditProperties": {
+        "enableAudit": "true",
+        "auditLevel": "low",
+        "auditMode": "direct"
+      },
+      "SdkAnalysisLevel": "9.0.300"
+    },
+    "frameworks": {
+      "net9.0-windows7.0": {
+        "targetAlias": "net9.0-windows",
+        "imports": [
+          "net461",
+          "net462",
+          "net47",
+          "net471",
+          "net472",
+          "net48",
+          "net481"
+        ],
+        "assetTargetFallback": true,
+        "warn": true,
+        "frameworkReferences": {
+          "Microsoft.NETCore.App": {
+            "privateAssets": "all"
+          },
+          "Microsoft.WindowsDesktop.App.WindowsForms": {
+            "privateAssets": "none"
+          }
+        },
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.313/PortableRuntimeIdentifierGraph.json"
+      }
+    }
+  },
+  "logs": [
+    {
+      "code": "NU1701",
+      "level": "Warning",
+      "warningLevel": 1,
+      "message": "Package 'Win32Interop.Gdi32 1.0.1' was restored using '.NETFramework,Version=v4.6.1, .NETFramework,Version=v4.6.2, .NETFramework,Version=v4.7, .NETFramework,Version=v4.7.1, .NETFramework,Version=v4.7.2, .NETFramework,Version=v4.8, .NETFramework,Version=v4.8.1' instead of the project target framework 'net9.0-windows7.0'. This package may not be fully compatible with your project.",
+      "libraryId": "Win32Interop.Gdi32",
+      "targetGraphs": [
+        "net9.0-windows7.0"
+      ]
+    },
+    {
+      "code": "NU1701",
+      "level": "Warning",
+      "warningLevel": 1,
+      "message": "Package 'Win32Interop.User32 1.0.1' was restored using '.NETFramework,Version=v4.6.1, .NETFramework,Version=v4.6.2, .NETFramework,Version=v4.7, .NETFramework,Version=v4.7.1, .NETFramework,Version=v4.7.2, .NETFramework,Version=v4.8, .NETFramework,Version=v4.8.1' instead of the project target framework 'net9.0-windows7.0'. This package may not be fully compatible with your project.",
+      "libraryId": "Win32Interop.User32",
+      "targetGraphs": [
+        "net9.0-windows7.0"
+      ]
+    }
+  ]
+}

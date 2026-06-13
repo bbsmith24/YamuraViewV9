@@ -1,0 +1,36 @@
+{
+  "version": 2,
+  "dgSpecHash": "0SQw/JKAi9Y=",
+  "success": true,
+  "projectFilePath": "E:\\GitHub\\YamuraViewV9\\YamuraView\\YamuraViewControls\\YamuraViewControls.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\bbsmi\\.nuget\\packages\\win32interop.gdi32\\1.0.1\\win32interop.gdi32.1.0.1.nupkg.sha512",
+    "C:\\Users\\bbsmi\\.nuget\\packages\\win32interop.user32\\1.0.1\\win32interop.user32.1.0.1.nupkg.sha512"
+  ],
+  "logs": [
+    {
+      "code": "NU1701",
+      "level": "Warning",
+      "message": "Package 'Win32Interop.Gdi32 1.0.1' was restored using '.NETFramework,Version=v4.6.1, .NETFramework,Version=v4.6.2, .NETFramework,Version=v4.7, .NETFramework,Version=v4.7.1, .NETFramework,Version=v4.7.2, .NETFramework,Version=v4.8, .NETFramework,Version=v4.8.1' instead of the project target framework 'net9.0-windows7.0'. This package may not be fully compatible with your project.",
+      "projectPath": "E:\\GitHub\\YamuraViewV9\\YamuraView\\YamuraViewControls\\YamuraViewControls.csproj",
+      "warningLevel": 1,
+      "filePath": "E:\\GitHub\\YamuraViewV9\\YamuraView\\YamuraViewControls\\YamuraViewControls.csproj",
+      "libraryId": "Win32Interop.Gdi32",
+      "targetGraphs": [
+        "net9.0-windows7.0"
+      ]
+    },
+    {
+      "code": "NU1701",
+      "level": "Warning",
+      "message": "Package 'Win32Interop.User32 1.0.1' was restored using '.NETFramework,Version=v4.6.1, .NETFramework,Version=v4.6.2, .NETFramework,Version=v4.7, .NETFramework,Version=v4.7.1, .NETFramework,Version=v4.7.2, .NETFramework,Version=v4.8, .NETFramework,Version=v4.8.1' instead of the project target framework 'net9.0-windows7.0'. This package may not be fully compatible with your project.",
+      "projectPath": "E:\\GitHub\\YamuraViewV9\\YamuraView\\YamuraViewControls\\YamuraViewControls.csproj",
+      "warningLevel": 1,
+      "filePath": "E:\\GitHub\\YamuraViewV9\\YamuraView\\YamuraViewControls\\YamuraViewControls.csproj",
+      "libraryId": "Win32Interop.User32",
+      "targetGraphs": [
+        "net9.0-windows7.0"
+      ]
+    }
+  ]
+}
