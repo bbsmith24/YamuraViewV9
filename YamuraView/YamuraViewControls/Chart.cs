@@ -109,14 +109,14 @@ namespace YamuraViewControls
         {
             chartProperties1.AxisChannelTree.Nodes.Clear();
             chartProperties1.CmbXAxis.Items.Clear();
-            chartProperties1.CmbAlignAxis.Items.Clear();
-            chartProperties1.TxtAutoThreshold.Text = "0.0";
+            //chartProperties1.CmbAlignAxis.Items.Clear();
+            //chartProperties1.TxtAutoThreshold.Text = "0.0";
             //foreach (KeyValuePair<String, Axis> curAxis in chartAxes)
             String curAxisName = yAxes.ElementAt(0).Key;
             Axis curAxis = yAxes.ElementAt(0).Value;
 
             //chartProperties1.CmbXAxis.Items.Add(xAxes.ElementAt(0).Key);
-            chartProperties1.CmbAlignAxis.Items.Add(xAxes.ElementAt(0).Key);
+            //chartProperties1.CmbAlignAxis.Items.Add(xAxes.ElementAt(0).Key);
 
             bool axisFound = false;
             //foreach (TreeNode axisItem in chartProperties1.AxisChannelTree.Nodes)

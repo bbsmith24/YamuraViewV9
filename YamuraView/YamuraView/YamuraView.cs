@@ -33,7 +33,8 @@ namespace YamuraView
         public String FolderToWatch { get; private set; }
         public SortedList<String, String> folderToWatchFiles = new System.Collections.Generic.SortedList<String, String>();
         List<YamuraViewControls.Chart> chartControls = new List<YamuraViewControls.Chart>();
-
+        public bool timeAlign = true;
+        public bool distanceAlign = true;
 
         public YamuraView()
         {
@@ -42,7 +43,7 @@ namespace YamuraView
             StripChart.ChartViewType = YamuraViewControls.Chart.ChartType.Stripchart;
             TrackMap.ChartViewType = YamuraViewControls.Chart.ChartType.XYChart;
             TractionCircle.ChartViewType = YamuraViewControls.Chart.ChartType.XYChart;
-            TractionCircle. ChartViewType = YamuraViewControls.Chart.ChartType.XYChart;
+            TractionCircle.ChartViewType = YamuraViewControls.Chart.ChartType.XYChart;
 
             chartControls.Add(StripChart);
             chartControls.Add(TrackMap);
@@ -455,7 +456,7 @@ namespace YamuraView
             StringBuilder errStr = new StringBuilder();
 
             String runName = GetFileName(fileName, false);
-            
+
             dataLogger.runData.Add(new RunData(runName));
             runIdx = dataLogger.runData.Count - 1;
             dataLogger.runData[runIdx].AddChannel("Time", "Timestamp", "Internal", runName, 1.0F);
@@ -866,10 +867,10 @@ namespace YamuraView
                 errInfo.FileInfoText = errStr.ToString();
                 errInfo.ShowDialog();
             }
-            foreach(var channel in dataLogger.runData[runIdx].channels)
+            foreach (var channel in dataLogger.runData[runIdx].channels)
             {
-                System.Diagnostics.Debug.WriteLine(string.Format("channel {0} has {1} points X range {2}, {3}, {4} Y range {5}, {6}, {7}", 
-                                                                                                                       channel.Key, 
+                System.Diagnostics.Debug.WriteLine(string.Format("channel {0} has {1} points X range {2}, {3}, {4} Y range {5}, {6}, {7}",
+                                                                                                                       channel.Key,
                                                                                                                        channel.Value.dataPoints.Count(),
                                                                                                                        channel.Value.XRange[0],
                                                                                                                        channel.Value.XRange[1],
@@ -880,6 +881,7 @@ namespace YamuraView
                                                                                                                        ));
             }
             AlignGPS();
+            AlignTime();
             /// update displays with new data
             AddLatestDataToCharts();
         }
@@ -1140,7 +1142,7 @@ namespace YamuraView
         public void AddLatestDataToCharts()
         {
             // no data to update
-            if(dataLogger.runData.Count == 0)
+            if (dataLogger.runData.Count == 0)
             {
                 return;
             }
@@ -1168,7 +1170,7 @@ namespace YamuraView
                 // assign channels to axes, add channels to view data set
                 foreach (KeyValuePair<string, DataChannel> curChannel in curRun.channels)
                 {
-                    chartControls[chartIdx].dataSets[dataSetIdx].AddChannel(curChannel.Key, 
+                    chartControls[chartIdx].dataSets[dataSetIdx].AddChannel(curChannel.Key,
                                                                             curChannel.Value.ChannelDescription,
                                                                             curChannel.Value.ChannelSource,
                                                                             curRun.runName,
@@ -1326,28 +1328,30 @@ namespace YamuraView
                 if (dataLogger.runData.Count > 1)
                 {
                     AlignGPS();
+                    AlignTime();
                 }
             }
-            for (int chartIdx = 0; chartIdx < 3; chartIdx++)
-            {
-                //chartControls[0].Invalidate();
-            }
+            //for (int chartIdx = 0; chartIdx < 3; chartIdx++)
+            //{
+            //    //chartControls[0].Invalidate();
+            //}
         }
         /// <summary>
         /// align most recent added data set to first data set using GPS data
         /// </summary>
         public void AlignGPS()
         {
+            if (!distanceAlign)
+            {
+                return;
+            }
             float distanceBetweenPositions = 0.0F;
             float minDistanceBetweenPositions = float.MaxValue;
             float distanceOffset = 0.0F;
-            float timeOffset = 0.0F;
             float gpsLat1;
             float gpsLong1;
             float gpsLat2;
             float gpsLong2;
-            float time1 = 0.0F;
-            float time2 = 0.0F;
             float distance1 = 0.0F;
             float distance2 = 0.0F;
             int lastRunIdx = dataLogger.runData.Count - 1;
@@ -1357,14 +1361,12 @@ namespace YamuraView
             {
                 gpsLat1 = dataLogger.runData[0].channels["Latitude"].DataPoints.ElementAt(gps1Idx).Value;
                 gpsLong1 = dataLogger.runData[0].channels["Longitude"].DataPoints.ElementAt(gps1Idx).Value;
-                time1 = dataLogger.runData[0].channels["Latitude"].DataPoints.ElementAt(gps1Idx).Key;
                 distance1 = dataLogger.runData[0].channels["Distance-GPS"].DataPoints.ElementAt(gps1Idx).Value;
                 // GPS points from last added data set
                 for (int gps2Idx = 0; gps2Idx < dataLogger.runData[0].channels["Latitude"].DataPoints.Count; gps2Idx++)
                 {
                     gpsLat2 = dataLogger.runData[lastRunIdx].channels["Latitude"].DataPoints.ElementAt(gps2Idx).Value;
                     gpsLong2 = dataLogger.runData[lastRunIdx].channels["Longitude"].DataPoints.ElementAt(gps2Idx).Value;
-                    time2 = dataLogger.runData[lastRunIdx].channels["Latitude"].DataPoints.ElementAt(gps2Idx).Key;
                     distance2 = dataLogger.runData[lastRunIdx].channels["Distance-GPS"].DataPoints.ElementAt(gps2Idx).Value;
 
                     distanceBetweenPositions = GPSDistance(gpsLat1, gpsLong1, gpsLat2, gpsLong2);
@@ -1378,26 +1380,57 @@ namespace YamuraView
                                 distanceOffset = distance1 - distance2;
                                 distanceOffsetSet = true;
                             }
-                            timeOffset = Math.Abs(time1 - time2) > Math.Abs(timeOffset) ? time1 - time2 : timeOffset;
+                            break;
                         }
-                        System.Diagnostics.Debug.WriteLine("===========================");
-                        System.Diagnostics.Debug.WriteLine("Position [" + gps1Idx + "]\tTime\t" + time1 + "\tLat\t" + gpsLat1 + "\tLong\t" + gpsLong1 + "\tDist\t" + distance1);
-                        System.Diagnostics.Debug.WriteLine("Position [" + gps2Idx + "]\tTime\t" + time2 + "\tLat\t" + gpsLat2 + "\tLong\t" + gpsLong2 + "\tDist\t" + distance2);
-                        System.Diagnostics.Debug.WriteLine(string.Format("distanceBetweenPositions {0} timeOffset {1} distanceOffset {2}", distanceBetweenPositions, timeOffset, distanceOffset));
-                        //if (minDistanceBetweenPositions == 0.0F)
-                        //{
-                        //    break;
-                        //}
+                        if (distanceOffsetSet)
+                        {
+                            break;
+                        }
                     }
                 }
-//                if (minDistanceBetweenPositions == 0.0F)
-//                {
-//                    break;
-//                }
+                if (distanceOffsetSet)
+                {
+                    break;
+                }
             }
             dataLogger.runData[lastRunIdx].DistanceOffset = distanceOffset;
-            dataLogger.runData[lastRunIdx].TimeOffset = timeOffset;
         }
+        /// <summary>
+        /// align most recent added data set to first data set using accerlation data 
+        /// first delta acceleration > threshold on defined axis is assumed to be the start of the run
+        /// GPS data can't align time since there may be holds aafter the first matching location point
+        /// </summary>
+        public void AlignTime()
+        {
+            if (!timeAlign)
+            {
+                return;
+            }
+            float priorAccel = 0.0F;
+            float curAccel = 0.0F;
+            float accelThreshold = 0.5F; // g's
+            float timeOffset = 0.0F;
+            int lastRunIdx = dataLogger.runData.Count - 1;
+
+            // acceleration from last added data set
+            foreach (RunData dataSet in dataLogger.runData)
+            {
+                priorAccel = 0.0F;
+                foreach (KeyValuePair<float, float> dataPoint in dataSet.channels["gX"].DataPoints)
+                {
+                    curAccel = dataPoint.Value;
+                    if (Math.Abs(curAccel - priorAccel) > accelThreshold)
+                    {
+                        timeOffset = dataPoint.Key;
+                        break;
+                    }
+                    priorAccel = curAccel;
+                }
+                dataSet.TimeOffset = timeOffset;
+                System.Diagnostics.Debug.WriteLine("run " + dataSet.runName + " time offset " + dataSet.TimeOffset.ToString());
+            }
+        }
+
         /// <summary>
         /// great circle distance between 2 lat/long points
         /// </summary>
@@ -1443,6 +1476,17 @@ namespace YamuraView
         {
             double rad = (deg * Math.PI) / 180.0;
             return (float)rad;
+        }
+
+        private void timeAlignSetupToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            TimeAlignDialog timeAlignDialog = new TimeAlignDialog();
+            timeAlignDialog.timeAligned = timeAlign;
+            if (timeAlignDialog.ShowDialog() != DialogResult.OK)
+            {
+                return;
+            }
+            //timeAlign = timeAlignDialog.TimeAligned;
         }
     }
 }

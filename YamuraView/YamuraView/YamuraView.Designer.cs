@@ -39,6 +39,8 @@
             addRunsMenuItem = new ToolStripMenuItem();
             clearRunsToolStripMenuItem = new ToolStripMenuItem();
             setAutoloadFolderToolStripMenuItem = new ToolStripMenuItem();
+            timeAlignSetupToolStripMenuItem = new ToolStripMenuItem();
+            distanceAlignSetupToolStripMenuItem = new ToolStripMenuItem();
             exitToolStripMenuItem = new ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)splitContainer1).BeginInit();
             splitContainer1.Panel1.SuspendLayout();
@@ -127,7 +129,7 @@
             // 
             // fileToolStripMenuItem
             // 
-            fileToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { addRunsMenuItem, clearRunsToolStripMenuItem, setAutoloadFolderToolStripMenuItem, exitToolStripMenuItem });
+            fileToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { addRunsMenuItem, clearRunsToolStripMenuItem, setAutoloadFolderToolStripMenuItem, timeAlignSetupToolStripMenuItem, distanceAlignSetupToolStripMenuItem, exitToolStripMenuItem });
             fileToolStripMenuItem.Name = "fileToolStripMenuItem";
             fileToolStripMenuItem.Size = new Size(37, 20);
             fileToolStripMenuItem.Text = "File";
@@ -135,26 +137,39 @@
             // addRunsMenuItem
             // 
             addRunsMenuItem.Name = "addRunsMenuItem";
-            addRunsMenuItem.Size = new Size(176, 22);
+            addRunsMenuItem.Size = new Size(182, 22);
             addRunsMenuItem.Text = "Add Runs";
             addRunsMenuItem.Click += addRunsMenuItem_Click;
             // 
             // clearRunsToolStripMenuItem
             // 
             clearRunsToolStripMenuItem.Name = "clearRunsToolStripMenuItem";
-            clearRunsToolStripMenuItem.Size = new Size(176, 22);
+            clearRunsToolStripMenuItem.Size = new Size(182, 22);
             clearRunsToolStripMenuItem.Text = "Clear Runs";
             // 
             // setAutoloadFolderToolStripMenuItem
             // 
             setAutoloadFolderToolStripMenuItem.Name = "setAutoloadFolderToolStripMenuItem";
-            setAutoloadFolderToolStripMenuItem.Size = new Size(176, 22);
+            setAutoloadFolderToolStripMenuItem.Size = new Size(182, 22);
             setAutoloadFolderToolStripMenuItem.Text = "Set Autoload folder";
+            // 
+            // timeAlignSetupToolStripMenuItem
+            // 
+            timeAlignSetupToolStripMenuItem.Name = "timeAlignSetupToolStripMenuItem";
+            timeAlignSetupToolStripMenuItem.Size = new Size(182, 22);
+            timeAlignSetupToolStripMenuItem.Text = "Time Align setup";
+            timeAlignSetupToolStripMenuItem.Click += timeAlignSetupToolStripMenuItem_Click;
+            // 
+            // distanceAlignSetupToolStripMenuItem
+            // 
+            distanceAlignSetupToolStripMenuItem.Name = "distanceAlignSetupToolStripMenuItem";
+            distanceAlignSetupToolStripMenuItem.Size = new Size(182, 22);
+            distanceAlignSetupToolStripMenuItem.Text = "Distance Align setup";
             // 
             // exitToolStripMenuItem
             // 
             exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-            exitToolStripMenuItem.Size = new Size(176, 22);
+            exitToolStripMenuItem.Size = new Size(182, 22);
             exitToolStripMenuItem.Text = "Exit";
             // 
             // YamuraView
@@ -195,5 +210,7 @@
         private YamuraViewControls.Chart StripChart;
         private YamuraViewControls.Chart TrackMap;
         private YamuraViewControls.Chart TractionCircle;
+        private ToolStripMenuItem timeAlignSetupToolStripMenuItem;
+        private ToolStripMenuItem distanceAlignSetupToolStripMenuItem;
     }
 }

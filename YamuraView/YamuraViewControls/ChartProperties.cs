@@ -45,18 +45,18 @@ namespace YamuraViewControls
             get { return cmbXAxis; }
             set { cmbXAxis = value; }
         }
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public ComboBox CmbAlignAxis
-        {
-            get { return cmbAlignAxis; }
-            set { cmbAlignAxis = value; }
-        }
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public TextBox TxtAutoThreshold
-        {
-            get { return txtAutoThreshold; }
-            set { txtAutoThreshold = value; }
-        }
+        //[DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        //public ComboBox CmbAlignAxis
+        //{
+        //    get { return cmbAlignAxis; }
+        //    set { cmbAlignAxis = value; }
+        //}
+        //[DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        //public TextBox TxtAutoThreshold
+        //{
+        //    get { return txtAutoThreshold; }
+        //    set { txtAutoThreshold = value; }
+        //}
         //Dictionary<string, Axis> chartAxes;// = new Dictionary<string, Axis>();
         //public Dictionary<string, Axis> ChartAxes
         //{
@@ -115,7 +115,6 @@ namespace YamuraViewControls
             set
             {
                 cmbXAxis.Text = value;
-                axisOffsetsGrid.Columns["axisOffset"].Visible = (cmbXAxis.Text == "Time");
             }
         }
         /// <summary>
@@ -137,22 +136,6 @@ namespace YamuraViewControls
             //axisOffsetsGrid.Columns["axisOffset"].Visible = false;
             //axisOffsetsGrid.Columns["axisChannel"].AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
             //axisOffsetsGrid.CellEndEdit += AxisOffsetsGrid_CellEndEdit;
-        }
-
-        private void AxisOffsetsGrid_CellEndEdit(object sender, DataGridViewCellEventArgs e)
-        {
-            // only handle change to offset value
-            if (e.ColumnIndex != axisOffsetsGrid.Columns["axisOffset"].Index)
-            {
-                return;
-            }
-            string[] channelInfo = axisOffsetsGrid.Rows[e.RowIndex].Cells["axisChannel"].Value.ToString().Split(new char[] { '-' });
-            int runIdx = Convert.ToInt32(channelInfo[0]);
-            string channelName = channelInfo[1];
-            //float offsetValue = Convert.ToSingle(axisOffsetsGrid.Rows[e.RowIndex].Cells["axisOffset"].Value);
-
-            //AxisOffsetUpdateEventArgs updateArgs = new AxisOffsetUpdateEventArgs(channelName, runIdx, 0, offsetValue);
-            //AxisOffsetUpdateEvent(this, updateArgs);
         }
         /// <summary>
         /// 
@@ -273,22 +256,11 @@ namespace YamuraViewControls
             //    btnDoAutoAlign.Enabled = true;
             //}
 
-            axisOffsetsGrid.Rows.Clear();
             for (int yAxisIdx = 0; yAxisIdx < ChartOwner.Y_Axes.Count; yAxisIdx++)
             {
                 if (ChartOwner.Y_Axes.ElementAt(yAxisIdx).Key == cmbXAxis.Text)
                 {
                     continue;
-                }
-                foreach (ChartChannel channel in ChartOwner.Y_Axes.ElementAt(yAxisIdx).Value.AssociatedChannels)
-                {
-                    axisOffsetsGrid.Rows.Add();
-                    axisOffsetsGrid.Rows[axisOffsetsGrid.Rows.Count - 1].Cells["axisChannel"].Value = channel.ChannelName;
-                    axisOffsetsGrid.Rows[axisOffsetsGrid.Rows.Count - 1].Cells["axisStart"].Value = channel.YRange[0].ToString();
-                    axisOffsetsGrid.Rows[axisOffsetsGrid.Rows.Count - 1].Cells["axisEnd"].Value = channel.YRange[1].ToString();
-                    axisOffsetsGrid.Rows[axisOffsetsGrid.Rows.Count - 1].Cells["axisOffset"].Value = 0;// channel.AxisOffset[0].ToString();
-                    // force recalculation of graphics path with new axis assignment
-                    channel.ChannelPath.Reset();
                 }
                 foreach (ChartChannel channel in ChartOwner.Y_Axes.ElementAt(yAxisIdx).Value.AssociatedChannels)
                 {
@@ -367,10 +339,10 @@ namespace YamuraViewControls
 
         }
         #region Auto align
-        private void btnDoAutoAlign_Click(object sender, EventArgs e)
-        {
-            AutoAlign(Convert.ToSingle(txtAutoThreshold.Text), cmbAlignAxis.Text);
-        }
+        //private void btnDoAutoAlign_Click(object sender, EventArgs e)
+        //{
+        //    AutoAlign(Convert.ToSingle(txtAutoThreshold.Text), cmbAlignAxis.Text);
+        //}
         /// <summary>
         /// estimate launch point offset from speed data
         /// find first speed > 30, walk back to first speed = 0
@@ -421,13 +393,23 @@ namespace YamuraViewControls
         /// <param name="e"></param>
         private void traceColorMenuItem_Click(object sender, EventArgs e)
         {
-            if((axisChannelTree.SelectedNode == null) ||
+            if ((axisChannelTree.SelectedNode == null) ||
                (axisChannelTree.SelectedNode.Tag == null) ||
                (colorDialog1.ShowDialog() != DialogResult.OK))
             {
                 return;
             }
             ((ChartChannel)axisChannelTree.SelectedNode.Tag).ChannelColor = colorDialog1.Color;
+        }
+
+        private void btnResetDistanceALign_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void label3_Click(object sender, EventArgs e)
+        {
+
         }
     }
     //public class AxisOffsetUpdateEventArgs : EventArgs
