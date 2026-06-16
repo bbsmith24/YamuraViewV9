@@ -36,7 +36,7 @@
             // chartPanel
             // 
             chartPanel.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            chartPanel.BackColor = SystemColors.ControlDarkDark;
+            chartPanel.BackColor = Color.Black;
             chartPanel.Location = new Point(20, 3);
             chartPanel.Name = "chartPanel";
             chartPanel.Size = new Size(130, 127);

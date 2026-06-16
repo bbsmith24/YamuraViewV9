@@ -1,4 +1,5 @@
 ﻿using GDI;
+using Microsoft.VisualBasic.Devices;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -80,7 +81,7 @@ namespace YamuraViewControls
             }
         }
 
-        protected int dragZoomPenWidth = 1;
+        protected int dragZoomPenWidth = 2;
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public List<bool> StartMouseDrag { get; set; }
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
@@ -553,8 +554,15 @@ namespace YamuraViewControls
                 #endregion
             }
         }
-        public void DrawCursorAtScaledPoint(PointF scaledPoint)
+        public void DrawCursorAtScaledPoint(PointF scaledPoint, int runIdx)
         {
+            if(StartMouseMove.Count < (runIdx + 1))
+            {
+                StartMouseMove.Add(false);
+                ChartStartCursorPos.Add(new Point());
+                ChartLastCursorPos.Add(new Point());
+                StartMouseDrag.Add(false);
+            }
             Axis primaryX = ChartOwner.X_Axes.ElementAtOrDefault(0).Value;
             Point screenPoint = new Point(0,0);
             if (primaryX == null)
@@ -604,19 +612,30 @@ namespace YamuraViewControls
             }
             displayScale[1] *= -1.0F;
             #endregion
-            screenPoint.X = (int)((scaledPoint.X - ChartOwner.X_Axes.ElementAt(0).Value.AxisDisplayRange[0]) * displayScale[0]);// - ChartOwner.ChartBorder;
-            screenPoint.Y = (int)((scaledPoint.Y - ChartOwner.Y_Axes.ElementAt(0).Value.AxisDisplayRange[1]) * displayScale[1]);// - ChartOwner.ChartBorder;
+            //screenPoint.X = (int)((scaledPoint.X - ChartOwner.X_Axes.ElementAt(0).Value.AxisDisplayRange[0]) * displayScale[0]) - ChartOwner.ChartBorder;
+            //screenPoint.Y = (int)((scaledPoint.Y - ChartOwner.Y_Axes.ElementAt(0).Value.AxisDisplayRange[1]) * displayScale[1]) - ChartOwner.ChartBorder;
+            screenPoint.X = (int)((scaledPoint.X - ChartOwner.X_Axes.ElementAt(0).Value.AxisDisplayRange[0]) * displayScale[0]) + ChartOwner.ChartBorder;
+            screenPoint.Y = (int)((scaledPoint.Y - ChartOwner.Y_Axes.ElementAt(0).Value.AxisDisplayRange[1]) * displayScale[1]) + ChartOwner.ChartBorder;
             //screenPoint = ScaleDataToDisplay(scaledPoint,
             //                   displayScale[0], displayScale[1],
             //                   ChartOwner.X_Axes.ElementAt(0).Value.AxisDisplayRange[0], ChartOwner.Y_Axes.ElementAt(0).Value.AxisDisplayRange[0],
             //                   Bounds);
             //Point screenPointInt = new Point((int)screenPoint.X, (int)screenPoint.Y);
-            //if (StartMouseMove[0])
-            //{
-            //    DrawCursorAt(ChartLastCursorPos[0].X, ChartLastCursorPos[0].Y);
-            //    StartMouseMove[0] = false;
-            //}
-            DrawCursorAtScreenPoint(screenPoint);
+            if (StartMouseMove[runIdx])
+            {
+                DrawCursorAtScreenPoint(ChartLastCursorPos[runIdx]);
+                StartMouseMove[runIdx] = false;
+            }
+            // Only draw if inside panel area
+            if ((screenPoint.X >= 0) &&
+                (screenPoint.Y >= 0) &&
+                (screenPoint.X <= chartPanel.Width) &&
+                (screenPoint.Y <= chartPanel.Height))
+            {
+                DrawCursorAtScreenPoint(screenPoint);
+                StartMouseMove[runIdx] = true;
+                ChartLastCursorPos[runIdx] = screenPoint;
+            }
         }
         /// <summary>
         /// 
@@ -736,6 +755,7 @@ namespace YamuraViewControls
                 return; 
             }
             float timeAtCursor = 0.0F;
+            float distanceAtCursor = 0.0F;
             //SortedList<string, SortedList<string, float>> valuesAtCursor = new SortedList<string, SortedList<string, float>>();
             try
             {
@@ -805,15 +825,21 @@ namespace YamuraViewControls
                     if (ChartOwner.XChannelName == "Time")
                     {
                         timeAtCursor = dataX;
+                        if (TryFindNearestKeyByValue(ds.channels["xDistance"].DataPoints, timeAtCursor, out float foundKey))
+                        {
+                            distanceAtCursor = ds.channels["xDistance"].DataPoints[foundKey];
+                        }
                     }
                     else if (ChartOwner.XChannelName == "xTime")
                     {
                         if (ds.channels != null && ds.channels.TryGetValue("xTime", out ChartChannel xt) && xt.DataPoints != null && xt.DataPoints.Count > 0)
+                        //if (ds.channels != null && ds.channels.TryGetValue("xDistance", out ChartChannel xt) && xt.DataPoints != null && xt.DataPoints.Count > 0)
                         {
 
                             if (TryFindNearestKeyByValue(xt.DataPoints, dataX, out float foundKey))
                             {
                                 timeAtCursor = foundKey;
+                                distanceAtCursor = xt.DataPoints[foundKey];
                             }
                         }
                     }
@@ -822,12 +848,20 @@ namespace YamuraViewControls
                         if (ds.channels != null && ds.channels.TryGetValue(ChartOwner.XChannelName, out ChartChannel axisChan) && axisChan.DataPoints != null && axisChan.DataPoints.Count > 0)
                         {
                             if (TryFindNearestKeyByValue(axisChan.DataPoints, dataX, out float foundKey))
+                            {
                                 timeAtCursor = foundKey;
+                            }
+                            if (TryFindNearestKeyByValue(ds.channels["xDistance"].DataPoints, timeAtCursor, out foundKey))
+                            {
+                                distanceAtCursor = ds.channels["xDistance"].DataPoints[foundKey];
+                            }
+
                         }
                     }
+                    //System.Diagnostics.Debug.WriteLine("At cursor Time: " + timeAtCursor + " Distance " +  distanceAtCursor);
                     if (!outArgs.XAxisValues.ContainsKey(ChartOwner.XChannelName))
                     {
-                        outArgs.XAxisValues.Add(ChartOwner.XChannelName, timeAtCursor);
+                        outArgs.XAxisValues.Add(ds.DataSetName, timeAtCursor);
                     }
                 }
 
@@ -845,12 +879,13 @@ namespace YamuraViewControls
                         // (for track map and traction circle updates)
                         // will need to change this if I allow anything on X axis in other charts
                         if ((!chan.ShowChannel) && ((chan.ChannelSource != "IMU") &&
-                                                    (chan.ChannelSource != "GPS")))
+                                                    (chan.ChannelSource != "GPS") &&
+                                                    (chan.ChannelSource != "Calculated")))
                         { 
                             continue; 
                         }
                         //string dsKey = chan.DataSetIndex.ToString() + "-Time";
-                        float sampleTime = outArgs.XAxisValues.TryGetValue(ChartOwner.XChannelName, out float tval) ? tval : dataX;
+                        float sampleTime = outArgs.XAxisValues[chan.DataSetName];//.TryGetValue(ChartOwner.XChannelName, out float tval) ? tval : dataX;
                         float foundY = 0.0F;
                         if (chan.DataPoints != null && chan.DataPoints.Count > 0 && TryFindNearestValue(chan.DataPoints, sampleTime, out foundY))
                         {
@@ -881,15 +916,15 @@ namespace YamuraViewControls
                 }
                 // Raise event for listeners (other charts) with mapped X and channel values
                 ChartMouseTrackEvent?.Invoke(this, outArgs);
-                System.Diagnostics.Debug.WriteLine("Time : " + timeAtCursor.ToString());
-                foreach (KeyValuePair<string, SortedList<string, float>> valueAtCursor in outArgs.YAxisValues)
-                {
-                    System.Diagnostics.Debug.WriteLine("\t" + valueAtCursor.Key);
-                    foreach(KeyValuePair<string, float> value in valueAtCursor.Value)
-                    {
-                        System.Diagnostics.Debug.WriteLine("\t\t" + value.Key + "\t" + value.Value);
-                    }
-                }
+                //System.Diagnostics.Debug.WriteLine("Time : " + timeAtCursor.ToString());
+                //foreach (KeyValuePair<string, SortedList<string, float>> valueAtCursor in outArgs.YAxisValues)
+                //{
+                //    System.Diagnostics.Debug.WriteLine("\t" + valueAtCursor.Key);
+                //    foreach(KeyValuePair<string, float> value in valueAtCursor.Value)
+                //    {
+                //        System.Diagnostics.Debug.WriteLine("\t\t" + value.Key + "\t" + value.Value);
+                //    }
+                //}
                 //Graphics g = chartPanel.CreateGraphics();
             }
             catch (Exception ex)

@@ -272,38 +272,40 @@ namespace YamuraViewControls
         /// <param name="e"></param>
         public void OnChartMouseTrack(object sender, ChartControlMouseTrackEventArgs e)
         {
-            System.Diagnostics.Debug.WriteLine(Name);
-            System.Diagnostics.Debug.WriteLine("At time " + e.XAxisValues.ElementAt(0).Value.ToString());
+            //System.Diagnostics.Debug.WriteLine(Name);
+            //System.Diagnostics.Debug.WriteLine("At time " + e.XAxisValues.ElementAt(0).Value.ToString());
             PointF scaledPoint = new PointF(0, 0);
+            int runIdx = 0;
             foreach (KeyValuePair<string, SortedList<string, float>> channels in e.YAxisValues)
             {
-                foreach (KeyValuePair<string, float> values in channels.Value)
+                foreach (KeyValuePair<string, float> channel in channels.Value)
                 {
                     if (Name == "TractionCircle")
                     {
-                        if (values.Key == "gX")
+                        if (channel.Key == "gX")
                         {
-                            scaledPoint.X = values.Value;
+                            scaledPoint.X = channel.Value;
                         }
-                        if (values.Key == "gY")
+                        if (channel.Key == "gY")
                         {
-                            scaledPoint.Y = values.Value;
+                            scaledPoint.Y = channel.Value;
                         }
                     }
                     if (Name == "TrackMap")
                     {
-                        if (values.Key == "Longitude")
+                        if (channel.Key == "Longitude")
                         {
-                            scaledPoint.X = values.Value;
+                            scaledPoint.X = channel.Value;
                         }
-                        if (values.Key == "Latitude")
+                        if (channel.Key == "Latitude")
                         {
-                            scaledPoint.Y = values.Value;
+                            scaledPoint.Y = channel.Value;
                         }
                     }
-                    System.Diagnostics.Debug.WriteLine("Chart " + ChartName + " draw cursor at " + scaledPoint.ToString());
-                    chartView1.DrawCursorAtScaledPoint(scaledPoint);
                 }
+                //System.Diagnostics.Debug.WriteLine("Chart " + ChartName + " draw cursor " + runIdx + " at " + scaledPoint.ToString());
+                chartView1.DrawCursorAtScaledPoint(scaledPoint, runIdx);
+                runIdx++;
             }
             //float timeAtCursor = 0.0F;
             //Dictionary<string, SortedList<string, float>> valuesAtCursor = new Dictionary<string, SortedList<string, float>>();
