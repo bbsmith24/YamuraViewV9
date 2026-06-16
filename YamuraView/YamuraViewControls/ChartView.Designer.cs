@@ -42,6 +42,7 @@
             chartPanel.Size = new Size(130, 127);
             chartPanel.TabIndex = 0;
             chartPanel.Paint += chartPanel_Paint;
+            chartPanel.MouseMove += OnChartMouseMove;
             chartPanel.Resize += chartPanel_Resize;
             // 
             // vScrollBar

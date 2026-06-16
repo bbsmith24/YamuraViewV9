@@ -72,6 +72,7 @@
             // 
             // StripChart
             // 
+            StripChart.ChartName = "StripChart";
             StripChart.Dock = DockStyle.Fill;
             StripChart.Location = new Point(0, 0);
             StripChart.Name = "StripChart";
@@ -98,6 +99,7 @@
             // 
             // TrackMap
             // 
+            TrackMap.ChartName = "Track Map";
             TrackMap.Dock = DockStyle.Fill;
             TrackMap.Location = new Point(0, 0);
             TrackMap.Name = "TrackMap";
@@ -106,6 +108,7 @@
             // 
             // TractionCircle
             // 
+            TractionCircle.ChartName = "Traction Circle";
             TractionCircle.Dock = DockStyle.Fill;
             TractionCircle.Location = new Point(0, 0);
             TractionCircle.Name = "TractionCircle";

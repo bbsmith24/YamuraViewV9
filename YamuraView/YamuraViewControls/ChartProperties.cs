@@ -159,20 +159,24 @@ namespace YamuraViewControls
             {
                 return;
             }
-            string channelName;
-            string channelDataSet;
             // this channel in all data sets is shown/hidden, so update all channel in all data sets
             if (e.Node.Parent == null)
             {
                 foreach (TreeNode channelNode in e.Node.Nodes)
                 {
-                    (channelNode.Tag as ChartChannel).ShowChannel = e.Node.Checked;
+                    if ((channelNode.Tag != null) && (channelNode.Tag is ChartChannel chartChannel))
+                    {
+                        chartChannel.ShowChannel = e.Node.Checked;
+                    }
                 }
             }
             // only selected channel is shown/hidden, so update only selected channel
             else
             {
-                (e.Node.Tag as ChartChannel).ShowChannel = e.Node.Checked;
+                if (e.Node.Tag is ChartChannel chartChannel)
+                {
+                    chartChannel.ShowChannel = e.Node.Checked;
+                }
             }
         }
         /// <summary>

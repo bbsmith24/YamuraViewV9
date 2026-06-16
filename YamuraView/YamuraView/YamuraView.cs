@@ -13,6 +13,7 @@ using System.Windows.Forms.Design;
 using System.Windows.Forms.VisualStyles;
 using Win32Interop.Methods;
 using Win32Interop.Structs;
+using YamuraViewControls;
 
 namespace YamuraView
 {
@@ -41,33 +42,49 @@ namespace YamuraView
             InitializeComponent();
             FolderToWatch = @"C:\ftp_transfer";
             StripChart.ChartViewType = YamuraViewControls.Chart.ChartType.Stripchart;
+            StripChart.ChartName = "Strip Chart";
+            StripChart.EqualScale = false;
+
             TrackMap.ChartViewType = YamuraViewControls.Chart.ChartType.XYChart;
+            TrackMap.ChartName = "Track Map";
+            TrackMap.EqualScale = true;
+
             TractionCircle.ChartViewType = YamuraViewControls.Chart.ChartType.XYChart;
-            TractionCircle.ChartViewType = YamuraViewControls.Chart.ChartType.XYChart;
+            TractionCircle.ChartName = "Traction Circle";
+            TractionCircle.EqualScale = true;
 
             chartControls.Add(StripChart);
             chartControls.Add(TrackMap);
             chartControls.Add(TractionCircle);
+            chartControls[0].CursorMode = YamuraViewControls.ChartView.CursorStyle.VERTICAL;
+            chartControls[0].CursorUpdateSource = true;
+            chartControls[1].CursorMode = YamuraViewControls.ChartView.CursorStyle.BOX;
+            chartControls[1].CursorUpdateSource = false;
+            chartControls[2].CursorMode = YamuraViewControls.ChartView.CursorStyle.BOX;
+            chartControls[2].CursorUpdateSource = false;
 
             #region chart control event handlers
             chartControls[0].chartProperties1.ChartXAxisChangeEvent += chartControls[0].chartView1.OnChartXAxisChange;
+            chartControls[1].chartProperties1.ChartXAxisChangeEvent += chartControls[1].chartView1.OnChartXAxisChange;
+            chartControls[2].chartProperties1.ChartXAxisChangeEvent += chartControls[2].chartView1.OnChartXAxisChange;
+
             chartControls[0].chartProperties1.ClearGraphicsPathEvent += chartControls[0].chartView1.OnClearGraphicsPath;
             chartControls[0].chartProperties1.ClearGraphicsPathEvent += chartControls[1].chartView1.OnClearGraphicsPath;
             chartControls[0].chartProperties1.ClearGraphicsPathEvent += chartControls[2].chartView1.OnClearGraphicsPath;
 
-            chartControls[1].chartProperties1.ChartXAxisChangeEvent += chartControls[1].chartView1.OnChartXAxisChange;
             chartControls[1].chartProperties1.ClearGraphicsPathEvent += chartControls[0].chartView1.OnClearGraphicsPath;
             chartControls[1].chartProperties1.ClearGraphicsPathEvent += chartControls[1].chartView1.OnClearGraphicsPath;
             chartControls[1].chartProperties1.ClearGraphicsPathEvent += chartControls[2].chartView1.OnClearGraphicsPath;
 
-            chartControls[2].chartProperties1.ChartXAxisChangeEvent += chartControls[2].chartView1.OnChartXAxisChange;
+
             chartControls[2].chartProperties1.ClearGraphicsPathEvent += chartControls[0].chartView1.OnClearGraphicsPath;
             chartControls[2].chartProperties1.ClearGraphicsPathEvent += chartControls[1].chartView1.OnClearGraphicsPath;
             chartControls[2].chartProperties1.ClearGraphicsPathEvent += chartControls[2].chartView1.OnClearGraphicsPath;
-            // stripchart mouse move event handlers
-            //chartControls[0].chartView1.ChartMouseMoveEvent += OnChartMouseMove;// new ChartMouseMove(OnChartMouseMove);
-            //chartControls[0].chartView1.ChartMouseMoveEvent += chartControls[1].chartView1.OnChartMouseMove;
-            //chartControls[0].chartView1.ChartMouseMoveEvent += chartControls[2].chartView1.OnChartMouseMove;
+
+
+            chartControls[0].chartView1.ChartMouseTrackEvent += chartControls[1].OnChartMouseTrack;
+            chartControls[0].chartView1.ChartMouseTrackEvent += chartControls[2].OnChartMouseTrack;
+
             #endregion
         }
         #region read various log file formats
@@ -232,9 +249,9 @@ namespace YamuraView
                     gY = Convert.ToSingle(splitStr[yValIdx]);
                     gZ = Convert.ToSingle(splitStr[zValIdx]);
                     // add channel (only if needed)
-                    dataLogger.runData[runIdx].AddChannel("gX", "X Axis Acceleration", "Accelerometer", runName, 1.0F);
-                    dataLogger.runData[runIdx].AddChannel("gY", "Y Axis Acceleration", "Accelerometer", runName, 1.0F);
-                    dataLogger.runData[runIdx].AddChannel("gZ", "Z Axis Acceleration", "Accelerometer", runName, 1.0F);
+                    dataLogger.runData[runIdx].AddChannel("gX", "X Axis Acceleration", "IMU", runName, 1.0F);
+                    dataLogger.runData[runIdx].AddChannel("gY", "Y Axis Acceleration", "IMU", runName, 1.0F);
+                    dataLogger.runData[runIdx].AddChannel("gZ", "Z Axis Acceleration", "IMU", runName, 1.0F);
                     // add data to channel
                     dataLogger.runData[runIdx].channels["gX"].AddPoint(timestampSeconds, gX);
                     dataLogger.runData[runIdx].channels["gY"].AddPoint(timestampSeconds, gY);
@@ -267,7 +284,6 @@ namespace YamuraView
             bool gpsDistanceValid = false;
             StringBuilder errStr = new StringBuilder();
 
-            String[] splitStr;
             String runName = GetFileName(fileName, false);
             dataLogger.runData.Add(new RunData(runName));
             runIdx = dataLogger.runData.Count;
@@ -374,9 +390,9 @@ namespace YamuraView
                     {
                         inFile.ReadUInt32();
                         // add channel (only if needed)
-                        dataLogger.runData[runIdx].AddChannel("gX", "X Axis Acceleration", "Accelerometer", runName, 1.0F);
-                        dataLogger.runData[runIdx].AddChannel("gY", "Y Axis Acceleration", "Accelerometer", runName, 1.0F);
-                        dataLogger.runData[runIdx].AddChannel("gZ", "Z Axis Acceleration", "Accelerometer", runName, 1.0F);
+                        dataLogger.runData[runIdx].AddChannel("gX", "X Axis Acceleration", "IMU", runName, 1.0F);
+                        dataLogger.runData[runIdx].AddChannel("gY", "Y Axis Acceleration", "IMU", runName, 1.0F);
+                        dataLogger.runData[runIdx].AddChannel("gZ", "Z Axis Acceleration", "IMU", runName, 1.0F);
                         Single accelVal = 0.0F;
                         for (int valIdx = 0; valIdx < 3; valIdx++)
                         {
@@ -530,21 +546,16 @@ namespace YamuraView
                             float az = inFile.ReadSingle();
                             if (!dataLogger.runData[runIdx].channels.ContainsKey("gX"))
                             {
-                                dataLogger.runData[runIdx].AddChannel("gX", "Accelerometer channel " + "gX", "G", runName, 1.0F);
+                                dataLogger.runData[runIdx].AddChannel("gX", "Accelerometer channel " + "gX", "IMU", runName, 1.0F);
                             }
                             if (!dataLogger.runData[runIdx].channels.ContainsKey("gY"))
                             {
-                                dataLogger.runData[runIdx].AddChannel("gY", "Accelerometer channel " + "gY", "G", runName, 1.0F);
+                                dataLogger.runData[runIdx].AddChannel("gY", "Accelerometer channel " + "gY", "IMU", runName, 1.0F);
                             }
                             if (!dataLogger.runData[runIdx].channels.ContainsKey("gZ"))
                             {
-                                dataLogger.runData[runIdx].AddChannel("gZ", "Accelerometer channel " + "gZ", "G", runName, 1.0F);
+                                dataLogger.runData[runIdx].AddChannel("gZ", "Accelerometer channel " + "gZ", "IMU", runName, 1.0F);
                             }
-                            //System.Diagnostics.Debug.WriteLine(absTime.ToString() +
-                            //                                   "\tIMU\t" +
-                            //                                   ax.ToString() + "\t" +
-                            //                                   ay.ToString() + "\t" +
-                            //                                   az.ToString());
                             dataLogger.runData[runIdx].channels["gX"].AddPoint(absTime, ax);
                             dataLogger.runData[runIdx].channels["gY"].AddPoint(absTime, ay);
                             dataLogger.runData[runIdx].channels["gZ"].AddPoint(absTime, az);
@@ -1147,7 +1158,6 @@ namespace YamuraView
                 return;
             }
             int runIdx = dataLogger.runData.Count - 1;
-            int channelIdx = 0;
             string xAxisName = "X Axis";
             string yAxisName = "Y Axis";
             #region update display info

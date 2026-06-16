@@ -65,7 +65,7 @@
             chartView1.Dock = DockStyle.Fill;
             chartView1.Location = new Point(3, 3);
             chartView1.Name = "chartView1";
-            chartView1.Size = new Size(837, 497);
+            //chartView1.Size = new Size(837, 497);
             chartView1.TabIndex = 0;
             // 
             // tabPage2
@@ -75,7 +75,7 @@
             tabPage2.Location = new Point(4, 24);
             tabPage2.Name = "tabPage2";
             tabPage2.Padding = new Padding(3);
-            tabPage2.Size = new Size(843, 503);
+            //tabPage2.Size = new Size(843, 503);
             tabPage2.TabIndex = 1;
             tabPage2.Text = "Properties";
             // 
@@ -85,7 +85,7 @@
             chartProperties1.Location = new Point(3, 3);
             chartProperties1.Margin = new Padding(4, 3, 4, 3);
             chartProperties1.Name = "chartProperties1";
-            chartProperties1.Size = new Size(837, 497);
+            //chartProperties1.Size = new Size(837, 497);
             chartProperties1.TabIndex = 0;
             // 
             // Chart

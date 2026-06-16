@@ -3,48 +3,40 @@
   "WorkspaceRootPath": "E:\\GitHub\\YamuraViewV9\\YamuraViewV9\\YamuraView\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{4682F407-4E90-4F4E-B1C1-4B8D68629D49}|YamuraViewControls\\YamuraViewControls.csproj|e:\\github\\yamuraviewv9\\yamuraviewv9\\yamuraview\\yamuraviewcontrols\\chart.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{4682F407-4E90-4F4E-B1C1-4B8D68629D49}|YamuraViewControls\\YamuraViewControls.csproj|solutionrelative:yamuraviewcontrols\\chart.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{4682F407-4E90-4F4E-B1C1-4B8D68629D49}|YamuraViewControls\\YamuraViewControls.csproj|e:\\github\\yamuraviewv9\\yamuraviewv9\\yamuraview\\yamuraviewcontrols\\chartview.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{4682F407-4E90-4F4E-B1C1-4B8D68629D49}|YamuraViewControls\\YamuraViewControls.csproj|solutionrelative:yamuraviewcontrols\\chartview.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{4682F407-4E90-4F4E-B1C1-4B8D68629D49}|YamuraViewControls\\YamuraViewControls.csproj|e:\\github\\yamuraviewv9\\yamuraviewv9\\yamuraview\\yamuraviewcontrols\\channelcolorselector.designer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{4682F407-4E90-4F4E-B1C1-4B8D68629D49}|YamuraViewControls\\YamuraViewControls.csproj|solutionrelative:yamuraviewcontrols\\channelcolorselector.designer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{307DFF32-1565-4813-86B5-6B283D008BBE}|YamuraView\\YamuraView.csproj|e:\\github\\yamuraviewv9\\yamuraviewv9\\yamuraview\\yamuraview\\yamuraview.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{307DFF32-1565-4813-86B5-6B283D008BBE}|YamuraView\\YamuraView.csproj|solutionrelative:yamuraview\\yamuraview.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{307DFF32-1565-4813-86B5-6B283D008BBE}|YamuraView\\YamuraView.csproj|e:\\github\\yamuraviewv9\\yamuraviewv9\\yamuraview\\yamuraview\\timealigndialog.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
-      "RelativeMoniker": "D:0:0:{307DFF32-1565-4813-86B5-6B283D008BBE}|YamuraView\\YamuraView.csproj|solutionrelative:yamuraview\\timealigndialog.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
+      "AbsoluteMoniker": "D:0:0:{4682F407-4E90-4F4E-B1C1-4B8D68629D49}|YamuraViewControls\\YamuraViewControls.csproj|E:\\GitHub\\YamuraViewV9\\YamuraViewV9\\YamuraView\\yamuraviewcontrols\\chart.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
+      "RelativeMoniker": "D:0:0:{4682F407-4E90-4F4E-B1C1-4B8D68629D49}|YamuraViewControls\\YamuraViewControls.csproj|solutionrelative:yamuraviewcontrols\\chart.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{307DFF32-1565-4813-86B5-6B283D008BBE}|YamuraView\\YamuraView.csproj|e:\\github\\yamuraviewv9\\yamuraviewv9\\yamuraview\\yamuraview\\timealigndialog.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{307DFF32-1565-4813-86B5-6B283D008BBE}|YamuraView\\YamuraView.csproj|solutionrelative:yamuraview\\timealigndialog.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{307DFF32-1565-4813-86B5-6B283D008BBE}|YamuraView\\YamuraView.csproj|e:\\github\\yamuraviewv9\\yamuraviewv9\\yamuraview\\yamuraview\\timealigndialog.designer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{307DFF32-1565-4813-86B5-6B283D008BBE}|YamuraView\\YamuraView.csproj|solutionrelative:yamuraview\\timealigndialog.designer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{307DFF32-1565-4813-86B5-6B283D008BBE}|YamuraView\\YamuraView.csproj|E:\\GitHub\\YamuraViewV9\\YamuraViewV9\\YamuraView\\yamuraview\\yamuraview.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
+      "AbsoluteMoniker": "D:0:0:{307DFF32-1565-4813-86B5-6B283D008BBE}|YamuraView\\YamuraView.csproj|e:\\github\\yamuraviewv9\\yamuraviewv9\\yamuraview\\yamuraview\\yamuraview.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
       "RelativeMoniker": "D:0:0:{307DFF32-1565-4813-86B5-6B283D008BBE}|YamuraView\\YamuraView.csproj|solutionrelative:yamuraview\\yamuraview.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{4682F407-4E90-4F4E-B1C1-4B8D68629D49}|YamuraViewControls\\YamuraViewControls.csproj|e:\\github\\yamuraviewv9\\yamuraviewv9\\yamuraview\\yamuraviewcontrols\\chart.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{4682F407-4E90-4F4E-B1C1-4B8D68629D49}|YamuraViewControls\\YamuraViewControls.csproj|solutionrelative:yamuraviewcontrols\\chart.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{4682F407-4E90-4F4E-B1C1-4B8D68629D49}|YamuraViewControls\\YamuraViewControls.csproj|e:\\github\\yamuraviewv9\\yamuraviewv9\\yamuraview\\yamuraviewcontrols\\chartproperties.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{4682F407-4E90-4F4E-B1C1-4B8D68629D49}|YamuraViewControls\\YamuraViewControls.csproj|solutionrelative:yamuraviewcontrols\\chartproperties.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{4682F407-4E90-4F4E-B1C1-4B8D68629D49}|YamuraViewControls\\YamuraViewControls.csproj|e:\\github\\yamuraviewv9\\yamuraviewv9\\yamuraview\\yamuraviewcontrols\\chartview.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
+      "RelativeMoniker": "D:0:0:{4682F407-4E90-4F4E-B1C1-4B8D68629D49}|YamuraViewControls\\YamuraViewControls.csproj|solutionrelative:yamuraviewcontrols\\chartview.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
     },
     {
       "AbsoluteMoniker": "D:0:0:{4682F407-4E90-4F4E-B1C1-4B8D68629D49}|YamuraViewControls\\YamuraViewControls.csproj|e:\\github\\yamuraviewv9\\yamuraviewv9\\yamuraview\\yamuraviewcontrols\\chartproperties.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
       "RelativeMoniker": "D:0:0:{4682F407-4E90-4F4E-B1C1-4B8D68629D49}|YamuraViewControls\\YamuraViewControls.csproj|solutionrelative:yamuraviewcontrols\\chartproperties.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{4682F407-4E90-4F4E-B1C1-4B8D68629D49}|YamuraViewControls\\YamuraViewControls.csproj|E:\\GitHub\\YamuraViewV9\\YamuraViewV9\\YamuraView\\yamuraviewcontrols\\chart.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
-      "RelativeMoniker": "D:0:0:{4682F407-4E90-4F4E-B1C1-4B8D68629D49}|YamuraViewControls\\YamuraViewControls.csproj|solutionrelative:yamuraviewcontrols\\chart.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{4682F407-4E90-4F4E-B1C1-4B8D68629D49}|YamuraViewControls\\YamuraViewControls.csproj|e:\\github\\yamuraviewv9\\yamuraviewv9\\yamuraview\\yamuraviewcontrols\\display_info.cs||{8B382828-6202-11D1-8870-0000F87579D2}",
-      "RelativeMoniker": "D:0:0:{4682F407-4E90-4F4E-B1C1-4B8D68629D49}|YamuraViewControls\\YamuraViewControls.csproj|solutionrelative:yamuraviewcontrols\\display_info.cs||{8B382828-6202-11D1-8870-0000F87579D2}"
+      "AbsoluteMoniker": "D:0:0:{4682F407-4E90-4F4E-B1C1-4B8D68629D49}|YamuraViewControls\\YamuraViewControls.csproj|e:\\github\\yamuraviewv9\\yamuraviewv9\\yamuraview\\yamuraviewcontrols\\chartproperties.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{4682F407-4E90-4F4E-B1C1-4B8D68629D49}|YamuraViewControls\\YamuraViewControls.csproj|solutionrelative:yamuraviewcontrols\\chartproperties.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -54,7 +46,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 15,
+          "SelectedChildIndex": 10,
           "Children": [
             {
               "$type": "Bookmark",
@@ -77,16 +69,34 @@
               "Name": "ST:0:0:{eefa5220-e298-11d0-8f78-00a0c9110057}"
             },
             {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{aa2115a1-9712-457b-9047-dbb71ca2cdd2}"
+            },
+            {
               "$type": "Document",
-              "DocumentIndex": 8,
-              "Title": "ChartProperties.cs [Design]",
-              "DocumentMoniker": "E:\\GitHub\\YamuraViewV9\\YamuraViewV9\\YamuraView\\YamuraViewControls\\ChartProperties.cs",
-              "RelativeDocumentMoniker": "YamuraViewControls\\ChartProperties.cs",
-              "ToolTip": "E:\\GitHub\\YamuraViewV9\\YamuraViewV9\\YamuraView\\YamuraViewControls\\ChartProperties.cs [Design]",
-              "RelativeToolTip": "YamuraViewControls\\ChartProperties.cs [Design]",
+              "DocumentIndex": 2,
+              "Title": "ChannelColorSelector.Designer.cs",
+              "DocumentMoniker": "E:\\GitHub\\YamuraViewV9\\YamuraViewV9\\YamuraView\\YamuraViewControls\\ChannelColorSelector.Designer.cs",
+              "RelativeDocumentMoniker": "YamuraViewControls\\ChannelColorSelector.Designer.cs",
+              "ToolTip": "E:\\GitHub\\YamuraViewV9\\YamuraViewV9\\YamuraView\\YamuraViewControls\\ChannelColorSelector.Designer.cs",
+              "RelativeToolTip": "YamuraViewControls\\ChannelColorSelector.Designer.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAcAAAAxAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-06-13T11:23:25.832Z",
-              "EditorCaption": " [Design]"
+              "WhenOpened": "2026-06-15T22:24:34.502Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "YamuraView.cs",
+              "DocumentMoniker": "E:\\GitHub\\YamuraViewV9\\YamuraViewV9\\YamuraView\\YamuraView\\YamuraView.cs",
+              "RelativeDocumentMoniker": "YamuraView\\YamuraView.cs",
+              "ToolTip": "E:\\GitHub\\YamuraViewV9\\YamuraViewV9\\YamuraView\\YamuraView\\YamuraView.cs",
+              "RelativeToolTip": "YamuraView\\YamuraView.cs",
+              "ViewState": "AgIAACkAAAAAAAAAAAAwwC4AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-06-15T11:53:07.792Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -97,25 +107,12 @@
               "ToolTip": "E:\\GitHub\\YamuraViewV9\\YamuraViewV9\\YamuraView\\YamuraView\\YamuraView.cs [Design]",
               "RelativeToolTip": "YamuraView\\YamuraView.cs [Design]",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-06-13T13:15:03.855Z",
+              "WhenOpened": "2026-06-15T11:53:04.75Z",
               "EditorCaption": " [Design]"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "YamuraView.cs",
-              "DocumentMoniker": "E:\\GitHub\\YamuraViewV9\\YamuraViewV9\\YamuraView\\YamuraView\\YamuraView.cs",
-              "RelativeDocumentMoniker": "YamuraView\\YamuraView.cs",
-              "ToolTip": "E:\\GitHub\\YamuraViewV9\\YamuraViewV9\\YamuraView\\YamuraView\\YamuraView.cs",
-              "RelativeToolTip": "YamuraView\\YamuraView.cs",
-              "ViewState": "AgIAALYFAAAAAAAAAAAqwNEFAAAIAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-06-10T22:01:21.153Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 9,
+              "DocumentIndex": 4,
               "Title": "Chart.cs [Design]",
               "DocumentMoniker": "E:\\GitHub\\YamuraViewV9\\YamuraViewV9\\YamuraView\\YamuraViewControls\\Chart.cs",
               "RelativeDocumentMoniker": "YamuraViewControls\\Chart.cs",
@@ -127,89 +124,63 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 6,
+              "DocumentIndex": 0,
               "Title": "Chart.cs",
               "DocumentMoniker": "E:\\GitHub\\YamuraViewV9\\YamuraViewV9\\YamuraView\\YamuraViewControls\\Chart.cs",
               "RelativeDocumentMoniker": "YamuraViewControls\\Chart.cs",
               "ToolTip": "E:\\GitHub\\YamuraViewV9\\YamuraViewV9\\YamuraView\\YamuraViewControls\\Chart.cs",
               "RelativeToolTip": "YamuraViewControls\\Chart.cs",
-              "ViewState": "AgIAAGIAAAAAAAAAAAAIwHYAAABOAAAAAAAAAA==",
+              "ViewState": "AgIAAAkBAAAAAAAAAAAqwDEBAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-06-10T16:23:06.753Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
-              "Title": "TimeAlignDialog.Designer.cs",
-              "DocumentMoniker": "E:\\GitHub\\YamuraViewV9\\YamuraViewV9\\YamuraView\\YamuraView\\TimeAlignDialog.Designer.cs",
-              "RelativeDocumentMoniker": "YamuraView\\TimeAlignDialog.Designer.cs",
-              "ToolTip": "E:\\GitHub\\YamuraViewV9\\YamuraViewV9\\YamuraView\\YamuraView\\TimeAlignDialog.Designer.cs",
-              "RelativeToolTip": "YamuraView\\TimeAlignDialog.Designer.cs",
-              "ViewState": "AgIAAGMAAAAAAAAAAAD4v3AAAAAAAAAAAAAAAA==",
+              "DocumentIndex": 7,
+              "Title": "ChartProperties.cs [Design]",
+              "DocumentMoniker": "E:\\GitHub\\YamuraViewV9\\YamuraViewV9\\YamuraView\\YamuraViewControls\\ChartProperties.cs",
+              "RelativeDocumentMoniker": "YamuraViewControls\\ChartProperties.cs",
+              "ToolTip": "E:\\GitHub\\YamuraViewV9\\YamuraViewV9\\YamuraView\\YamuraViewControls\\ChartProperties.cs [Design]",
+              "RelativeToolTip": "YamuraViewControls\\ChartProperties.cs [Design]",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-06-14T00:54:16.492Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 3,
-              "Title": "TimeAlignDialog.cs",
-              "DocumentMoniker": "E:\\GitHub\\YamuraViewV9\\YamuraViewV9\\YamuraView\\YamuraView\\TimeAlignDialog.cs",
-              "RelativeDocumentMoniker": "YamuraView\\TimeAlignDialog.cs",
-              "ToolTip": "E:\\GitHub\\YamuraViewV9\\YamuraViewV9\\YamuraView\\YamuraView\\TimeAlignDialog.cs",
-              "RelativeToolTip": "YamuraView\\TimeAlignDialog.cs",
-              "ViewState": "AgIAAAkAAAAAAAAAAAAAAD0AAAABAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-06-14T00:52:50.014Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "TimeAlignDialog.cs [Design]",
-              "DocumentMoniker": "E:\\GitHub\\YamuraViewV9\\YamuraViewV9\\YamuraView\\YamuraView\\TimeAlignDialog.cs",
-              "RelativeDocumentMoniker": "YamuraView\\TimeAlignDialog.cs",
-              "ToolTip": "E:\\GitHub\\YamuraViewV9\\YamuraViewV9\\YamuraView\\YamuraView\\TimeAlignDialog.cs [Design]",
-              "RelativeToolTip": "YamuraView\\TimeAlignDialog.cs [Design]",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-06-14T00:47:47.612Z",
+              "WhenOpened": "2026-06-13T11:23:25.832Z",
               "EditorCaption": " [Design]"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 10,
-              "Title": "Display_Info.cs",
-              "DocumentMoniker": "E:\\GitHub\\YamuraViewV9\\YamuraViewV9\\YamuraView\\YamuraViewControls\\Display_Info.cs",
-              "RelativeDocumentMoniker": "YamuraViewControls\\Display_Info.cs",
-              "ToolTip": "E:\\GitHub\\YamuraViewV9\\YamuraViewV9\\YamuraView\\YamuraViewControls\\Display_Info.cs",
-              "RelativeToolTip": "YamuraViewControls\\Display_Info.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-06-13T13:43:24.151Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 7,
+              "DocumentIndex": 8,
               "Title": "ChartProperties.cs",
               "DocumentMoniker": "E:\\GitHub\\YamuraViewV9\\YamuraViewV9\\YamuraView\\YamuraViewControls\\ChartProperties.cs",
               "RelativeDocumentMoniker": "YamuraViewControls\\ChartProperties.cs",
               "ToolTip": "E:\\GitHub\\YamuraViewV9\\YamuraViewV9\\YamuraView\\YamuraViewControls\\ChartProperties.cs",
               "RelativeToolTip": "YamuraViewControls\\ChartProperties.cs",
-              "ViewState": "AgIAAEoBAAAAAAAAAAAuwFgBAAALAAAAAAAAAA==",
+              "ViewState": "AgIAAJkAAAAAAAAAAADgv6oAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-06-10T15:09:00.278Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 6,
+              "Title": "ChartView.cs [Design]",
+              "DocumentMoniker": "E:\\GitHub\\YamuraViewV9\\YamuraViewV9\\YamuraView\\YamuraViewControls\\ChartView.cs",
+              "RelativeDocumentMoniker": "YamuraViewControls\\ChartView.cs",
+              "ToolTip": "E:\\GitHub\\YamuraViewV9\\YamuraViewV9\\YamuraView\\YamuraViewControls\\ChartView.cs [Design]",
+              "RelativeToolTip": "YamuraViewControls\\ChartView.cs [Design]",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-06-14T21:58:44.933Z",
+              "EditorCaption": " [Design]"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
               "Title": "ChartView.cs",
               "DocumentMoniker": "E:\\GitHub\\YamuraViewV9\\YamuraViewV9\\YamuraView\\YamuraViewControls\\ChartView.cs",
               "RelativeDocumentMoniker": "YamuraViewControls\\ChartView.cs",
               "ToolTip": "E:\\GitHub\\YamuraViewV9\\YamuraViewV9\\YamuraView\\YamuraViewControls\\ChartView.cs",
               "RelativeToolTip": "YamuraViewControls\\ChartView.cs",
-              "ViewState": "AgIAANEAAAAAAAAAAAAYwOwAAAAaAAAAAAAAAA==",
+              "ViewState": "AgIAALkBAAAAAAAAAAAowCsCAAArAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-06-10T15:05:34.903Z",
               "EditorCaption": ""

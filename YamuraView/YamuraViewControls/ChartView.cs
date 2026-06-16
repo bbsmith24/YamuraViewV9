@@ -1,4 +1,5 @@
-﻿using System;
+﻿using GDI;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -8,20 +9,22 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using GDI;
+using System.Windows.Forms.PropertyGridInternal;
 using Win32Interop.Methods;
+using Win32Interop.Structs;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace YamuraViewControls
 {
     public partial class ChartView : UserControl
     {
-        public delegate void ChartMouseMove(object sender, ChartControlMouseMoveEventArgs e);
+        //public delegate void ChartMouseMove(object sender, ChartControlMouseTrackEventArgs e);
+        public delegate void ChartMouseTrack(object sender, ChartControlMouseTrackEventArgs e);
         public delegate void ChartXAxisChange(object sender, ChartControlXAxisChangeEventArgs e);
         public delegate void AxisOffsetUpdate(object sender, AxisOffsetUpdateEventArgs e);
         public delegate void ClearGraphicsPath(object sender, EventArgs e);
 
-        public event ChartMouseMove ChartMouseMoveEvent;
+        public event ChartMouseTrack ChartMouseTrackEvent;
 
         public enum DrawMode
         {
@@ -78,81 +81,15 @@ namespace YamuraViewControls
         }
 
         protected int dragZoomPenWidth = 1;
-        protected int chartBorder = 10;
-        protected Rectangle chartBounds = new Rectangle(0, 0, 0, 0);
-        protected List<bool> startMouseDrag = new List<bool>();
-        protected List<bool> startMouseMove = new List<bool>();
-        protected List<Point> chartLastCursorPos = new List<Point>();
-        protected List<Point> chartStartCursorPos = new List<Point>();
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        public List<bool> StartMouseDrag { get; set; }
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        public List<bool> StartMouseMove { get; set; }
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        public List<Point> ChartLastCursorPos { get; set; }
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        public List<Point> ChartStartCursorPos { get; set; }
 
-        string xChannelName;
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public string XChannelName
-        {
-            get { return xChannelName; }
-            set { xChannelName = value; }
-        }
-        //
-        // chart display properties 
-        //
-        bool allowDrag = true;
-        /// <summary>
-        /// chart allows drag area with left mouse button
-        /// </summary>
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        /// <summary>
-        /// chart allows drag area with left mouse button
-        /// </summary>
-        public bool AllowDrag
-        {
-            get
-            {
-                return allowDrag;
-            }
-
-            set
-            {
-                allowDrag = value;
-            }
-        }
-        // crosshairs, box, circle work
-        // horizontal and vertical look weird
-        CursorStyle cursorMode = CursorStyle.CROSSHAIRS;
-        /// <summary>
-        /// type of mouse move cursor - CROSSHAIRS, HORIZONTAL, VERTICAL, BOX, CIRCLE
-        /// </summary>
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public CursorStyle CursorMode
-        {
-            get { return cursorMode; }
-            set { cursorMode = value; }
-        }
-        int cursorBoxSize = 10;
-        /// <summary>
-        /// size of box and circle cursor
-        /// </summary>
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public int CursorBoxSize
-        {
-            get { return cursorBoxSize; }
-            set { cursorBoxSize = value; }
-        }
-        bool cursorUpdateSource = true;
-        /// <summary>
-        /// chart accepts mouse moves and raises cursor update events for listeners
-        /// </summary>
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public bool CursorUpdateSource
-        {
-            get
-            {
-                return cursorUpdateSource;
-            }
-            set
-            {
-                cursorUpdateSource = value;
-            }
-        }
         bool showHScroll = true;
         /// <summary>
         /// show the H scrollbar
@@ -181,14 +118,6 @@ namespace YamuraViewControls
                 UpdateElementPositions();
             }
         }
-        bool equalScale = false;
-        // true if X and Y scale are equal regardless of window size
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public bool EqualScale
-        {
-            get { return equalScale; }
-            set { equalScale = value; }
-        }
         ChartViewMode chartMode = ChartViewMode.ABSOLUTE;
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public ChartViewMode ChartMode
@@ -196,17 +125,27 @@ namespace YamuraViewControls
             get { return chartMode; }
             set { chartMode = value; }
         }
+        // overlay state (for paint-overlay cursor and selection)
+        private bool isSelecting = false;
+        private Rectangle selectionRect = Rectangle.Empty;
+        private Point cursorPos = Point.Empty;
+        private bool cursorVisible = false;
         public ChartView()
         {
             InitializeComponent();
-            xChannelName = "Time";
-            CursorUpdateSource = true;
-
-            chartLastCursorPos.Add(new Point(0, 0));
-            chartStartCursorPos.Add(new Point(0, 0));
-            startMouseMove.Add(false);
-            startMouseDrag.Add(false);
+            ChartLastCursorPos = new List<Point>();
+            ChartLastCursorPos.Add(new Point(0, 0));
+            ChartStartCursorPos = new List<Point>();
+            ChartStartCursorPos.Add(new Point(0, 0));
+            StartMouseMove = new List<bool>();
+            StartMouseMove.Add(false);
+            StartMouseDrag = new List<bool>();
+            StartMouseDrag.Add(false);
             hScrollBar.Scroll += HScrollBar_Scroll;
+            
+
+            //chartPanel.MouseMove -= chartPanel_MouseMove;
+            //chartPanel.MouseMove += chartPanel_MouseMove;
         }
         #region control message handlers
         /// <summary>
@@ -232,18 +171,21 @@ namespace YamuraViewControls
             {
                 return;
             }
-            DrawChartView();
+            DrawChartView(e.Graphics);
         }
-        void DrawChartView()
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="chartGraphics"></param>
+        void DrawChartView(Graphics chartGraphics)
         {
-            int idx = 0;
             #region initialize mouse/cursor moves
-            for (int moveIdx = 0; moveIdx < startMouseMove.Count; moveIdx++)
+            for (int moveIdx = 0; moveIdx < StartMouseMove.Count; moveIdx++)
             {
-                startMouseMove[moveIdx] = false;
-                startMouseDrag[moveIdx] = false;
-                chartStartCursorPos[moveIdx] = new Point(0, 0);
-                chartLastCursorPos[moveIdx] = new Point(0, 0);
+                StartMouseMove[moveIdx] = false;
+                StartMouseDrag[moveIdx] = false;
+                ChartStartCursorPos[moveIdx] = new Point(0, 0);
+                ChartLastCursorPos[moveIdx] = new Point(0, 0);
             }
             #endregion
             #region nothing to display yet
@@ -263,10 +205,15 @@ namespace YamuraViewControls
             #endregion
             #region get X axis display range based on all visible channels
             // range can be time or distance
-            ChartOwner.X_Axes.ElementAt(0).Value.AxisDisplayRange[0] = float.MaxValue;
-            ChartOwner.X_Axes.ElementAt(0).Value.AxisDisplayRange[1] = float.MinValue;
-            ChartOwner.X_Axes.ElementAt(0).Value.AxisDisplayRange[2] = 0;
-            foreach(DisplayDataSet dataSet in ChartOwner.dataSets)
+            Axis primaryX = ChartOwner.X_Axes.ElementAtOrDefault(0).Value;
+            if (primaryX == null)
+            {
+                return;
+            }
+            primaryX.AxisDisplayRange[0] = float.MaxValue;
+            primaryX.AxisDisplayRange[1] = float.MinValue;
+            primaryX.AxisDisplayRange[2] = 0;
+            foreach (DisplayDataSet dataSet in ChartOwner.dataSets)
             {
                 foreach (KeyValuePair<string, ChartChannel> chanInfo in dataSet.channels)
                 {
@@ -275,25 +222,25 @@ namespace YamuraViewControls
                         continue;
                     }
                     // time based x axis
-                    if (xChannelName == "Time")
+                    if (ChartOwner.XChannelName == "Time")
                     {
-                        ChartOwner.X_Axes.ElementAt(0).Value.AxisDisplayRange[0] = (dataSet.channels["Time"].XRange[0]) < ChartOwner.X_Axes.ElementAt(0).Value.AxisDisplayRange[0] ? dataSet.channels["Time"].XRange[0] : (ChartOwner.X_Axes.ElementAt(0).Value.AxisDisplayRange[0]);
-                        ChartOwner.X_Axes.ElementAt(0).Value.AxisDisplayRange[1] = (dataSet.channels["Time"].XRange[1]) > ChartOwner.X_Axes.ElementAt(0).Value.AxisDisplayRange[1] ? dataSet.channels["Time"].XRange[1] : (ChartOwner.X_Axes.ElementAt(0).Value.AxisDisplayRange[1]);
-                        ChartOwner.X_Axes.ElementAt(0).Value.AxisDisplayRange[2] = (dataSet.channels["Time"].XRange[1]) - dataSet.channels["Time"].XRange[0];
+                        primaryX.AxisDisplayRange[0] = (dataSet.channels["Time"].XRange[0]) < primaryX.AxisDisplayRange[0] ? dataSet.channels["Time"].XRange[0] : primaryX.AxisDisplayRange[0];
+                        primaryX.AxisDisplayRange[1] = (dataSet.channels["Time"].XRange[1]) > primaryX.AxisDisplayRange[1] ? dataSet.channels["Time"].XRange[1] : primaryX.AxisDisplayRange[1];
+                        primaryX.AxisDisplayRange[2] = (dataSet.channels["Time"].XRange[1]) - dataSet.channels["Time"].XRange[0];
                     }
                     // distance based x axis
-                    else if (xChannelName == "xTime")
+                    else if (ChartOwner.XChannelName == "xTime")
                     {
-                        ChartOwner.X_Axes.ElementAt(0).Value.AxisDisplayRange[0] = dataSet.channels["xDistance"].XRange[0] < ChartOwner.X_Axes.ElementAt(0).Value.AxisDisplayRange[0] ? dataSet.channels["xDistance"].XRange[0] : ChartOwner.X_Axes.ElementAt(0).Value.AxisDisplayRange[0];
-                        ChartOwner.X_Axes.ElementAt(0).Value.AxisDisplayRange[1] = dataSet.channels["xDistance"].XRange[1] > ChartOwner.X_Axes.ElementAt(0).Value.AxisDisplayRange[1] ? dataSet.channels["xDistance"].XRange[1] : ChartOwner.X_Axes.ElementAt(0).Value.AxisDisplayRange[1];
-                        ChartOwner.X_Axes.ElementAt(0).Value.AxisDisplayRange[2] = dataSet.channels["xDistance"].XRange[1] - dataSet.channels["xDistance"].XRange[0];
+                        primaryX.AxisDisplayRange[0] = dataSet.channels["xDistance"].XRange[0] < primaryX.AxisDisplayRange[0] ? dataSet.channels["xDistance"].XRange[0] : primaryX.AxisDisplayRange[0];
+                        primaryX.AxisDisplayRange[1] = dataSet.channels["xDistance"].XRange[1] > primaryX.AxisDisplayRange[1] ? dataSet.channels["xDistance"].XRange[1] : primaryX.AxisDisplayRange[1];
+                        primaryX.AxisDisplayRange[2] = dataSet.channels["xDistance"].XRange[1] - dataSet.channels["xDistance"].XRange[0];
                     }
                     // other channel based x axis
-                    else 
+                    else
                     {
-                        ChartOwner.X_Axes.ElementAt(0).Value.AxisDisplayRange[0] = dataSet.channels[xChannelName].YRange[0] < ChartOwner.X_Axes.ElementAt(0).Value.AxisDisplayRange[0] ? dataSet.channels[xChannelName].YRange[0] : ChartOwner.X_Axes.ElementAt(0).Value.AxisDisplayRange[0];
-                        ChartOwner.X_Axes.ElementAt(0).Value.AxisDisplayRange[1] = dataSet.channels[xChannelName].YRange[1] > ChartOwner.X_Axes.ElementAt(0).Value.AxisDisplayRange[1] ? dataSet.channels[xChannelName].YRange[1] : ChartOwner.X_Axes.ElementAt(0).Value.AxisDisplayRange[1];
-                        ChartOwner.X_Axes.ElementAt(0).Value.AxisDisplayRange[2] = ChartOwner.X_Axes.ElementAt(0).Value.AxisDisplayRange[1] - ChartOwner.X_Axes.ElementAt(0).Value.AxisDisplayRange[0];
+                        primaryX.AxisDisplayRange[0] = dataSet.channels[ChartOwner.XChannelName].YRange[0] < primaryX.AxisDisplayRange[0] ? dataSet.channels[ChartOwner.XChannelName].YRange[0] : primaryX.AxisDisplayRange[0];
+                        primaryX.AxisDisplayRange[1] = dataSet.channels[ChartOwner.XChannelName].YRange[1] > primaryX.AxisDisplayRange[1] ? dataSet.channels[ChartOwner.XChannelName].YRange[1] : primaryX.AxisDisplayRange[1];
+                        primaryX.AxisDisplayRange[2] = primaryX.AxisDisplayRange[1] - primaryX.AxisDisplayRange[0];
                     }
                     // only need to process 1 channel for x axis range since all channels use same x axis values
                     break;
@@ -340,13 +287,13 @@ namespace YamuraViewControls
                     }
                     #endregion
                     #region X axis display offset
-                    if(xChannelName == "Time")
-                    { 
-                        //ChartOwner.X_Axes.ElementAt(0).Value.AxisOffset = ChartOwner.dataSets[curChanInfo.DataSetIndex].TimeOffset;
-                    }
-                    else if (xChannelName == "xTime")
+                    if (ChartOwner.XChannelName == "Time")
                     {
-                        ChartOwner.X_Axes.ElementAt(0).Value.AxisOffset = ChartOwner.dataSets[curChanInfo.DataSetIndex].DistanceOffset;
+                        // primaryX.AxisOffset = ChartOwner.dataSets[curChanInfo.DataSetIndex].TimeOffset;
+                    }
+                    else if (ChartOwner.XChannelName == "xTime")
+                    {
+                        primaryX.AxisOffset = ChartOwner.dataSets[curChanInfo.DataSetIndex].DistanceOffset;
                     }
                     #endregion
                     #region build unscaled path
@@ -355,22 +302,22 @@ namespace YamuraViewControls
                         initialValue = true;
                         foreach (KeyValuePair<float, float> curData in curChanInfo.DataPoints)
                         {
-                            if(curChanInfo == null)
+                            if (curChanInfo == null)
                             {
                                 continue;
                             }
                             // x axis is time - direct lookup
                             // key is time, value is data value at time
-                            if (xChannelName == "Time")
+                            if (ChartOwner.XChannelName == "Time")
                             {
                                 points[1] = new PointF(curData.Key, curData.Value);
                             }
                             // x axis is not time
                             // use data point time to look up distance in xTime channel
-                            else if (xChannelName == "xTime")
+                            else if (ChartOwner.XChannelName == "xTime")
                             {
                                 // this point is time/value
-                                float timeValue = ChartOwner.dataSets[curChanInfo.DataSetIndex].channels[xChannelName].dataPoints.FirstOrDefault(i => i.Key >= curData.Key).Value;
+                                float timeValue = ChartOwner.dataSets[curChanInfo.DataSetIndex].channels[ChartOwner.XChannelName].dataPoints.FirstOrDefault(i => i.Key >= curData.Key).Value;
                                 // use time to find distance in xTime channel
                                 float timeDistance = ChartOwner.dataSets[curChanInfo.DataSetIndex].channels["xTime"].dataPoints.FirstOrDefault(i => i.Key >= curData.Key).Value;
                                 points[1] = new PointF(timeDistance, curData.Value);
@@ -378,7 +325,7 @@ namespace YamuraViewControls
                             // x axis is not time - use time from current channel point, find nearest time to that time in axis channel
                             else
                             {
-                                float tst = ChartOwner.dataSets[curChanInfo.DataSetIndex].channels[xChannelName].dataPoints.FirstOrDefault(i => i.Key >= curData.Key).Value;
+                                float tst = ChartOwner.dataSets[curChanInfo.DataSetIndex].channels[ChartOwner.XChannelName].dataPoints.FirstOrDefault(i => i.Key >= curData.Key).Value;
                                 points[1] = new PointF(tst, curData.Value);
                             }
                             if (initialValue)
@@ -394,11 +341,10 @@ namespace YamuraViewControls
                     #endregion
                     #region draw to transformed graphic context
                     pathPen = new Pen(curChanInfo.ChannelColor);
-                    using (Graphics chartGraphics = chartPanel.CreateGraphics())
                     {
-                        displayScale[0] = (float)chartBounds.Width / ChartOwner.X_Axes.ElementAt(0).Value.AxisDisplayRange[2];
-                        displayScale[1] = (float)chartBounds.Height / yAxis.Value.AxisDisplayRange[2];
-                        if (EqualScale)
+                        displayScale[0] = (float)(ChartOwner.ChartWidth - (2 *ChartOwner.ChartBorder)) / primaryX.AxisDisplayRange[2];
+                        displayScale[1] = (float)(ChartOwner.ChartHeight - (2 * ChartOwner.ChartBorder)) / yAxis.Value.AxisDisplayRange[2];
+                        if (ChartOwner.EqualScale)
                         {
                             if (displayScale[0] < displayScale[1])
                             {
@@ -411,15 +357,14 @@ namespace YamuraViewControls
                         }
                         displayScale[1] *= -1.0F;
                         // translate to lower left corner of display area
-                        chartGraphics.TranslateTransform(chartBorder, (float)chartBounds.Height + chartBorder);
+                        chartGraphics.TranslateTransform(ChartOwner.ChartBorder, (float)ChartOwner.ChartHeight - ChartOwner.ChartBorder);
                         // scale to display range in X and Y
                         chartGraphics.ScaleTransform(displayScale[0], displayScale[1]);
                         // translate by -1 * minimum display range + axis offset (scrolling)
-                        chartGraphics.TranslateTransform(-1 * ChartOwner.X_Axes.ElementAt(0).Value.AxisDisplayRange[0] +  // untransformed X value
-                                                         0, //-1 * ChartOwner.dataSets[curChanInfo.DataSetIndex].TimeOffset, // .ChartOwner.X_Axes.ElementAt(0).Value.AxisOffset,                 // offset X
-                                                         -1 * yAxis.Value.AxisDisplayRange[0] +                           // untransformed Y value
-                                                         -1 * 0                                                           // offset Y
-                                                         );
+                        chartGraphics.TranslateTransform(-1 * primaryX.AxisDisplayRange[0] + 
+                                                         0,
+                                                         -1 * yAxis.Value.AxisDisplayRange[0] + 
+                                                         0);
                         // set pen width to 0 (1 pixel)
                         pathPen.Width = 0;
                         // draw the path
@@ -439,11 +384,14 @@ namespace YamuraViewControls
         /// <param name="e"></param>
         internal void chartPanel_Resize(object sender, EventArgs e)
         {
-            // update the paintable area
-            chartBounds.X = chartBorder;
-            chartBounds.Y = chartBorder;
-            chartBounds.Width = chartPanel.Width - (2 * chartBorder);
-            chartBounds.Height = chartPanel.Height - (2 * chartBorder);
+            if (ChartOwner != null)
+            {
+                // update the paintable area
+                ChartOwner.SetChartBounds(ChartOwner.ChartBorder,
+                                          ChartOwner.ChartBorder,
+                                          Width - (2 * ChartOwner.ChartBorder),
+                                          Height - (2 * ChartOwner.ChartBorder));
+            }
             // redraw
             chartPanel.Invalidate();
         }
@@ -452,202 +400,39 @@ namespace YamuraViewControls
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        internal void chartPanel_MouseMove(object sender, MouseEventArgs e)
-        {
-            //if (CursorUpdateSource == false)
-            //{
-            //    return;
-            //}
-            //chartPanel.Focus();
-            //#region left mouse button down - dragging zoom region 
-            //if ((e.Button == MouseButtons.Left) && AllowDrag)
-            //{
-            //    // starting mouse drag - erase old cursor if needed, save initial start and end locations
-            //    if (!startMouseDrag[0])
-            //    {
-            //        // was moving mouse with left button up, erase cursor
-            //        if (startMouseMove[0])
-            //        {
-            //            DrawCursorAt(chartLastCursorPos[0].X, chartLastCursorPos[0].Y);
-            //        }
-            //        // save location
-            //        chartStartCursorPos[0] = new Point(e.Location.X, 0);
-            //        chartLastCursorPos[0] = new Point(e.Location.X, chartPanel.Height);
-            //    }
-            //    // continue mouse drag - erase last box
-            //    else
-            //    {
-            //        DrawSelectArea(chartStartCursorPos[0].X, chartStartCursorPos[0].Y, chartLastCursorPos[0].X, chartLastCursorPos[0].Y);
-            //    }
-            //    // continue mouse drag, save current end location and draw new box
-            //    chartLastCursorPos[0] = new Point(e.Location.X, chartLastCursorPos[0].Y);
-            //    DrawSelectArea(chartStartCursorPos[0].X, chartStartCursorPos[0].Y, chartLastCursorPos[0].X, chartLastCursorPos[0].Y);
-            //    // mouse drag has started, mouse move has stopped
-            //    startMouseDrag[0] = true;
-            //    startMouseMove[0] = false;
-            //}
-            //#endregion
-            //#region just moving the mouse with no buttons
-            //else
-            //{
-            //    if (CursorMode != CursorStyle.NONE)
-            //    {
-            //        startMouseDrag[0] = false;
-            //        #region erase if something was drawn
-            //        if (!startMouseMove[0])
-            //        {
-            //            chartLastCursorPos[0] = e.Location;
-            //        }
-            //        else
-            //        {
-            //            DrawCursorAt(chartLastCursorPos[0].X, chartLastCursorPos[0].Y);
-            //        }
-            //        #endregion
-            //        #region draw new cursor if in chart area
-            //        if (((e.Location.X >= chartBorder) && (e.Location.X <= (chartPanel.Width - chartBorder))) &&
-            //            ((e.Location.Y >= chartBorder) && (e.Location.Y <= (chartPanel.Height - chartBorder))))
-            //        {
-            //            startMouseMove[0] = true;
-            //            chartLastCursorPos[0] = e.Location;
-            //            DrawCursorAt(chartLastCursorPos[0].X, chartLastCursorPos[0].Y);
-            //        }
-            //        // outside of chart, don't draw and not started
-            //        else
-            //        {
-            //            startMouseMove[0] = false;
-            //        }
-            //        #endregion
-            //    }
-            //}
-            //#endregion
-            //// up to now, dealing in screen units. convert current position to X axis value and active Y axis values and raise message
-            //if (ChartOwner.Y_Axes.Count == 0)
-            //{
-            //    return;
-            //}
-            //// create event args
-            //try
-            //{
-            //    ChartControlMouseMoveEventArgs moveEventArgs = new ChartControlMouseMoveEventArgs();
-
-            //    PointF axisPoint = new PointF();
-            //    // x and y scale
-            //    float[] displayScale = new float[] { 1.0F, 1.0F };
-            //    displayScale[0] = (float)chartBounds.Width / ChartOwner.Y_Axes[xChannelName].AxisDisplayRange[2];
-
-            //    foreach (ChannelInfo channel in ChartOwner.Y_Axes[xChannelName].AssociatedChannels)
-            //    {
-            //        displayScale[1] = 1.0F;
-
-            //        axisPoint.X = (float)e.Location.X;
-            //        axisPoint.Y = (float)e.Location.Y;
-
-            //        axisPoint = ScaleDisplayToData(axisPoint,
-            //                            displayScale[0],
-            //                            displayScale[1],
-            //                            0.0F,
-            //                            0.0F,
-            //                            chartBounds);
-            //        axisPoint.X -= (-1 * ChartOwner.Y_Axes[xChannelName].AxisDisplayRange[0] +
-            //                                ChartOwner.Y_Axes[xChannelName].AssociatedChannels[channel.RunIndex.ToString() + "-" + xChannelName].AxisOffset[0]);  // offset X
-
-            //        float timeAtCursor = 0.0F;
-            //        if (channel.ChannelName == "Time")
-            //        {
-            //            timeAtCursor = axisPoint.X;
-            //        }
-            //        else if (channel.ChannelName == "xTime")
-            //        {
-            //            // find time from distance point
-            //            float timeValue = ChartOwner.dataSets[channel.RunIndex].channels["xDistance"].dataPoints.FirstOrDefault(i => i.Key >= axisPoint.X).Value;
-
-
-            //            timeAtCursor = timeValue;
-            //        }
-            //        moveEventArgs.XAxisValues.Add(channel.RunIndex.ToString() + "-" + "Time"/*channel.Value.ChannelName*/, timeAtCursor/*axisPoint.X*/);
-
-            //        if (xChannelName == "xTime")
-            //        {
-            //            System.Diagnostics.Debug.WriteLine("xTime time at cursor: " + axisPoint.X);
-            //            System.Diagnostics.Debug.WriteLine("xTime value at cursor: " + axisPoint.Y);
-            //        }
-            //        else
-            //        {
-            //            System.Diagnostics.Debug.WriteLine("Time at cursor: " + axisPoint.X);
-            //            System.Diagnostics.Debug.WriteLine("Value at cursor: " + axisPoint.Y);
-            //        }
-
-            //    }
-            //    foreach (KeyValuePair<string, Axis> axis in ChartOwner.Y_Axes)
-            //    {
-            //        if (!axis.Value.ShowAxis)
-            //        {
-            //            continue;
-            //        }
-            //        foreach (ChannelInfo channel in axis.Value.AssociatedChannels)
-            //        {
-            //            displayScale[1] = (float)chartBounds.Height / axis.Value.AxisDisplayRange[2];
-            //            axisPoint.X = (float)e.Location.X;
-            //            axisPoint.Y = (float)e.Location.Y;
-
-            //            axisPoint = ScaleDisplayToData(axisPoint,
-            //                                displayScale[0],
-            //                                displayScale[1],
-            //                                0.0F,
-            //                                0.0F,
-            //                                chartBounds);
-
-            //            axisPoint.Y -= (channel.AxisRange[0] +
-            //                                axis.Value.AxisOffset[1]);
-
-            //            moveEventArgs.YAxisValues.Add(channel.RunIndex.ToString() + "-" + channel.ChannelName, axisPoint.Y);
-            //        }
-            //    }
-            //    ChartMouseMoveEvent(this, moveEventArgs);
-            //}
-            //catch (Exception ex)
-            //{
-            //    System.Diagnostics.Debug.WriteLine("Error in chart mouse move event: " + ex.Message);
-            //}
-        }
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
         internal void chartPanel_MouseUp(object sender, MouseEventArgs e)
         {
-            if ((startMouseDrag[0]) && AllowDrag)
+            if ((StartMouseDrag[0]) && ChartOwner.AllowDrag)
             {
                 // original scaling
                 float[] displayScale = new float[] { 1.0F, 1.0F };
-                displayScale[0] = (float)chartBounds.Width / ChartOwner.Y_Axes[xChannelName].AxisDisplayRange[2];
+                displayScale[0] = (float)ChartOwner.ChartWidth / ChartOwner.Y_Axes[ChartOwner.XChannelName].AxisDisplayRange[2];
 
-                PointF scaledStart = chartStartCursorPos[0];
-                PointF scaledEnd = chartLastCursorPos[0];
+                PointF scaledStart = ChartStartCursorPos[0];
+                PointF scaledEnd = ChartLastCursorPos[0];
                 scaledStart = ScaleDisplayToData(scaledStart,
                                     displayScale[0],
                                     displayScale[1],
                                     0.0F,
                                     0.0F,
-                                    chartBounds);
+                                    ChartOwner.ChartBounds);
                 scaledEnd = ScaleDisplayToData(scaledEnd,
                                     displayScale[0],
                                     displayScale[1],
                                     0.0F,
                                     0.0F,
-                                    chartBounds);
+                                    ChartOwner.ChartBounds);
 
-                ChartOwner.Y_Axes[xChannelName].AxisDisplayRange[0] = scaledStart.X < scaledEnd.X ? scaledStart.X : scaledEnd.X;
-                ChartOwner.Y_Axes[xChannelName].AxisDisplayRange[1] = scaledStart.X < scaledEnd.X ? scaledEnd.X : scaledStart.X;
-                ChartOwner.Y_Axes[xChannelName].AxisDisplayRange[2] = ChartOwner.Y_Axes[xChannelName].AxisDisplayRange[1] - ChartOwner.Y_Axes[xChannelName].AxisDisplayRange[0];
+                ChartOwner.Y_Axes[ChartOwner.XChannelName].AxisDisplayRange[0] = scaledStart.X < scaledEnd.X ? scaledStart.X : scaledEnd.X;
+                ChartOwner.Y_Axes[ChartOwner.XChannelName].AxisDisplayRange[1] = scaledStart.X < scaledEnd.X ? scaledEnd.X : scaledStart.X;
+                ChartOwner.Y_Axes[ChartOwner.XChannelName].AxisDisplayRange[2] = ChartOwner.Y_Axes[ChartOwner.XChannelName].AxisDisplayRange[1] - ChartOwner.Y_Axes[ChartOwner.XChannelName].AxisDisplayRange[0];
 
 
-                hScrollBar.Minimum = (int)ChartOwner.Y_Axes[xChannelName].AxisValueRange[0];
-                hScrollBar.Maximum = (int)ChartOwner.Y_Axes[xChannelName].AxisValueRange[1];
-                hScrollBar.Value = (int)ChartOwner.Y_Axes[xChannelName].AxisDisplayRange[0];
-                hScrollBar.LargeChange = (int)ChartOwner.Y_Axes[xChannelName].AxisDisplayRange[2];
-                startMouseDrag[0] = false;
+                hScrollBar.Minimum = (int)ChartOwner.Y_Axes[ChartOwner.XChannelName].AxisValueRange[0];
+                hScrollBar.Maximum = (int)ChartOwner.Y_Axes[ChartOwner.XChannelName].AxisValueRange[1];
+                hScrollBar.Value = (int)ChartOwner.Y_Axes[ChartOwner.XChannelName].AxisDisplayRange[0];
+                hScrollBar.LargeChange = (int)ChartOwner.Y_Axes[ChartOwner.XChannelName].AxisDisplayRange[2];
+                StartMouseDrag[0] = false;
                 chartPanel.Invalidate();
             }
         }
@@ -658,11 +443,11 @@ namespace YamuraViewControls
         {
             // original scaling
             float[] displayScale = new float[] { 1.0F, 1.0F };
-            displayScale[0] = (float)chartBounds.Width / ChartOwner.Y_Axes[xChannelName].AxisDisplayRange[2];
+            displayScale[0] = (float)ChartOwner.ChartWidth / ChartOwner.Y_Axes[ChartOwner.XChannelName].AxisDisplayRange[2];
 
             PointF scaledStart = new PointF(e.NewValue, 0);
-            ChartOwner.Y_Axes[xChannelName].AxisDisplayRange[0] = scaledStart.X;
-            ChartOwner.Y_Axes[xChannelName].AxisDisplayRange[1] = scaledStart.X + ChartOwner.Y_Axes[xChannelName].AxisDisplayRange[2];
+            ChartOwner.Y_Axes[ChartOwner.XChannelName].AxisDisplayRange[0] = scaledStart.X;
+            ChartOwner.Y_Axes[ChartOwner.XChannelName].AxisDisplayRange[1] = scaledStart.X + ChartOwner.Y_Axes[ChartOwner.XChannelName].AxisDisplayRange[2];
             chartPanel.Invalidate();
 
         }
@@ -695,7 +480,7 @@ namespace YamuraViewControls
         /// </summary>
         /// <param name="x"></param>
         /// <param name="y"></param>
-        internal void DrawCursorAt(int x, int y)
+        internal void DrawCursorAtScreenPoint(Point drawPoint)
         {
             Rectangle locationBox = new Rectangle(0, 0, 0, 0);
             IntPtr lpPoint = new IntPtr();
@@ -713,44 +498,50 @@ namespace YamuraViewControls
                 Gdi32.SetROP2(hDC, (int)DrawMode.R2_XORPEN);
                 #endregion
                 #region crosshairs
-                if (cursorMode == CursorStyle.CROSSHAIRS)
+                if (ChartOwner.CursorMode == CursorStyle.CROSSHAIRS)
                 {
                     // horizontal line
-                    Gdi32.MoveToEx(hDC, 0, y, lpPoint);
-                    Gdi32.LineTo(hDC, chartPanel.Width, y);
+                    Gdi32.MoveToEx(hDC, 0, drawPoint.Y, lpPoint);
+                    Gdi32.LineTo(hDC, chartPanel.Width, drawPoint.Y);
                     // vertical line
-                    Gdi32.MoveToEx(hDC, x, chartPanel.Height, lpPoint);
-                    Gdi32.LineTo(hDC, x, 0);
+                    Gdi32.MoveToEx(hDC, drawPoint.X, chartPanel.Height, lpPoint);
+                    Gdi32.LineTo(hDC, drawPoint.X, 0);
                 }
                 #endregion
                 #region box
-                else if (cursorMode == CursorStyle.BOX)
+                else if (ChartOwner.CursorMode == CursorStyle.BOX)
                 {
-                    locationBox = new Rectangle(x - (cursorBoxSize / 2), y - (cursorBoxSize / 2), cursorBoxSize, cursorBoxSize);
-                    Gdi32.Rectangle(hDC, locationBox.Left, locationBox.Top, locationBox.Left + cursorBoxSize, locationBox.Top + cursorBoxSize);
+                    Point point1 = new Point(drawPoint.X - (ChartOwner.CursorBoxSize / 2), drawPoint.Y - (ChartOwner.CursorBoxSize / 2));
+                    Size boxSize = new Size(ChartOwner.CursorBoxSize, ChartOwner.CursorBoxSize);
+                    //locationBox = new Rectangle(drawPoint.X - (ChartOwner.CursorBoxSize / 2), 
+                    //                            drawPoint.Y - (ChartOwner.CursorBoxSize / 2), 
+                    //                            ChartOwner.CursorBoxSize, 
+                    //                            ChartOwner.CursorBoxSize);
+                    locationBox = new Rectangle(point1, boxSize);
+                    Gdi32.Rectangle(hDC, locationBox.Left, locationBox.Top, locationBox.Right, locationBox.Bottom);// locationBox.Left + ChartOwner.CursorBoxSize, locationBox.Top + ChartOwner.CursorBoxSize);
                 }
                 #endregion
                 #region circle
-                else if (cursorMode == CursorStyle.CIRCLE)
+                else if (ChartOwner.CursorMode == CursorStyle.CIRCLE)
                 {
-                    locationBox = new Rectangle(x - (cursorBoxSize / 2), y - (cursorBoxSize / 2), cursorBoxSize, cursorBoxSize);
-                    Gdi32.Ellipse(hDC, locationBox.Left, locationBox.Top, locationBox.Left + cursorBoxSize, locationBox.Top + cursorBoxSize);
+                    locationBox = new Rectangle(drawPoint.X - (ChartOwner.CursorBoxSize / 2), drawPoint.Y - (ChartOwner.CursorBoxSize / 2), ChartOwner.CursorBoxSize, ChartOwner.CursorBoxSize);
+                    Gdi32.Ellipse(hDC, locationBox.Left, locationBox.Top, locationBox.Left + ChartOwner.CursorBoxSize, locationBox.Top + ChartOwner.CursorBoxSize);
                 }
                 #endregion
                 #region horizontal line
-                else if (cursorMode == CursorStyle.HORIZONTAL)
+                else if (ChartOwner.CursorMode == CursorStyle.HORIZONTAL)
                 {
                     // horizontal line
-                    Gdi32.MoveToEx(hDC, 0, y, lpPoint);
-                    Gdi32.LineTo(hDC, chartPanel.Width, y);
+                    Gdi32.MoveToEx(hDC, 0, drawPoint.Y, lpPoint);
+                    Gdi32.LineTo(hDC, chartPanel.Width, drawPoint.Y);
                 }
                 #endregion
                 #region vertical line
-                else if (cursorMode == CursorStyle.VERTICAL)
+                else if (ChartOwner.CursorMode == CursorStyle.VERTICAL)
                 {
                     // vertical line
-                    Gdi32.MoveToEx(hDC, x, 0, lpPoint);
-                    Gdi32.LineTo(hDC, x, chartPanel.Height);
+                    Gdi32.MoveToEx(hDC, drawPoint.X, 0, lpPoint);
+                    Gdi32.LineTo(hDC, drawPoint.X, chartPanel.Height);
                 }
                 #endregion
                 #region clean up GDI, reset context
@@ -761,6 +552,71 @@ namespace YamuraViewControls
                 drawGraphics.ReleaseHdc();
                 #endregion
             }
+        }
+        public void DrawCursorAtScaledPoint(PointF scaledPoint)
+        {
+            Axis primaryX = ChartOwner.X_Axes.ElementAtOrDefault(0).Value;
+            Point screenPoint = new Point(0,0);
+            if (primaryX == null)
+            {
+                return;
+            }
+            float[] displayScale = new float[2];
+            // scale to screen conversion (from DrawChartView)
+            //  displayScale[0] = (float)(ChartOwner.ChartWidth -  (2 * ChartOwner.ChartBorder)) / primaryX.AxisDisplayRange[2];
+            //  displayScale[1] = (float)(ChartOwner.ChartHeight - (2 * ChartOwner.ChartBorder)) / yAxis.Value.AxisDisplayRange[2];
+            //  if (ChartOwner.EqualScale)
+            //  {
+            //      if (displayScale[0] < displayScale[1])
+            //      {
+            //          displayScale[1] = displayScale[0];
+            //      }
+            //      else
+            //      {
+            //          displayScale[0] = displayScale[1];
+            //      }
+            //  }  
+            //  displayScale[1] *= -1.0F;
+            //// translate to lower left corner of display area
+            //  chartGraphics.TranslateTransform(ChartOwner.ChartBorder, (float)ChartOwner.ChartHeight - ChartOwner.ChartBorder);
+            //// scale to display range in X and Y
+            //  chartGraphics.ScaleTransform(displayScale[0], displayScale[1]);
+            //// translate by -1 * minimum display range + axis offset (scrolling)
+            //  chartGraphics.TranslateTransform(-1 * primaryX.AxisDisplayRange[0] +
+            //                                   0,
+            //                                   -1 * yAxis.Value.AxisDisplayRange[0] +
+            //                                   0);
+            //
+            // displayScaleX matches the drawing transform used elsewhere
+            #region get scale for scaled to screen
+            displayScale[0] = (float)(Width -  (ChartOwner.ChartBorder * 2)) / ChartOwner.X_Axes.ElementAt(0).Value.AxisDisplayRange[2];
+            displayScale[1] = (float)(Height - (ChartOwner.ChartBorder * 2)) / ChartOwner.Y_Axes.ElementAt(0).Value.AxisDisplayRange[2];
+            if (ChartOwner.EqualScale)
+            {
+                if (displayScale[0] < displayScale[1])
+                {
+                    displayScale[1] = displayScale[0];
+                }
+                else
+                {
+                    displayScale[0] = displayScale[1];
+                }
+            }
+            displayScale[1] *= -1.0F;
+            #endregion
+            screenPoint.X = (int)((scaledPoint.X - ChartOwner.X_Axes.ElementAt(0).Value.AxisDisplayRange[0]) * displayScale[0]);// - ChartOwner.ChartBorder;
+            screenPoint.Y = (int)((scaledPoint.Y - ChartOwner.Y_Axes.ElementAt(0).Value.AxisDisplayRange[1]) * displayScale[1]);// - ChartOwner.ChartBorder;
+            //screenPoint = ScaleDataToDisplay(scaledPoint,
+            //                   displayScale[0], displayScale[1],
+            //                   ChartOwner.X_Axes.ElementAt(0).Value.AxisDisplayRange[0], ChartOwner.Y_Axes.ElementAt(0).Value.AxisDisplayRange[0],
+            //                   Bounds);
+            //Point screenPointInt = new Point((int)screenPoint.X, (int)screenPoint.Y);
+            //if (StartMouseMove[0])
+            //{
+            //    DrawCursorAt(ChartLastCursorPos[0].X, ChartLastCursorPos[0].Y);
+            //    StartMouseMove[0] = false;
+            //}
+            DrawCursorAtScreenPoint(screenPoint);
         }
         /// <summary>
         /// 
@@ -825,10 +681,10 @@ namespace YamuraViewControls
         /// <returns></returns>
         internal PointF ScaleDisplayToData(PointF sourcePt, float scaleX, float scaleY, float offsetX, float offsetY, Rectangle bounds)
         {
-            PointF rPt = new PointF(sourcePt.X, sourcePt.Y);
-            rPt.X = (rPt.X / scaleX) - offsetX;
-            rPt.Y = -1.0F * ((rPt.Y - (float)bounds.Height) / scaleY) - offsetY;
-            return rPt;
+            PointF scaledPoint = new PointF(sourcePt.X, sourcePt.Y);
+            scaledPoint.X = (scaledPoint.X / scaleX) - offsetX;
+            scaledPoint.Y = -1.0F * ((scaledPoint.Y - (float)bounds.Height) / scaleY) - offsetY;
+            return scaledPoint;
         }
         #endregion
 
@@ -873,122 +729,173 @@ namespace YamuraViewControls
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        public virtual void OnChartMouseMove(object sender, ChartControlMouseMoveEventArgs e)
+        public void OnChartMouseMove(object sender, EventArgs e)
         {
-            //#region move cursor(s)
-            //// position in event args is data - need to scale to screen
-            //float[] displayScale = new float[] { 1.0F, 1.0F };
-            //PointF endPt = new PointF();
-            //int axisIdx = 0;
-            //string axisFullName = "";
-            //int cursorIdx = -1;
-            //if (CursorMode != CursorStyle.NONE)
-            //{
-            //    // check each Y axis
-            //    foreach (KeyValuePair<string, Axis> yAxis in ChartOwner.Y_Axes)
-            //    {
-            //        //ChartOwner.ChartAxes[e.Node.Name].ShowAxis = e.Node.Checked;
-            //        // skip if axis is not displayed
-            //        if (!yAxis.Value.ShowAxis)
-            //        //if (!yAxis.Value.AssociatedChannels[0].ShowChannel)
-            //        {
-            //            continue;
-            //        }
-            //        axisFullName = axisIdx.ToString() + "-" + yAxis.Key;
-            //        displayScale[0] = (float)chartBounds.Width / ChartOwner.Y_Axes[xChannelName].AxisDisplayRange[2];
-            //        displayScale[1] = (float)chartBounds.Height / yAxis.Value.AxisDisplayRange[2];
-            //        if (EqualScale)
-            //        {
-            //            if (displayScale[0] < displayScale[1])
-            //            {
-            //                displayScale[1] = displayScale[0];
-            //            }
-            //            else
-            //            {
-            //                displayScale[0] = displayScale[1];
-            //            }
-            //        }
-            //        // check each associated channel
-            //        foreach (KeyValuePair<String, ChannelInfo> curChanInfo in yAxis.Value.AssociatedChannels)
-            //        {
-            //            // skip if channel is not displayed
-            //            if (!curChanInfo.Value.ShowChannel)
-            //            {
-            //                continue;
-            //            }
-            //            cursorIdx++;
-            //            // add new cursor info if needed
-            //            if (startMouseMove.Count <= cursorIdx)
-            //            {
-            //                startMouseMove.Add(false);
-            //                startMouseDrag.Add(false);
-            //                chartStartCursorPos.Add(new Point(0, 0));
-            //                chartLastCursorPos.Add(new Point(0, 0));
-            //            }
-            //            ChartChannel curChannel = ChartOwner.dataSets[curChanInfo.Value.RunIndex].channels[curChanInfo.Value.ChannelName];
+            if (ChartOwner.ChartViewType != Chart.ChartType.Stripchart)
+            {
+                return; 
+            }
+            float timeAtCursor = 0.0F;
+            //SortedList<string, SortedList<string, float>> valuesAtCursor = new SortedList<string, SortedList<string, float>>();
+            try
+            {
+                if (ChartOwner == null || ChartOwner.X_Axes == null || ChartOwner.X_Axes.Count == 0)
+                    return;
 
-            //            // x axis is time - direct lookup
-            //            if (axisFullName == (axisIdx.ToString() + "-Time"))
-            //            {
-            //                endPt.X = e.XAxisValues[xChannelName];// curChannel.DataPoints[].PointValue;
-            //                endPt.Y = curChannel.DataPoints[endPt.X];
-            //            }
-            //            // x axis is not time - find nearest time in axis channel, 
-            //            else
-            //            {
-            //                float tst = ChartOwner.dataSets[curChanInfo.Value.RunIndex].channels[xChannelName].dataPoints.FirstOrDefault(i => i.Key >= e.XAxisValues[curChanInfo.Value.RunIndex.ToString() + "-Time"]).Value;
-            //                //if (tst == null)
-            //                //{
-            //                //    continue;
-            //                //}
-            //                endPt.X = tst;
-            //                tst = curChannel.dataPoints.FirstOrDefault(i => i.Key >= e.XAxisValues[curChanInfo.Value.RunIndex.ToString() + "-Time"]).Value;
-            //                //if (tst == null)
-            //                //{
-            //                //    continue;
-            //                //}
-            //                endPt.Y = tst;
-            //            }
-            //            endPt = ScaleDataToDisplay(endPt,                                                      // point
-            //                                        displayScale[0],                              // scale X
-            //                                        displayScale[1],                              // scale Y
-            //                                        -1 * ChartOwner.Y_Axes[xChannelName].AxisDisplayRange[0] +
-            //                                                    ChartOwner.Y_Axes[xChannelName].AssociatedChannels[curChanInfo.Value.RunIndex.ToString() + "-" + xChannelName].AxisOffset[0],  // offset X
-            //                                        yAxis.Value.AxisDisplayRange[0] +
-            //                                                    ChartOwner.Y_Axes[xChannelName].AssociatedChannels[curChanInfo.Value.RunIndex.ToString() + "-" + xChannelName].AxisOffset[1],  // offset Y
-            //                                        chartBounds);                                 // graphics area boundary
+                // Ensure cursor storage exists for index 0
+                if (StartMouseMove.Count == 0)
+                {
+                    StartMouseMove.Add(false);
+                    StartMouseDrag.Add(false);
+                    ChartStartCursorPos.Add(new Point(0, 0));
+                    ChartLastCursorPos.Add(new Point(0, 0));
+                }
 
+                // Mouse position relative to chartPanel
+                Point mousePt = chartPanel.PointToClient(Cursor.Position);
+                int mx = mousePt.X;
+                int my = mousePt.Y;
 
-            //            startMouseDrag[cursorIdx] = false;
-            //            #region erase if something was drawn
-            //            if (!startMouseMove[cursorIdx])
-            //            {
-            //                chartLastCursorPos[cursorIdx] = new Point((int)endPt.X, (int)endPt.Y);
-            //            }
-            //            else
-            //            {
-            //                DrawCursorAt(chartLastCursorPos[cursorIdx].X, chartLastCursorPos[cursorIdx].Y);
-            //            }
-            //            #endregion
-            //            #region draw new cursor if in chart area
-            //            if (((endPt.X >= chartBorder) && (endPt.X <= (chartPanel.Width - chartBorder))) &&
-            //                ((endPt.Y >= chartBorder) && (endPt.Y <= (chartPanel.Height - chartBorder))))
-            //            {
-            //                startMouseMove[cursorIdx] = true;
-            //                chartLastCursorPos[cursorIdx] = new Point((int)endPt.X, (int)endPt.Y);
-            //                DrawCursorAt(chartLastCursorPos[cursorIdx].X, chartLastCursorPos[cursorIdx].Y);
-            //            }
-            //            // outside of chart, don't draw and not started
-            //            else
-            //            {
-            //                startMouseMove[cursorIdx] = false;
-            //            }
-            //            #endregion
-            //        }
-            //    }
-            //}
-            //#endregion
+                // Erase previous cursor if drawn
+                if (StartMouseMove[0])
+                {
+                    DrawCursorAtScreenPoint(ChartLastCursorPos[0]);
+                    StartMouseMove[0] = false;
+                }
 
+                // Draw horizontal + vertical lines at current mouse point using existing GDI helper
+                //ChartOwner.CursorMode = CursorStyle.CROSSHAIRS;
+                // Only draw if inside panel area
+                if ((mousePt.X >= 0) && 
+                    (mousePt.Y >= 0) && 
+                    (mousePt.X <= chartPanel.Width) && 
+                    (mousePt.Y <= chartPanel.Height))
+                {
+                    DrawCursorAtScreenPoint(mousePt);
+                    StartMouseMove[0] = true;
+                    ChartLastCursorPos[0] = mousePt;
+                }
+
+                // Map mouse X -> data-space X using the primary X axis transform
+                Axis primaryXAxis = ChartOwner.X_Axes.ElementAtOrDefault(0).Value;
+                if (primaryXAxis == null || primaryXAxis.AxisDisplayRange == null || primaryXAxis.AxisDisplayRange.Length < 3)
+                    return;
+
+                float xRange = primaryXAxis.AxisDisplayRange[2];
+                if (xRange == 0.0f || ChartOwner.Width <= 0)
+                    return;
+
+                // displayScaleX matches the drawing transform used elsewhere
+                float displayScaleX = (float)ChartOwner.Width / xRange;
+
+                // panel X relative to chart area (subtract border)
+                float panelX = mx - ChartOwner.ChartBorder;
+
+                // Compute data-space X (axis units)
+                float dataX = (panelX / displayScaleX) + primaryXAxis.AxisDisplayRange[0] - primaryXAxis.AxisOffset;
+
+                ChartControlMouseTrackEventArgs outArgs = new ChartControlMouseTrackEventArgs();
+
+                // For each dataset compute dataset-specific time corresponding to dataX
+                for (int dsIdx = 0; dsIdx < ChartOwner.dataSets.Count; dsIdx++)
+                {
+                    var ds = ChartOwner.dataSets[dsIdx];
+                    timeAtCursor = dataX;
+
+                    if (ChartOwner.XChannelName == "Time")
+                    {
+                        timeAtCursor = dataX;
+                    }
+                    else if (ChartOwner.XChannelName == "xTime")
+                    {
+                        if (ds.channels != null && ds.channels.TryGetValue("xTime", out ChartChannel xt) && xt.DataPoints != null && xt.DataPoints.Count > 0)
+                        {
+
+                            if (TryFindNearestKeyByValue(xt.DataPoints, dataX, out float foundKey))
+                            {
+                                timeAtCursor = foundKey;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if (ds.channels != null && ds.channels.TryGetValue(ChartOwner.XChannelName, out ChartChannel axisChan) && axisChan.DataPoints != null && axisChan.DataPoints.Count > 0)
+                        {
+                            if (TryFindNearestKeyByValue(axisChan.DataPoints, dataX, out float foundKey))
+                                timeAtCursor = foundKey;
+                        }
+                    }
+                    if (!outArgs.XAxisValues.ContainsKey(ChartOwner.XChannelName))
+                    {
+                        outArgs.XAxisValues.Add(ChartOwner.XChannelName, timeAtCursor);
+                    }
+                }
+
+                // For each displayed channel, find Y value at the computed dataset time using TryFindNearestValue
+                foreach (KeyValuePair<string, Axis> axisKvp in ChartOwner.Y_Axes)
+                {
+                    Axis yAxis = axisKvp.Value;
+                    if (yAxis == null)
+                    {
+                        continue;
+                    }
+                    foreach (ChartChannel chan in yAxis.AssociatedChannels)
+                    {
+                        // skip hidden channels unless source is GPS or IMU
+                        // (for track map and traction circle updates)
+                        // will need to change this if I allow anything on X axis in other charts
+                        if ((!chan.ShowChannel) && ((chan.ChannelSource != "IMU") &&
+                                                    (chan.ChannelSource != "GPS")))
+                        { 
+                            continue; 
+                        }
+                        //string dsKey = chan.DataSetIndex.ToString() + "-Time";
+                        float sampleTime = outArgs.XAxisValues.TryGetValue(ChartOwner.XChannelName, out float tval) ? tval : dataX;
+                        float foundY = 0.0F;
+                        if (chan.DataPoints != null && chan.DataPoints.Count > 0 && TryFindNearestValue(chan.DataPoints, sampleTime, out foundY))
+                        {
+                            if (!outArgs.YAxisValues.ContainsKey(chan.DataSetName))
+                            {
+                                outArgs.YAxisValues.Add(chan.DataSetName, new SortedList<string, float>());
+                            }
+                            if(!outArgs.YAxisValues[chan.DataSetName].ContainsKey(chan.ChannelName))
+                            {
+                                outArgs.YAxisValues[chan.DataSetName].Add(chan.ChannelName, foundY);
+                            }
+                        }
+                        else
+                        {
+                            foundY = float.NaN;
+                            if (!outArgs.YAxisValues.ContainsKey(chan.DataSetName))
+                            {
+                                outArgs.YAxisValues.Add(chan.DataSetName, new SortedList<string, float>());
+                            }
+                            if (!outArgs.YAxisValues[chan.DataSetName].ContainsKey(chan.ChannelName))
+                            {
+                                outArgs.YAxisValues[chan.DataSetName].Add(chan.ChannelName, foundY);
+                            }
+                        }
+                    }
+                    //outArgs.YAxisValues = valuesAtCursor;
+
+                }
+                // Raise event for listeners (other charts) with mapped X and channel values
+                ChartMouseTrackEvent?.Invoke(this, outArgs);
+                System.Diagnostics.Debug.WriteLine("Time : " + timeAtCursor.ToString());
+                foreach (KeyValuePair<string, SortedList<string, float>> valueAtCursor in outArgs.YAxisValues)
+                {
+                    System.Diagnostics.Debug.WriteLine("\t" + valueAtCursor.Key);
+                    foreach(KeyValuePair<string, float> value in valueAtCursor.Value)
+                    {
+                        System.Diagnostics.Debug.WriteLine("\t\t" + value.Key + "\t" + value.Value);
+                    }
+                }
+                //Graphics g = chartPanel.CreateGraphics();
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine("OnChartMouseMove error: " + ex.Message);
+            }
         }
         /// <summary>
         /// 
@@ -997,11 +904,11 @@ namespace YamuraViewControls
         /// <param name="e"></param>
         public void OnChartXAxisChange(object sender, ChartControlXAxisChangeEventArgs e)
         {
-            xChannelName = e.XAxisName;
-            //hScrollBar.Minimum = (int)ChartOwner.Y_Axes[xChannelName].AxisValueRange[0];
-            //hScrollBar.Maximum = (int)ChartOwner.Y_Axes[xChannelName].AxisValueRange[1];
-            //hScrollBar.Value = (int)ChartOwner.Y_Axes[xChannelName].AxisDisplayRange[0];
-            //hScrollBar.LargeChange = (int)ChartOwner.Y_Axes[xChannelName].AxisDisplayRange[2];
+            ChartOwner.XChannelName = e.XAxisName;
+            //hScrollBar.Minimum = (int)ChartOwner.Y_Axes[ChartOwner.XChannelName].AxisValueRange[0];
+            //hScrollBar.Maximum = (int)ChartOwner.Y_Axes[ChartOwner.XChannelName].AxisValueRange[1];
+            //hScrollBar.Value = (int)ChartOwner.Y_Axes[ChartOwner.XChannelName].AxisDisplayRange[0];
+            //hScrollBar.LargeChange = (int)ChartOwner.Y_Axes[ChartOwner.XChannelName].AxisDisplayRange[2];
             chartPanel.Invalidate();
         }
         public void OnClearGraphicsPath(object sender, EventArgs e)
@@ -1030,8 +937,217 @@ namespace YamuraViewControls
             //}
             //chartPanel.Invalidate();
         }
+        /// <summary>
+        /// binary-search nearest-key lookup for SortedList<float,float>
+        /// </summary>
+        /// <param name="sorted"></param>
+        /// <param name="key"></param>
+        /// <param name="foundValue"></param>
+        /// <returns></returns>
+        public static bool TryFindNearestValue(SortedList<float, float> sorted, float key, out float foundValue)
+        {
+            foundValue = 0f;
+            if (sorted == null || sorted.Count == 0)
+                return false;
+
+            IList<float> keys = sorted.Keys;
+            int lo = 0;
+            int hi = keys.Count - 1;
+
+            while (lo <= hi)
+            {
+                int mid = (lo + hi) >> 1;
+                float k = keys[mid];
+                if (k == key)
+                {
+                    foundValue = sorted[k];
+                    return true;
+                }
+                if (k < key) lo = mid + 1;
+                else hi = mid - 1;
+            }
+
+            if (lo == 0)
+            {
+                foundValue = sorted[keys[0]];
+                return true;
+            }
+            if (lo >= keys.Count)
+            {
+                foundValue = sorted[keys[keys.Count - 1]];
+                return true;
+            }
+
+            float prevKey = keys[lo - 1];
+            float nextKey = keys[lo];
+            foundValue = (key - prevKey) <= (nextKey - key) ? sorted[prevKey] : sorted[nextKey];
+            return true;
+        }
+        /// <summary>
+        /// Helper: nearest-key lookup by searching values (returns key whose value is nearest to targetValue) 
+        /// </summary>
+        /// <param name="sorted"></param>
+        /// <param name="targetValue"></param>
+        /// <param name="foundKey"></param>
+        /// <returns></returns>
+        public bool TryFindNearestKeyByValue(SortedList<float, float> sorted, float targetValue, out float foundKey)
+        {
+            foundKey = 0f;
+            if (sorted == null || sorted.Count == 0)
+                return false;
+
+            float bestDiff = float.MaxValue;
+            bool found = false;
+
+            foreach (var kv in sorted)
+            {
+                float diff = Math.Abs(kv.Value - targetValue);
+                if (diff < bestDiff)
+                {
+                    bestDiff = diff;
+                    foundKey = kv.Key;
+                    found = true;
+                }
+            }
+
+            return found;
+        }
+
+        //private void DrawOverlays(Graphics g)
+        //{
+        //    using (Pen overlayPen = new Pen(Color.FromArgb(180, Color.Black)))
+        //    using (Brush overlayBrush = new SolidBrush(Color.FromArgb(64, Color.LightGray)))
+        //    {
+        //        if (isSelecting && !selectionRect.IsEmpty)
+        //        {
+        //            g.FillRectangle(overlayBrush, selectionRect);
+        //            g.DrawRectangle(overlayPen, selectionRect);
+        //        }
+
+        //        if (cursorVisible && CursorMode != CursorStyle.NONE)
+        //        {
+        //            switch (CursorMode)
+        //            {
+        //                case CursorStyle.CROSSHAIRS:
+        //                    g.DrawLine(overlayPen, 0, cursorPos.Y, chartPanel.Width, cursorPos.Y);
+        //                    g.DrawLine(overlayPen, cursorPos.X, chartPanel.Height, cursorPos.X, 0);
+        //                    break;
+        //                case CursorStyle.BOX:
+        //                    var box = new Rectangle(cursorPos.X - (CursorBoxSize / 2), cursorPos.Y - (CursorBoxSize / 2), CursorBoxSize, CursorBoxSize);
+        //                    g.DrawRectangle(overlayPen, box);
+        //                    break;
+        //                case CursorStyle.CIRCLE:
+        //                    var circ = new Rectangle(cursorPos.X - (CursorBoxSize / 2), cursorPos.Y - (CursorBoxSize / 2), CursorBoxSize, CursorBoxSize);
+        //                    g.DrawEllipse(overlayPen, circ);
+        //                    break;
+        //                case CursorStyle.HORIZONTAL:
+        //                    g.DrawLine(overlayPen, 0, cursorPos.Y, chartPanel.Width, cursorPos.Y);
+        //                    break;
+        //                case CursorStyle.VERTICAL:
+        //                    g.DrawLine(overlayPen, cursorPos.X, 0, cursorPos.X, chartPanel.Height);
+        //                    break;
+        //            }
+        //        }
+
+        //        // Draw channel Y values in upper-right corner
+        //        DrawChannelValuesOverlay(g);
+        //    }
+        //}
+        //private void DrawChannelValuesOverlay(Graphics g)
+        //{
+        //    if (ChartOwner == null || ChartOwner.X_Axes == null || ChartOwner.X_Axes.Count == 0)
+        //        return;
+
+        //    Axis primaryXAxis = ChartOwner.X_Axes.ElementAtOrDefault(0).Value;
+        //    if (primaryXAxis == null || primaryXAxis.AxisDisplayRange == null || primaryXAxis.AxisDisplayRange.Length < 3)
+        //        return;
+
+        //    float xRange = primaryXAxis.AxisDisplayRange[2];
+        //    if (xRange == 0f || ChartOwner.ChartBounds.Width <= 0 || ChartOwner.ChartBounds.Height <= 0)
+        //        return;
+
+        //    // Compute data X under cursor
+        //    float displayScaleX = (float)ChartOwner.ChartBounds.Width / xRange;
+        //    float panelX = cursorPos.X - ChartOwner.ChartBorder;
+        //    float dataX = (panelX / displayScaleX) + primaryXAxis.AxisDisplayRange[0] - primaryXAxis.AxisOffset;
+
+        //    // Precompute per-dataset time mapping
+        //    var datasetTimes = new Dictionary<int, float>();
+        //    for (int dsIdx = 0; dsIdx < ChartOwner.dataSets.Count; dsIdx++)
+        //    {
+        //        var ds = ChartOwner.dataSets[dsIdx];
+        //        float timeAtCursor = dataX;
+
+        //        if (ChartOwner.XChannelName == "Time")
+        //        {
+        //            timeAtCursor = dataX;
+        //        }
+        //        else if (ChartOwner.XChannelName == "xTime")
+        //        {
+        //            if (ds.channels != null && ds.channels.TryGetValue("xTime", out ChartChannel xt) && xt.DataPoints != null && xt.DataPoints.Count > 0)
+        //            {
+        //                if (TryFindNearestKeyByValue(xt.DataPoints, dataX, out float foundKey))
+        //                    timeAtCursor = foundKey;
+        //            }
+        //        }
+        //        else
+        //        {
+        //            if (ds.channels != null && ds.channels.TryGetValue(ChartOwner.XChannelName, out ChartChannel axisChan) && axisChan.DataPoints != null && axisChan.DataPoints.Count > 0)
+        //            {
+        //                if (TryFindNearestKeyByValue(axisChan.DataPoints, dataX, out float foundKey))
+        //                    timeAtCursor = foundKey;
+        //            }
+        //        }
+
+        //        datasetTimes[dsIdx] = timeAtCursor;
+        //    }
+
+        //    // Prepare text layout
+        //    float padding = 6f;
+        //    float lineHeight = this.Font.Height + 2;
+        //    float xRight = ChartOwner.ChartBounds.X + ChartOwner.ChartBounds.Width - padding;
+        //    float yTop = ChartOwner.ChartBounds.Y + padding;
+
+        //    var sf = new StringFormat() { Alignment = StringAlignment.Far, LineAlignment = StringAlignment.Near };
+
+        //    // Iterate channels and draw their values
+        //    int lineIndex = 0;
+        //    foreach (KeyValuePair<string, Axis> axisKvp in ChartOwner.Y_Axes)
+        //    {
+        //        Axis yAxis = axisKvp.Value;
+        //        if (yAxis == null || !yAxis.ShowAxis) continue;
+
+        //        foreach (ChartChannel chan in yAxis.AssociatedChannels)
+        //        {
+        //            if (!chan.ShowChannel) continue;
+
+        //            float sampleTime = datasetTimes.TryGetValue(chan.DataSetIndex, out float tval) ? tval : dataX;
+        //            string valueText;
+        //            if (chan.DataPoints != null && chan.DataPoints.Count > 0 && TryFindNearestValue(chan.DataPoints, sampleTime, out float foundY))
+        //            {
+        //                valueText = $"{chan.ChannelName}: {foundY:G3}";
+        //            }
+        //            else
+        //            {
+        //                valueText = $"{chan.ChannelName}: N/A";
+        //            }
+
+        //            using (Brush textBrush = new SolidBrush(chan.ChannelColor))
+        //            {
+        //                float y = yTop + lineIndex * lineHeight;
+        //                RectangleF layout = new RectangleF(ChartOwner.ChartBounds.X, y, ChartOwner.ChartBounds.Width - (padding * 2), lineHeight);
+        //                g.DrawString(valueText, this.Font, textBrush, layout, sf);
+        //            }
+
+        //            lineIndex++;
+        //        }
+        //    }
+        //}
     }
-    public class ChartControlMouseMoveEventArgs : EventArgs
+    /// <summary>
+    /// 
+    /// </summary>
+    public class ChartControlMouseTrackEventArgs : EventArgs
     {
         Dictionary<string, float> xAxisValues = new Dictionary<string, float>();
         public Dictionary<string, float> XAxisValues
@@ -1039,23 +1155,30 @@ namespace YamuraViewControls
             get { return xAxisValues; }
             set { xAxisValues = value; }
         }
-        Dictionary<string, float> yAxisValues = new Dictionary<string, float>();
-        public Dictionary<string, float> YAxisValues
+        // list of channel names and value for each data set
+        SortedList<string, SortedList<string, float>> yAxisValues = new SortedList<string, SortedList<string, float>>();
+        public SortedList<string, SortedList<string, float>> YAxisValues
         {
             get { return yAxisValues; }
             set { yAxisValues = value; }
         }
 
     }
+    /// <summary>
+    /// 
+    /// </summary>
     public class ChartControlXAxisChangeEventArgs : EventArgs
     {
-        string xAxisName;
+        string xAxisName = "";
         public string XAxisName
         {
             get { return xAxisName; }
             set { xAxisName = value; }
         }
     }
+    /// <summary>
+    /// 
+    /// </summary>
     public class AxisOffsetUpdateEventArgs : EventArgs
     {
         string channelName;
@@ -1091,6 +1214,9 @@ namespace YamuraViewControls
             OffsetVal = offset;
         }
     }
+    /// <summary>
+    /// 
+    /// </summary>
     public class DataChannel
     {
         String channelName;
@@ -1218,3 +1344,6 @@ namespace YamuraViewControls
         }
     }
 }
+
+
+
