@@ -230,7 +230,7 @@ namespace YamuraViewControls
                         primaryX.AxisDisplayRange[2] = (dataSet.channels["Time"].XRange[1]) - dataSet.channels["Time"].XRange[0];
                     }
                     // distance based x axis
-                    else if (ChartOwner.XChannelName == "xTime")
+                    else if (ChartOwner.XChannelName == "Distance")
                     {
                         primaryX.AxisDisplayRange[0] = dataSet.channels["xDistance"].XRange[0] < primaryX.AxisDisplayRange[0] ? dataSet.channels["xDistance"].XRange[0] : primaryX.AxisDisplayRange[0];
                         primaryX.AxisDisplayRange[1] = dataSet.channels["xDistance"].XRange[1] > primaryX.AxisDisplayRange[1] ? dataSet.channels["xDistance"].XRange[1] : primaryX.AxisDisplayRange[1];
@@ -292,7 +292,7 @@ namespace YamuraViewControls
                     {
                         // primaryX.AxisOffset = ChartOwner.dataSets[curChanInfo.DataSetIndex].TimeOffset;
                     }
-                    else if (ChartOwner.XChannelName == "xTime")
+                    else if (ChartOwner.XChannelName == "Distance")
                     {
                         primaryX.AxisOffset = ChartOwner.dataSets[curChanInfo.DataSetIndex].DistanceOffset;
                     }
@@ -315,12 +315,12 @@ namespace YamuraViewControls
                             }
                             // x axis is not time
                             // use data point time to look up distance in xTime channel
-                            else if (ChartOwner.XChannelName == "xTime")
+                            else if (ChartOwner.XChannelName == "Distance")
                             {
                                 // this point is time/value
                                 float timeValue = ChartOwner.dataSets[curChanInfo.DataSetIndex].channels[ChartOwner.XChannelName].dataPoints.FirstOrDefault(i => i.Key >= curData.Key).Value;
                                 // use time to find distance in xTime channel
-                                float timeDistance = ChartOwner.dataSets[curChanInfo.DataSetIndex].channels["xTime"].dataPoints.FirstOrDefault(i => i.Key >= curData.Key).Value;
+                                float timeDistance = ChartOwner.dataSets[curChanInfo.DataSetIndex].channels["Distance"].dataPoints.FirstOrDefault(i => i.Key >= curData.Key).Value;
                                 points[1] = new PointF(timeDistance, curData.Value);
                             }
                             // x axis is not time - use time from current channel point, find nearest time to that time in axis channel
@@ -830,9 +830,9 @@ namespace YamuraViewControls
                             distanceAtCursor = ds.channels["xDistance"].DataPoints[foundKey];
                         }
                     }
-                    else if (ChartOwner.XChannelName == "xTime")
+                    else if (ChartOwner.XChannelName == "Distance")
                     {
-                        if (ds.channels != null && ds.channels.TryGetValue("xTime", out ChartChannel xt) && xt.DataPoints != null && xt.DataPoints.Count > 0)
+                        if (ds.channels != null && ds.channels.TryGetValue("Distance", out ChartChannel xt) && xt.DataPoints != null && xt.DataPoints.Count > 0)
                         //if (ds.channels != null && ds.channels.TryGetValue("xDistance", out ChartChannel xt) && xt.DataPoints != null && xt.DataPoints.Count > 0)
                         {
 
@@ -1117,9 +1117,9 @@ namespace YamuraViewControls
         //        {
         //            timeAtCursor = dataX;
         //        }
-        //        else if (ChartOwner.XChannelName == "xTime")
+        //        else if (ChartOwner.XChannelName == "Distance")
         //        {
-        //            if (ds.channels != null && ds.channels.TryGetValue("xTime", out ChartChannel xt) && xt.DataPoints != null && xt.DataPoints.Count > 0)
+        //            if (ds.channels != null && ds.channels.TryGetValue("Distance", out ChartChannel xt) && xt.DataPoints != null && xt.DataPoints.Count > 0)
         //            {
         //                if (TryFindNearestKeyByValue(xt.DataPoints, dataX, out float foundKey))
         //                    timeAtCursor = foundKey;

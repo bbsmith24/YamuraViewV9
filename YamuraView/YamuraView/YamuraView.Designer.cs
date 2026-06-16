@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            components = new System.ComponentModel.Container();
             splitContainer1 = new SplitContainer();
             StripChart = new YamuraViewControls.Chart();
             splitContainer2 = new SplitContainer();
@@ -42,6 +43,8 @@
             timeAlignSetupToolStripMenuItem = new ToolStripMenuItem();
             distanceAlignSetupToolStripMenuItem = new ToolStripMenuItem();
             exitToolStripMenuItem = new ToolStripMenuItem();
+            checkAutoAddTimer = new System.Windows.Forms.Timer(components);
+            selectAutoAddFolder = new FolderBrowserDialog();
             ((System.ComponentModel.ISupportInitialize)splitContainer1).BeginInit();
             splitContainer1.Panel1.SuspendLayout();
             splitContainer1.Panel2.SuspendLayout();
@@ -155,6 +158,7 @@
             setAutoloadFolderToolStripMenuItem.Name = "setAutoloadFolderToolStripMenuItem";
             setAutoloadFolderToolStripMenuItem.Size = new Size(182, 22);
             setAutoloadFolderToolStripMenuItem.Text = "Set Autoload folder";
+            setAutoloadFolderToolStripMenuItem.Click += SetAutoLoadFolderClick;
             // 
             // timeAlignSetupToolStripMenuItem
             // 
@@ -174,6 +178,12 @@
             exitToolStripMenuItem.Name = "exitToolStripMenuItem";
             exitToolStripMenuItem.Size = new Size(182, 22);
             exitToolStripMenuItem.Text = "Exit";
+            // 
+            // checkAutoAddTimer
+            // 
+            checkAutoAddTimer.Enabled = true;
+            checkAutoAddTimer.Interval = 30000;
+            checkAutoAddTimer.Tick += CheckAutoAddTimerClick;
             // 
             // YamuraView
             // 
@@ -215,5 +225,7 @@
         private YamuraViewControls.Chart TractionCircle;
         private ToolStripMenuItem timeAlignSetupToolStripMenuItem;
         private ToolStripMenuItem distanceAlignSetupToolStripMenuItem;
+        private System.Windows.Forms.Timer checkAutoAddTimer;
+        private FolderBrowserDialog selectAutoAddFolder;
     }
 }

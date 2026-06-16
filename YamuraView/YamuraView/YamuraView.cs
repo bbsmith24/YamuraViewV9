@@ -33,6 +33,12 @@ namespace YamuraView
 
         public String FolderToWatch { get; private set; }
         public SortedList<String, String> folderToWatchFiles = new System.Collections.Generic.SortedList<String, String>();
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        public SortedList<String, String> FolderToWatchFiles
+        {
+            get { return folderToWatchFiles; }
+            set { folderToWatchFiles = value; }
+        }
         List<YamuraViewControls.Chart> chartControls = new List<YamuraViewControls.Chart>();
         public bool timeAlign = true;
         public bool distanceAlign = true;
@@ -84,7 +90,17 @@ namespace YamuraView
 
             chartControls[0].chartView1.ChartMouseTrackEvent += chartControls[1].OnChartMouseTrack;
             chartControls[0].chartView1.ChartMouseTrackEvent += chartControls[2].OnChartMouseTrack;
-
+            #endregion
+            #region get list of files in folder to watch (for new files to process)
+            if (Directory.Exists(FolderToWatch))
+            {
+                String[] files = Directory.GetFiles(FolderToWatch);
+                foreach (String file in files)
+                {
+                    FolderToWatchFiles.Add(file, file);
+                }
+            }
+            checkAutoAddTimer.Start();
             #endregion
         }
         #region read various log file formats
@@ -614,9 +630,9 @@ namespace YamuraView
                                 {
                                     dataLogger.runData[runIdx].AddChannel("xDistance", "Distance-Time", "Calculated", runName, 1.0F);
                                 }
-                                if (!dataLogger.runData[runIdx].channels.ContainsKey("xTime"))
+                                if (!dataLogger.runData[runIdx].channels.ContainsKey("Distance"))
                                 {
-                                    dataLogger.runData[runIdx].AddChannel("xTime", "Time-Distance", "Calculated", runName, 1.0F);
+                                    dataLogger.runData[runIdx].AddChannel("Distance", "Time-Distance", "Calculated", runName, 1.0F);
                                 }
                                 // add data to channels
                                 dataLogger.runData[runIdx].channels["Latitude"].AddPoint(absTime, latitude);
@@ -796,7 +812,7 @@ namespace YamuraView
                 distRange[2] = distRange[1] - distRange[0];
                 // first distance/time point is 0, 0
                 dataLogger.runData[runIdx].channels["xDistance"].AddPoint(0.0F, 0.0F);
-                dataLogger.runData[runIdx].channels["xTime"].AddPoint(0.0F, 0.0F);
+                dataLogger.runData[runIdx].channels["Distance"].AddPoint(0.0F, 0.0F);
                 for (int timestampIdx = 0; timestampIdx < timestamps.Count; timestampIdx++)
                 {
                     // data before first GPS point
@@ -810,7 +826,7 @@ namespace YamuraView
                                                                  timestamps[timestampIdx]);
                         }
                         // don't need to check for existing time point since timestamps are from original data and dont have duplicates
-                        dataLogger.runData[runIdx].channels["xTime"].AddPoint(
+                        dataLogger.runData[runIdx].channels["Distance"].AddPoint(
                                                              timestamps[timestampIdx],
                                                              0.0F);
                         continue;
@@ -825,7 +841,7 @@ namespace YamuraView
                                                                  dataLogger.runData[runIdx].channels["Distance-GPS"].dataPoints[timestamps[timestampIdx]],
                                                                  timestamps[timestampIdx]);
                         }
-                        dataLogger.runData[runIdx].channels["xTime"].AddPoint(
+                        dataLogger.runData[runIdx].channels["Distance"].AddPoint(
                                                              timestamps[timestampIdx],
                                                              dataLogger.runData[runIdx].channels["Distance-GPS"].dataPoints[timestamps[timestampIdx]]);
                         // reset gps point range for interpolation
@@ -851,7 +867,7 @@ namespace YamuraView
                                  dataLogger.runData[runIdx].channels["Distance-GPS"].dataPoints.ElementAt(gpsDistIdx[0]).Value,
                                  dataLogger.runData[runIdx].channels["Distance-GPS"].dataPoints.ElementAt(gpsDistIdx[0]).Key);
                         }
-                        dataLogger.runData[runIdx].channels["xTime"].AddPoint(
+                        dataLogger.runData[runIdx].channels["Distance"].AddPoint(
                              dataLogger.runData[runIdx].channels["Distance-GPS"].dataPoints.ElementAt(gpsDistIdx[0]).Key,
                              dataLogger.runData[runIdx].channels["Distance-GPS"].dataPoints.ElementAt(gpsDistIdx[0]).Value);
                         continue;
@@ -864,7 +880,7 @@ namespace YamuraView
                                                              interpolateDist,
                                                              timestamps[timestampIdx]);
                     }
-                    dataLogger.runData[runIdx].channels["xTime"].AddPoint(
+                    dataLogger.runData[runIdx].channels["Distance"].AddPoint(
                                                          timestamps[timestampIdx],
                                                          interpolateDist);
                 }
@@ -878,19 +894,19 @@ namespace YamuraView
                 errInfo.FileInfoText = errStr.ToString();
                 errInfo.ShowDialog();
             }
-            foreach (var channel in dataLogger.runData[runIdx].channels)
-            {
-                System.Diagnostics.Debug.WriteLine(string.Format("channel {0} has {1} points X range {2}, {3}, {4} Y range {5}, {6}, {7}",
-                                                                                                                       channel.Key,
-                                                                                                                       channel.Value.dataPoints.Count(),
-                                                                                                                       channel.Value.XRange[0],
-                                                                                                                       channel.Value.XRange[1],
-                                                                                                                       channel.Value.XRange[2],
-                                                                                                                       channel.Value.YRange[0],
-                                                                                                                       channel.Value.YRange[1],
-                                                                                                                       channel.Value.YRange[2]
-                                                                                                                       ));
-            }
+            //foreach (var channel in dataLogger.runData[runIdx].channels)
+            //{
+            //    System.Diagnostics.Debug.WriteLine(string.Format("channel {0} has {1} points X range {2}, {3}, {4} Y range {5}, {6}, {7}",
+            //                                                                                                           channel.Key,
+            //                                                                                                           channel.Value.dataPoints.Count(),
+            //                                                                                                           channel.Value.XRange[0],
+            //                                                                                                           channel.Value.XRange[1],
+            //                                                                                                           channel.Value.XRange[2],
+            //                                                                                                           channel.Value.YRange[0],
+            //                                                                                                           channel.Value.YRange[1],
+            //                                                                                                           channel.Value.YRange[2]
+            //                                                                                                           ));
+            //}
             AlignGPS();
             AlignTime();
             /// update displays with new data
@@ -1150,6 +1166,7 @@ namespace YamuraView
         /// <summary>
         /// 
         /// </summary>
+        #endregion
         public void AddLatestDataToCharts()
         {
             // no data to update
@@ -1186,6 +1203,7 @@ namespace YamuraView
                                                                             curRun.runName,
                                                                             1.0F,
                                                                             curChannel.Value.dataPoints);
+                    chartControls[chartIdx].dataSets[dataSetIdx].channels[curChannel.Key].ChannelColor = chartControls[chartIdx].AutoColors[(dataLogger.runData.Count - 1) % 7];
                     chartControls[chartIdx].Y_Axes[yAxisName].AxisValueRange[0] = chartControls[chartIdx].Y_Axes[yAxisName].AxisValueRange[0] < curChannel.Value.YRange[0] ? chartControls[chartIdx].Y_Axes[yAxisName].AxisValueRange[0] : curChannel.Value.YRange[0];
                     chartControls[chartIdx].Y_Axes[yAxisName].AxisValueRange[1] = chartControls[chartIdx].Y_Axes[yAxisName].AxisValueRange[1] > curChannel.Value.YRange[1] ? chartControls[chartIdx].Y_Axes[yAxisName].AxisValueRange[1] : curChannel.Value.YRange[1];
                     chartControls[chartIdx].Y_Axes[yAxisName].AxisValueRange[2] = chartControls[chartIdx].Y_Axes[yAxisName].AxisValueRange[1] - chartControls[chartIdx].Y_Axes[yAxisName].AxisValueRange[0];
@@ -1201,16 +1219,11 @@ namespace YamuraView
                     chartControls[chartIdx].X_Axes[xAxisName].AxisDisplayRange[2] = chartControls[chartIdx].X_Axes[xAxisName].AxisValueRange[2];
 
                     int associatedIdx = chartControls[chartIdx].Y_Axes[yAxisName].AssociatedChannels.Count > 0 ? chartControls[chartIdx].Y_Axes[yAxisName].AssociatedChannels.Count - 1 : 0;
-                    //chartControls[chartIdx].Y_Axes[yAxisName].AssociatedChannels.Add(new YamuraViewControls.ChartChannel(curChannel.Key, 
-                    //                                                                                                     curChannel.Value.ChannelDescription, 
-                    //                                                                                                     curChannel.Value.ChannelSource,
-                    //                                                                                                     curRun.runName, 
-                    //                                                                                                     1.0F));
                     chartControls[chartIdx].Y_Axes[yAxisName].AssociatedChannels.Add(chartControls[chartIdx].dataSets[dataSetIdx].channels[curChannel.Key]);
                     int associatedChannelIdx = chartControls[chartIdx].Y_Axes[yAxisName].AssociatedChannels.Count - 1;
                     chartControls[chartIdx].Y_Axes[yAxisName].AssociatedChannels[associatedChannelIdx].DataSetName = curRun.runName;
                     chartControls[chartIdx].Y_Axes[yAxisName].AssociatedChannels[associatedChannelIdx].DataSetIndex = dataSetIdx;
-                    chartControls[chartIdx].Y_Axes[yAxisName].AssociatedChannels[associatedChannelIdx].ChannelColor = Color.Red/* penColors[channelIdx % penColors.Count]*/;
+                    chartControls[chartIdx].Y_Axes[yAxisName].AssociatedChannels[associatedChannelIdx].ChannelColor = chartControls[chartIdx].AutoColors[(dataLogger.runData.Count - 1) % 7];//Color.Red/* penColors[channelIdx % penColors.Count]*/;
                     chartControls[chartIdx].Y_Axes[yAxisName].AssociatedChannels[associatedChannelIdx].ShowChannel = false;
                     chartControls[chartIdx].Y_Axes[yAxisName].AssociatedChannels[associatedChannelIdx].XRange[0] = curChannel.Value.XRange[0];
                     chartControls[chartIdx].Y_Axes[yAxisName].AssociatedChannels[associatedChannelIdx].XRange[1] = curChannel.Value.XRange[1];
@@ -1218,86 +1231,11 @@ namespace YamuraView
                     chartControls[chartIdx].Y_Axes[yAxisName].AssociatedChannels[associatedChannelIdx].YRange[0] = curChannel.Value.YRange[0];
                     chartControls[chartIdx].Y_Axes[yAxisName].AssociatedChannels[associatedChannelIdx].YRange[1] = curChannel.Value.YRange[1];
                     chartControls[chartIdx].Y_Axes[yAxisName].AssociatedChannels[associatedChannelIdx].YRange[2] = curChannel.Value.YRange[1] - curChannel.Value.YRange[0];
-                    //chartControls[chartIdx].Y_Axes[yAxisName].AssociatedChannels[associatedChannelIdx].AxisOffset[0] = 0.0F;
-                    //chartControls[chartIdx].Y_Axes[yAxisName].AssociatedChannels[associatedChannelIdx].AxisOffset[1] = 0.0F;
-                    //chartControls[chartIdx].Y_Axes[yAxisName].AssociatedChannels[associatedChannelIdx].AxisRange[0] = chartControls[chartIdx].Y_Axes[yAxisName].AxisValueRange[0];
-                    //chartControls[chartIdx].Y_Axes[yAxisName].AssociatedChannels[associatedChannelIdx].AxisRange[1] = chartControls[chartIdx].Y_Axes[yAxisName].AxisValueRange[1];
-                    //chartControls[chartIdx].Y_Axes[yAxisName].AssociatedChannels[associatedChannelIdx].AxisRange[2] = chartControls[chartIdx].Y_Axes[yAxisName].AxisValueRange[2];
                 }
                 chartControls[chartIdx].UpdateData();
             }
-
-            //for (int runIdx = initialRunCount; runIdx < dataLogger.runData.Count; runIdx++)
-            //foreach (KeyValuePair<string, RunData> curRun in dataLogger.runData)
-            //{
-            //    RunData curRun = dataLogger.runData[dataLogger.runData.Count - 1];
-            //    {
-            //        channelIdx = 0;
-            //        foreach (KeyValuePair<String, DataChannel> curChannel in curRun.channels)
-            //        {
-            //            if (curChannel.Value.DataRange[0] == curChannel.Value.DataRange[1])
-            //            {
-            //                curChannel.Value.DataRange[1] += 1;
-            //            }
-            //            String axisName = curChannel.Key;
-            //            for (int chartIdx = 0; chartIdx < chartControls.Count; chartIdx++)
-            //            {
-            //                if (chartControls[chartIdx].ChartAxes.ContainsKey(axisName))
-            //                {
-            //                    chartControls[chartIdx].ChartAxes[axisName].AxisValueRange[0] = chartControls[chartIdx].ChartAxes[axisName].AxisValueRange[0] < curChannel.Value.DataRange[0] ? chartControls[chartIdx].ChartAxes[axisName].AxisValueRange[0] : curChannel.Value.DataRange[0];
-            //                    chartControls[chartIdx].ChartAxes[axisName].AxisValueRange[1] = chartControls[chartIdx].ChartAxes[axisName].AxisValueRange[1] > curChannel.Value.DataRange[1] ? chartControls[chartIdx].ChartAxes[axisName].AxisValueRange[1] : curChannel.Value.DataRange[1];
-            //                }
-            //                else
-            //                {
-            //                    //chartControls[chartIdx].ChartAxes.Add(axisName, new Axis());
-            //                    chartControls[chartIdx].ChartAxes[axisName].AxisValueRange[0] = curChannel.Value.DataRange[0];
-            //                    chartControls[chartIdx].ChartAxes[axisName].AxisValueRange[1] = curChannel.Value.DataRange[1];
-            //                }
-            //                chartControls[chartIdx].ChartAxes[axisName].AxisName = axisName;
-            //                chartControls[chartIdx].ChartAxes[axisName].AxisValueRange[2] = chartControls[chartIdx].ChartAxes[axisName].AxisValueRange[1] - chartControls[chartIdx].ChartAxes[axisName].AxisValueRange[0];
-            //                chartControls[chartIdx].ChartAxes[axisName].AxisDisplayRange[0] = chartControls[chartIdx].ChartAxes[axisName].AxisValueRange[0];
-            //                chartControls[chartIdx].ChartAxes[axisName].AxisDisplayRange[1] = chartControls[chartIdx].ChartAxes[axisName].AxisValueRange[1];
-            //                chartControls[chartIdx].ChartAxes[axisName].AxisDisplayRange[2] = chartControls[chartIdx].ChartAxes[axisName].AxisValueRange[2];
-
-            //                //chartControls[chartIdx].ChartAxes[axisName].AssociatedChannels.Add((runIdx.ToString() + "-" + curChannel.Key), new ChannelInfo(runIdx, curChannel.Key));
-            //                chartControls[chartIdx].ChartAxes[axisName].AssociatedChannels[(runIdx.ToString() + "-" + curChannel.Key)].ChannelColor = penColors[channelIdx % penColors.Count];
-            //                chartControls[chartIdx].ChartAxes[axisName].AssociatedChannels[(runIdx.ToString() + "-" + curChannel.Key)].AxisOffset[0] = 0.0F;
-            //                chartControls[chartIdx].ChartAxes[axisName].AssociatedChannels[(runIdx.ToString() + "-" + curChannel.Key)].AxisOffset[1] = 0.0F;
-            //                chartControls[chartIdx].ChartAxes[axisName].AssociatedChannels[(runIdx.ToString() + "-" + curChannel.Key)].AxisRange[0] = chartControls[chartIdx].ChartAxes[axisName].AxisValueRange[0];
-            //                chartControls[chartIdx].ChartAxes[axisName].AssociatedChannels[(runIdx.ToString() + "-" + curChannel.Key)].AxisRange[1] = chartControls[chartIdx].ChartAxes[axisName].AxisValueRange[1];
-            //                chartControls[chartIdx].ChartAxes[axisName].AssociatedChannels[(runIdx.ToString() + "-" + curChannel.Key)].AxisRange[2] = chartControls[chartIdx].ChartAxes[axisName].AxisValueRange[2];
-
-            //            }
-            //            #region strip chart control axes create/update
-            //            #endregion
-            //            #region traction circle control axes create/update
-            //            #endregion
-            //            #region track map control axes create/update
-            //            #endregion
-            //            channelIdx++;
-            //        }
-            //        for (int chartIdx = 0; chartIdx < chartControls.Count; chartIdx++)
-            //        {
-            //            chartControls[chartIdx].ChartAxes = chartControls[chartIdx].ChartAxes;
-            //            chartControls[chartIdx].ChartAxes = chartControls[chartIdx].ChartAxes;
-            //        }
-            //    }
-            //}
-            #endregion
-            #region populate run data grid
-            //runDataGrid.Rows.Clear();
-            //for (int runGridIdx = 0; runGridIdx < dataLogger.runData.Count; runGridIdx++)
-            //{
-            //    runDataGrid.Rows.Add();
-            //    runDataGrid.Rows[runDataGrid.Rows.Count - 1].Cells["colRunNumber"].Value = (runGridIdx + 1).ToString();
-            //    runDataGrid.Rows[runDataGrid.Rows.Count - 1].Cells["colDate"].Value = dataLogger.runData[runGridIdx].dateStr + " " + dataLogger.runData[runGridIdx].timeStr;
-            //    runDataGrid.Rows[runDataGrid.Rows.Count - 1].Cells["colMinTime"].Value = dataLogger.runData[runGridIdx].channels["Time"].DataRange[0];
-            //    runDataGrid.Rows[runDataGrid.Rows.Count - 1].Cells["colMaxTime"].Value = dataLogger.runData[runGridIdx].channels["Time"].DataRange[1];
-            //    runDataGrid.Rows[runDataGrid.Rows.Count - 1].Cells["colSourceFile"].Value = dataLogger.runData[runGridIdx].fileName.ToString();
-            //}
             #endregion
         }
-        #endregion
         /// <summary>
         /// 
         /// </summary>
@@ -1314,25 +1252,25 @@ namespace YamuraView
                 if (fileName.EndsWith("TXT", StringComparison.CurrentCultureIgnoreCase))
                 {
                     ReadTXTFile(fileName);
-                    if (!folderToWatchFiles.ContainsKey(fileName))
+                    if (!FolderToWatchFiles.ContainsKey(fileName))
                     {
-                        folderToWatchFiles.Add(fileName, fileName);
+                        FolderToWatchFiles.Add(fileName, fileName);
                     }
                 }
                 else if (fileName.EndsWith("YLG", StringComparison.CurrentCultureIgnoreCase))
                 {
                     ReadYLGFile(fileName);
-                    if (!folderToWatchFiles.ContainsKey(fileName))
+                    if (!FolderToWatchFiles.ContainsKey(fileName))
                     {
-                        folderToWatchFiles.Add(fileName, fileName);
+                        FolderToWatchFiles.Add(fileName, fileName);
                     }
                 }
                 else if (fileName.EndsWith("YL5", StringComparison.CurrentCultureIgnoreCase))
                 {
                     ReadYL5File(fileName);
-                    if (!folderToWatchFiles.ContainsKey(fileName))
+                    if (!FolderToWatchFiles.ContainsKey(fileName))
                     {
-                        folderToWatchFiles.Add(fileName, fileName);
+                        FolderToWatchFiles.Add(fileName, fileName);
                     }
                 }
                 if (dataLogger.runData.Count > 1)
@@ -1341,10 +1279,63 @@ namespace YamuraView
                     AlignTime();
                 }
             }
-            //for (int chartIdx = 0; chartIdx < 3; chartIdx++)
-            //{
-            //    //chartControls[0].Invalidate();
-            //}
+        }
+        private void CheckAutoAddTimerClick(object sender, EventArgs e)
+        {
+            bool loadFile = false;
+            String loadFileName = "";
+            #region find first unloaded file in in folder to watch
+            if (Directory.Exists(FolderToWatch))
+            {
+                String[] files = Directory.GetFiles(FolderToWatch);
+                foreach (String file in files)
+                {
+                    if (!FolderToWatchFiles.ContainsKey(file) &&
+                        (file.EndsWith("TXT", StringComparison.CurrentCultureIgnoreCase) ||
+                         file.EndsWith("YLG", StringComparison.CurrentCultureIgnoreCase) ||
+                         file.EndsWith("YL5", StringComparison.CurrentCultureIgnoreCase)))
+                    {
+                        loadFile = true;
+                        loadFileName = file;
+                        break;
+                    }
+                }
+            }
+            #endregion
+            #region no new file to load, return
+            if (!loadFile)
+            {
+                //System.Diagnostics.Debug.WriteLine("*******************************************");
+                //System.Diagnostics.Debug.WriteLine("* No new files to auto load in " + FolderToWatch);
+                //System.Diagnostics.Debug.WriteLine("*******************************************");
+                return;
+            }
+            #endregion
+            #region load various file formats
+            //System.Diagnostics.Debug.WriteLine("*******************************************");
+            //System.Diagnostics.Debug.WriteLine("* Auto loading file: " + loadFileName);
+            //System.Diagnostics.Debug.WriteLine("*******************************************");
+            if (loadFileName.EndsWith("TXT", StringComparison.CurrentCultureIgnoreCase))
+            {
+                ReadTXTFile(loadFileName);
+                FolderToWatchFiles.Add(loadFileName, loadFileName);
+            }
+            else if (loadFileName.EndsWith("YLG", StringComparison.CurrentCultureIgnoreCase))
+            {
+                ReadYLGFile(loadFileName);
+                FolderToWatchFiles.Add(loadFileName, loadFileName);
+            }
+            else if (loadFileName.EndsWith("YL5", StringComparison.CurrentCultureIgnoreCase))
+            {
+                ReadYL5File(loadFileName);
+                FolderToWatchFiles.Add(loadFileName, loadFileName);
+            }
+            #endregion
+            if (dataLogger.runData.Count > 1)
+            {
+                AlignGPS();
+                AlignTime();
+            }
         }
         /// <summary>
         /// align most recent added data set to first data set using GPS data
@@ -1437,7 +1428,7 @@ namespace YamuraView
                     priorAccel = curAccel;
                 }
                 dataSet.TimeOffset = timeOffset;
-                System.Diagnostics.Debug.WriteLine("run " + dataSet.runName + " time offset " + dataSet.TimeOffset.ToString());
+                //System.Diagnostics.Debug.WriteLine("run " + dataSet.runName + " time offset " + dataSet.TimeOffset.ToString());
             }
         }
 
@@ -1487,7 +1478,11 @@ namespace YamuraView
             double rad = (deg * Math.PI) / 180.0;
             return (float)rad;
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void timeAlignSetupToolStripMenuItem_Click(object sender, EventArgs e)
         {
             TimeAlignDialog timeAlignDialog = new TimeAlignDialog();
@@ -1498,6 +1493,27 @@ namespace YamuraView
             }
             //timeAlign = timeAlignDialog.TimeAligned;
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void SetAutoLoadFolderClick(object sender, EventArgs e)
+        {
+            if (selectAutoAddFolder.ShowDialog() == DialogResult.Cancel)
+            { return; }
+            FolderToWatch = selectAutoAddFolder.SelectedPath;
+            folderToWatchFiles.Clear();
+            #region get list of files in folder to watch (for new files to process)
+            if (Directory.Exists(FolderToWatch))
+            {
+                String[] files = Directory.GetFiles(FolderToWatch);
+                foreach (String file in files)
+                {
+                    FolderToWatchFiles.Add(file, file);
+                }
+            }
+            #endregion        
+        }
     }
 }
-

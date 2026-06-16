@@ -49,49 +49,7 @@ namespace YamuraViewControls
         public Dictionary<string, Axis> Y_Axes
         {
             get { return yAxes; }
-            set
-            {
-                yAxes = value;
-                //if (chartAxes == null)
-                //{
-                //    return;
-                //}
-                //chartPropertiesForm.AxisChannelTree.Nodes.Clear();
-                //chartPropertiesForm.CmbXAxis.Items.Clear();
-                //chartPropertiesForm.CmbAlignAxis.Items.Clear();
-                //chartPropertiesForm.TxtAutoThreshold.Text = "0.0";
-                //foreach (KeyValuePair<String, Axis> curAxis in chartAxes)
-                //{
-                //    chartPropertiesForm.CmbXAxis.Items.Add(curAxis.Key);
-                //    chartPropertiesForm.CmbAlignAxis.Items.Add(curAxis.Key);
-
-                //    bool axisFound = false;
-                //    foreach (TreeNode axisItem in chartPropertiesForm.AxisChannelTree.Nodes)
-                //    {
-                //        axisFound = false;
-                //        if (axisItem.Name == curAxis.Key)
-                //        {
-                //            axisFound = true;
-                //            break;
-                //        }
-                //    }
-                //    if (!axisFound)
-                //    {
-                //        chartPropertiesForm.AxisChannelTree.Nodes.Add(curAxis.Key, curAxis.Key, 0);
-                //        chartPropertiesForm.AxisChannelTree.Nodes[curAxis.Key].Checked = curAxis.Value.ShowAxis;
-                //    }
-                //    foreach (KeyValuePair<String, ChannelInfo> associatedChannel in curAxis.Value.AssociatedChannels)
-                //    {
-                //        if (chartPropertiesForm.AxisChannelTree.Nodes[curAxis.Key].Nodes.ContainsKey(associatedChannel.Key))
-                //        {
-                //            continue;
-                //        }
-                //        chartPropertiesForm.AxisChannelTree.Nodes[curAxis.Key].Nodes.Add(associatedChannel.Key, associatedChannel.Key, 1);
-                //        chartPropertiesForm.AxisChannelTree.Nodes[curAxis.Key].Nodes[associatedChannel.Key].Checked = associatedChannel.Value.ShowChannel;
-
-                //    }
-                //}
-            }
+            set { yAxes = value; }
         }
         // true if X and Y scale are equal regardless of window size
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
@@ -156,7 +114,7 @@ namespace YamuraViewControls
             }
         }
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public Rectangle ChartBounds = new Rectangle(0, 0, 0, 0);  
+        public Rectangle ChartBounds = new Rectangle(0, 0, 0, 0);
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public string XChannelName { get; set; }
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
@@ -165,17 +123,32 @@ namespace YamuraViewControls
         [Browsable(true)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         [Description("Chart Name displayed on chart tab in control"), Category("Data")]
-        public string ChartName { 
-            get 
+        public string ChartName {
+            get
             {
                 chartName = ChartTabs.TabPages[0].Text;
-                return chartName;  
-            } 
-            set { 
+                return chartName;
+            }
+            set {
                 chartName = value;
                 ChartTabs.TabPages[0].Text = chartName;
             }
         }
+
+        List<Color> autoColors = new List<Color> { Color.Red,
+                                                   Color.Green,
+                                                   Color.Blue,
+                                                   Color.Yellow,
+                                                   Color.Cyan,
+                                                   Color.Magenta,
+                                                   Color.Gray };
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        public List<Color> AutoColors
+        {
+            get { return autoColors; }
+            set { autoColors = value; }
+        }
+
         /// <summary>
         /// 
         /// </summary>
@@ -197,54 +170,64 @@ namespace YamuraViewControls
         /// </summary>
         public void UpdateData()
         {
-            chartProperties1.AxisChannelTree.Nodes.Clear();
+            //chartProperties1.AxisChannelTree.Nodes.Clear();
             chartProperties1.CmbXAxis.Items.Clear();
-            //chartProperties1.CmbAlignAxis.Items.Clear();
-            //chartProperties1.TxtAutoThreshold.Text = "0.0";
-            //foreach (KeyValuePair<String, Axis> curAxis in chartAxes)
             String curAxisName = yAxes.ElementAt(0).Key;
             Axis curAxis = yAxes.ElementAt(0).Value;
 
-            //chartProperties1.CmbXAxis.Items.Add(xAxes.ElementAt(0).Key);
-            //chartProperties1.CmbAlignAxis.Items.Add(xAxes.ElementAt(0).Key);
-
-            //foreach (TreeNode axisItem in chartProperties1.AxisChannelTree.Nodes)
-            //{
-            //    axisFound = false;
-            //    if (axisItem.Name == curAxisName)
-            //    {
-            //        axisFound = true;
-            //        break;
-            //    }
-            //}
-            //if (!axisFound)
-            //{
-            //    chartProperties1.AxisChannelTree.Nodes.Add(curAxisName, curAxisName, 0);
-            //    chartProperties1.AxisChannelTree.Nodes[curAxisName].Checked = curAxis.ShowAxis;
-            //}
             foreach (ChartChannel associatedChannel in curAxis.AssociatedChannels)
             {
-                if (!chartProperties1.AxisChannelTree.Nodes.ContainsKey(associatedChannel.ChannelName))
+                if (((ChartName == "Strip Chart") &&
+                     ((associatedChannel.ChannelName != "xDistance") && (associatedChannel.ChannelName != "Distance") && (associatedChannel.ChannelName != "Time"))) ||
+                    ((ChartName == "Track Map") &&
+                     ((associatedChannel.ChannelName == "Longitude") || (associatedChannel.ChannelName == "Latitude"))) ||
+                    ((ChartName == "Traction Circle") &&
+                     ((associatedChannel.ChannelName == "gX") || (associatedChannel.ChannelName == "gY") || (associatedChannel.ChannelName == "gZ"))))
                 {
-                    chartProperties1.AxisChannelTree.Nodes.Add(associatedChannel.ChannelName, associatedChannel.ChannelName,1);
+                    if (!chartProperties1.AxisChannelTree.Nodes.ContainsKey(associatedChannel.ChannelName))
+                    {
+                        chartProperties1.AxisChannelTree.Nodes.Add(associatedChannel.ChannelName, associatedChannel.ChannelName, 1);
+                    }
+                    String proposedName = associatedChannel.ChannelName + " (" + associatedChannel.DataSetName + ")";
+                    if (!chartProperties1.AxisChannelTree.Nodes[associatedChannel.ChannelName].Nodes.ContainsKey(proposedName))
+                    {
+                        TreeNode newNode = chartProperties1.AxisChannelTree.Nodes[associatedChannel.ChannelName].Nodes.Add(proposedName,
+                                                                                                    proposedName,
+                                                                                                    1);
+                        if (chartProperties1.AxisChannelTree.Nodes[associatedChannel.ChannelName].Checked)
+                        {
+                            associatedChannel.ShowChannel = true;
+                        }
+                        newNode.Tag = associatedChannel;
+                        newNode.Checked = associatedChannel.ShowChannel;
+                    }
                 }
-                TreeNode newNode = chartProperties1.AxisChannelTree.Nodes[associatedChannel.ChannelName].Nodes.Add(associatedChannel.ChannelName, 
-                                                                                                associatedChannel.ChannelName + " (" + associatedChannel.DataSetName + ")", 
-                                                                                                1);
-                newNode.Tag = associatedChannel;
-                newNode.Checked = associatedChannel.ShowChannel;
-                //if (chartProperties1.AxisChannelTree.Nodes[curAxisName].Nodes.ContainsKey(associatedChannel.ChannelName))
-                //{
-                //    continue;
-                //}
-                if (!chartProperties1.CmbXAxis.Items.Contains(associatedChannel.ChannelName))
-                {
-                    chartProperties1.CmbXAxis.Items.Add(associatedChannel.ChannelName);
-                }
-                //chartProperties1.AxisChannelTree.Nodes[curAxisName].Nodes.Add(associatedChannel.ChannelName, associatedChannel.ChannelName, 1);
-                //chartProperties1.AxisChannelTree.Nodes[curAxisName].Nodes[associatedChannel.ChannelName].Checked = associatedChannel.ShowChannel;
-
             }
+            if (ChartName == "Strip Chart")
+            {
+                chartProperties1.CmbXAxis.Items.Clear();
+                chartProperties1.CmbXAxis.Items.Add("Time");
+                chartProperties1.CmbXAxis.Items.Add("Distance");
+            }
+            else if (ChartName == "Track Map")
+            {
+                chartProperties1.CmbXAxis.Items.Clear();
+                chartProperties1.CmbXAxis.Items.Add("Longitude");
+                chartProperties1.CmbXAxis.Items.Add("Latitude");
+            }
+            else if (ChartName == "Traction Circle")
+            {
+                chartProperties1.CmbXAxis.Items.Clear();
+                chartProperties1.CmbXAxis.Items.Add("gX");
+                chartProperties1.CmbXAxis.Items.Add("gY");
+                chartProperties1.CmbXAxis.Items.Add("gZ");
+            }
+            Invalidate(true);
+            //if (!chartProperties1.CmbXAxis.Items.Contains(associatedChannel.ChannelName))
+            //{
+            //    chartProperties1.CmbXAxis.Items.Add(associatedChannel.ChannelName);
+            //}
+
         }
         /// <summary>
         /// 
@@ -372,9 +355,9 @@ namespace YamuraViewControls
             //        {
             //            timeAtCursor = dataX;
             //        }
-            //        else if (XChannelName == "xTime")
+            //        else if (XChannelName == "Distance")
             //        {
-            //            if (ds.channels != null && ds.channels.TryGetValue("xTime", out ChartChannel xt) && xt.DataPoints != null && xt.DataPoints.Count > 0)
+            //            if (ds.channels != null && ds.channels.TryGetValue("Distance", out ChartChannel xt) && xt.DataPoints != null && xt.DataPoints.Count > 0)
             //            {
             //                if (chartView1.TryFindNearestKeyByValue(xt.DataPoints, dataX, out float foundKey))
             //                    timeAtCursor = foundKey;
