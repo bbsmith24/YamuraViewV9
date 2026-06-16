@@ -594,7 +594,9 @@ namespace YamuraView
                             float latitude = (float)inFile.ReadInt32() / 10000000.0F;
                             float longitude = (float)inFile.ReadInt32() / 10000000.0F;
                             float course = (float)inFile.ReadInt32();
-                            float speed = (float)inFile.ReadInt32() / 1000.0F;
+                            float speed = ((float)inFile.ReadInt32() / 1000.0F) * 2.23694F; // convert GPS meters/sec to MPH
+                            // convert meters/second to KPH
+                            //float speed = ((float)inFile.ReadInt32() / 1000.0F) * 3.6F; // convert GPS meters/sec to KPH
                             Byte SIV = inFile.ReadByte();
                             if (SIV > 0)
                             {
@@ -1433,7 +1435,7 @@ namespace YamuraView
         }
 
         /// <summary>
-        /// great circle distance between 2 lat/long points
+        /// great circle distance between 2 lat/long points in feet
         /// </summary>
         /// <param name="lat1Deg"></param>
         /// <param name="long1Deg"></param>
@@ -1450,7 +1452,7 @@ namespace YamuraView
             // d = R ⋅ c
             // where   'lat' is latitude, 'long' is longitude, R is earth’s radius (mean radius = 6371km);
 
-            double R = 6371e3F; // metres
+            double R = 6371e3F; // meters
             R = R * 3.28084; // feet
             double phi1 = DegreesToRadians(lat1Deg);
             double phi2 = DegreesToRadians(lat2Deg);
