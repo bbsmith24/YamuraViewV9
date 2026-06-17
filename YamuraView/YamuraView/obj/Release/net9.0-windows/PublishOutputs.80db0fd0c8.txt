@@ -1,0 +1,9 @@
+D:\Temp\YamuraLog release\YamuraView.exe
+D:\Temp\YamuraLog release\YamuraView.dll
+D:\Temp\YamuraLog release\YamuraView.deps.json
+D:\Temp\YamuraLog release\YamuraView.runtimeconfig.json
+D:\Temp\YamuraLog release\YamuraView.pdb
+D:\Temp\YamuraLog release\Win32Interop.Gdi32.dll
+D:\Temp\YamuraLog release\Win32Interop.User32.dll
+D:\Temp\YamuraLog release\YamuraViewControls.dll
+D:\Temp\YamuraLog release\YamuraViewControls.pdb

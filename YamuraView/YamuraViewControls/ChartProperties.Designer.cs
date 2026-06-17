@@ -44,7 +44,6 @@
             cmbChartMode = new ComboBox();
             label5 = new Label();
             colorDialog1 = new ColorDialog();
-            btnResetDistanceALign = new Button();
             channelsContext.SuspendLayout();
             SuspendLayout();
             // 
@@ -52,10 +51,11 @@
             // 
             axisChannelTree.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             axisChannelTree.ContextMenuStrip = channelsContext;
-            axisChannelTree.Location = new Point(14, 169);
+            axisChannelTree.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            axisChannelTree.Location = new Point(14, 108);
             axisChannelTree.Margin = new Padding(4, 3, 4, 3);
             axisChannelTree.Name = "axisChannelTree";
-            axisChannelTree.Size = new Size(405, 274);
+            axisChannelTree.Size = new Size(405, 335);
             axisChannelTree.TabIndex = 30;
             axisChannelTree.AfterCheck += axisChannelTree_AfterCheck;
             // 
@@ -114,18 +114,19 @@
             // 
             // cmbXAxis
             // 
+            cmbXAxis.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
             cmbXAxis.FormattingEnabled = true;
             cmbXAxis.Location = new Point(83, 14);
             cmbXAxis.Margin = new Padding(4, 3, 4, 3);
             cmbXAxis.Name = "cmbXAxis";
-            cmbXAxis.Size = new Size(104, 23);
+            cmbXAxis.Size = new Size(104, 29);
             cmbXAxis.TabIndex = 32;
             cmbXAxis.SelectedIndexChanged += cmbXAxis_SelectedIndexChanged;
             // 
             // label2
             // 
             label2.AutoSize = true;
-            label2.Location = new Point(14, 17);
+            label2.Location = new Point(14, 22);
             label2.Margin = new Padding(4, 0, 4, 0);
             label2.Name = "label2";
             label2.Size = new Size(38, 15);
@@ -135,7 +136,7 @@
             // label3
             // 
             label3.AutoSize = true;
-            label3.Location = new Point(14, 151);
+            label3.Location = new Point(14, 90);
             label3.Margin = new Padding(4, 0, 4, 0);
             label3.Name = "label3";
             label3.Size = new Size(56, 15);
@@ -145,12 +146,13 @@
             // 
             // cmbChartMode
             // 
+            cmbChartMode.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
             cmbChartMode.FormattingEnabled = true;
             cmbChartMode.Items.AddRange(new object[] { "Absolute", "Normalized" });
-            cmbChartMode.Location = new Point(83, 43);
+            cmbChartMode.Location = new Point(83, 49);
             cmbChartMode.Margin = new Padding(4, 3, 4, 3);
             cmbChartMode.Name = "cmbChartMode";
-            cmbChartMode.Size = new Size(104, 23);
+            cmbChartMode.Size = new Size(104, 29);
             cmbChartMode.TabIndex = 41;
             cmbChartMode.Text = "Absolute";
             cmbChartMode.SelectedIndexChanged += cmbChartMode_SelectedIndexChanged;
@@ -158,28 +160,17 @@
             // label5
             // 
             label5.AutoSize = true;
-            label5.Location = new Point(14, 46);
+            label5.Location = new Point(14, 57);
             label5.Margin = new Padding(4, 0, 4, 0);
             label5.Name = "label5";
             label5.Size = new Size(70, 15);
             label5.TabIndex = 40;
             label5.Text = "Chart Mode";
             // 
-            // btnResetDistanceALign
-            // 
-            btnResetDistanceALign.Location = new Point(112, 107);
-            btnResetDistanceALign.Name = "btnResetDistanceALign";
-            btnResetDistanceALign.Size = new Size(92, 41);
-            btnResetDistanceALign.TabIndex = 43;
-            btnResetDistanceALign.Text = "Reset Distance Align";
-            btnResetDistanceALign.UseVisualStyleBackColor = true;
-            btnResetDistanceALign.Click += btnResetDistanceALign_Click;
-            // 
             // ChartProperties
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            Controls.Add(btnResetDistanceALign);
             Controls.Add(cmbChartMode);
             Controls.Add(label5);
             Controls.Add(label3);
@@ -213,6 +204,5 @@
         private Label label5;
         private ToolStripMenuItem traceColorMenuItem;
         private ColorDialog colorDialog1;
-        private Button btnResetDistanceALign;
     }
 }

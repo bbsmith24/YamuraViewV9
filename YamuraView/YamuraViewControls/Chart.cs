@@ -129,7 +129,8 @@ namespace YamuraViewControls
                 chartName = ChartTabs.TabPages[0].Text;
                 return chartName;
             }
-            set {
+            set 
+            {
                 chartName = value;
                 ChartTabs.TabPages[0].Text = chartName;
             }
@@ -208,12 +209,14 @@ namespace YamuraViewControls
                 chartProperties1.CmbXAxis.Items.Clear();
                 chartProperties1.CmbXAxis.Items.Add("Time");
                 chartProperties1.CmbXAxis.Items.Add("Distance");
+                chartProperties1.CmbXAxis.Text = "Distance";
             }
             else if (ChartName == "Track Map")
             {
                 chartProperties1.CmbXAxis.Items.Clear();
                 chartProperties1.CmbXAxis.Items.Add("Longitude");
                 chartProperties1.CmbXAxis.Items.Add("Latitude");
+                chartProperties1.CmbXAxis.Text = "Longitude";
             }
             else if (ChartName == "Traction Circle")
             {
@@ -221,6 +224,7 @@ namespace YamuraViewControls
                 chartProperties1.CmbXAxis.Items.Add("gX");
                 chartProperties1.CmbXAxis.Items.Add("gY");
                 chartProperties1.CmbXAxis.Items.Add("gZ");
+                chartProperties1.CmbXAxis.Text = "gX";
             }
             Invalidate(true);
             //if (!chartProperties1.CmbXAxis.Items.Contains(associatedChannel.ChannelName))

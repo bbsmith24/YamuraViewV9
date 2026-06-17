@@ -1,0 +1,5 @@
+D:\Temp\YamuraLog release\YamuraViewControls.dll
+D:\Temp\YamuraLog release\YamuraViewControls.deps.json
+D:\Temp\YamuraLog release\YamuraViewControls.pdb
+D:\Temp\YamuraLog release\Win32Interop.Gdi32.dll
+D:\Temp\YamuraLog release\Win32Interop.User32.dll

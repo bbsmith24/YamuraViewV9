@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
             components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(YamuraView));
             splitContainer1 = new SplitContainer();
             StripChart = new YamuraViewControls.Chart();
             splitContainer2 = new SplitContainer();
@@ -58,6 +59,8 @@
             // 
             // splitContainer1
             // 
+            splitContainer1.BackColor = SystemColors.Control;
+            splitContainer1.BorderStyle = BorderStyle.Fixed3D;
             splitContainer1.Dock = DockStyle.Fill;
             splitContainer1.Location = new Point(0, 24);
             splitContainer1.Name = "splitContainer1";
@@ -70,7 +73,8 @@
             // 
             splitContainer1.Panel2.Controls.Add(splitContainer2);
             splitContainer1.Size = new Size(800, 426);
-            splitContainer1.SplitterDistance = 266;
+            splitContainer1.SplitterDistance = 554;
+            splitContainer1.SplitterWidth = 5;
             splitContainer1.TabIndex = 0;
             // 
             // StripChart
@@ -79,11 +83,12 @@
             StripChart.Dock = DockStyle.Fill;
             StripChart.Location = new Point(0, 0);
             StripChart.Name = "StripChart";
-            StripChart.Size = new Size(266, 426);
+            StripChart.Size = new Size(550, 422);
             StripChart.TabIndex = 0;
             // 
             // splitContainer2
             // 
+            splitContainer2.BorderStyle = BorderStyle.Fixed3D;
             splitContainer2.Dock = DockStyle.Fill;
             splitContainer2.Location = new Point(0, 0);
             splitContainer2.Name = "splitContainer2";
@@ -96,8 +101,9 @@
             // splitContainer2.Panel2
             // 
             splitContainer2.Panel2.Controls.Add(TractionCircle);
-            splitContainer2.Size = new Size(530, 426);
-            splitContainer2.SplitterDistance = 166;
+            splitContainer2.Size = new Size(241, 426);
+            splitContainer2.SplitterDistance = 234;
+            splitContainer2.SplitterWidth = 5;
             splitContainer2.TabIndex = 0;
             // 
             // TrackMap
@@ -106,7 +112,7 @@
             TrackMap.Dock = DockStyle.Fill;
             TrackMap.Location = new Point(0, 0);
             TrackMap.Name = "TrackMap";
-            TrackMap.Size = new Size(530, 166);
+            TrackMap.Size = new Size(237, 230);
             TrackMap.TabIndex = 0;
             // 
             // TractionCircle
@@ -115,7 +121,7 @@
             TractionCircle.Dock = DockStyle.Fill;
             TractionCircle.Location = new Point(0, 0);
             TractionCircle.Name = "TractionCircle";
-            TractionCircle.Size = new Size(530, 256);
+            TractionCircle.Size = new Size(237, 183);
             TractionCircle.TabIndex = 0;
             // 
             // openLogFile
@@ -192,9 +198,10 @@
             ClientSize = new Size(800, 450);
             Controls.Add(splitContainer1);
             Controls.Add(menuStrip1);
+            Icon = (Icon)resources.GetObject("$this.Icon");
             MainMenuStrip = menuStrip1;
             Name = "YamuraView";
-            Text = "Form1";
+            Text = "YamuraView 9.x";
             splitContainer1.Panel1.ResumeLayout(false);
             splitContainer1.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)splitContainer1).EndInit();

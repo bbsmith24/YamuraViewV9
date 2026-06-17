@@ -335,7 +335,14 @@ namespace YamuraViewControls
                                 points[0] = new PointF(points[1].X, points[1].Y);
                                 continue;
                             }
-                            curChanInfo.ChannelPath.AddLine(points[0], points[1]);
+                            if (ChartOwner.ChartName == "Traction Circle")
+                            {
+                                curChanInfo.ChannelPath.AddEllipse(new RectangleF(points[0], new SizeF(.001F, .001F)));
+                            }
+                            else
+                            {
+                                curChanInfo.ChannelPath.AddLine(points[0], points[1]);
+                            }
                             points[0] = new PointF(points[1].X, points[1].Y);
                         }
                     }
@@ -370,6 +377,16 @@ namespace YamuraViewControls
                         pathPen.Width = 0;
                         // draw the path
                         chartGraphics.DrawPath(pathPen, curChanInfo.ChannelPath);
+                        if (ChartOwner.ChartName == "Traction Circle")
+                        {
+                            pathPen.Color = Color.DarkGray;
+                            chartGraphics.DrawEllipse(pathPen, new RectangleF(-0.5F, -0.5F, 1.0F, 1.0F));
+                            chartGraphics.DrawEllipse(pathPen, new RectangleF(-1.0F, -1.0F, 2.0F, 2.0F));
+                            chartGraphics.DrawEllipse(pathPen, new RectangleF(-1.5F, -1.5F, 3.0F, 3.0F));
+                            chartGraphics.DrawLine(pathPen, new PointF(0, -1.75F), new PointF(0, 1.75F));
+                            chartGraphics.DrawLine(pathPen, new PointF(-1.75F, 0), new PointF(1.75F, 0));
+                            //                            curChanInfo.ChannelPath.AddEllipse(new RectangleF(points[0], new SizeF(.001F, .001F)));
+                        }
                         // reset to original orientation
                         chartGraphics.ResetTransform();
                     }
