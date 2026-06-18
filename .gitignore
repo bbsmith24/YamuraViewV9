@@ -84,3 +84,20 @@
 **/obj/**
 **/bin/**
 
+/YamuraView/YamuraView/bin/Release/net9.0-windows/YamuraView.dll
+/YamuraView/YamuraView/obj/Release/net9.0-windows/ref/YamuraView.dll
+/YamuraView/YamuraView/obj/Release/net9.0-windows/refint/YamuraView.dll
+/YamuraView/YamuraView/obj/Release/net9.0-windows/YamuraView.dll
+/YamuraView/YamuraView/bin/Release/net9.0-windows/YamuraViewControls.pdb
+/YamuraView/YamuraViewControls/bin/Release/net9.0-windows/YamuraViewControls.dll
+/YamuraView/YamuraViewControls/bin/Release/net9.0-windows/YamuraViewControls.pdb
+/YamuraView/YamuraViewControls/obj/Release/net9.0-windows/ref/YamuraViewControls.dll
+/YamuraView/YamuraViewControls/obj/Release/net9.0-windows/refint/YamuraViewControls.dll
+/YamuraView/YamuraViewControls/obj/Release/net9.0-windows/YamuraViewControls.dll
+/YamuraView/YamuraViewControls/obj/Release/net9.0-windows/YamuraViewControls.pdb
+/YamuraView/.vs/ProjectEvaluation/yamuraview.projects.v9.bin
+/YamuraView/YamuraView/bin/Release/net9.0-windows/YamuraView.pdb
+/YamuraView/YamuraView/obj/Release/net9.0-windows/YamuraView.pdb
+/YamuraView/YamuraView/bin/Release/net9.0-windows/YamuraView.exe
+/YamuraView/.vs/ProjectEvaluation/yamuraview.metadata.v9.bin
+/YamuraView/.vs/ProjectEvaluation/yamuraview.strings.v9.bin
