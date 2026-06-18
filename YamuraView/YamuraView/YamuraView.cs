@@ -1517,5 +1517,20 @@ namespace YamuraView
             }
             #endregion        
         }
+
+        private void saveConfigurationToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            String setupStr = String.Empty;
+            foreach(Chart curChart in chartControls)
+            {
+                setupStr += curChart.SaveSetup();
+            }
+
+        }
+
+        private void loadConfigurationToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 }

@@ -77,3 +77,10 @@
 /YamuraView/.vs/YamuraView/v17/.futdcache.v2
 /YamuraView/.vs/YamuraView/FileContentIndex/f1e7ee17-652a-4b51-8871-a72966f517ec.vsidx
 *.vsidx
+*.dll
+*.pdb
+*.obj
+*.bin
+**/obj/**
+**/bin/**
+

@@ -19,7 +19,9 @@ namespace YamuraViewControls
     public delegate void ChartXAxisChange(object sender, ChartControlXAxisChangeEventArgs e);
     public delegate void AxisOffsetUpdate(object sender, AxisOffsetUpdateEventArgs e);
     public delegate void ClearGraphicsPath(object sender, EventArgs e);
-
+    /// <summary>
+    /// 
+    /// </summary>
     public partial class Chart : UserControl
     {
         public List<DisplayDataSet> dataSets = new List<DisplayDataSet>();
@@ -248,8 +250,14 @@ namespace YamuraViewControls
             ChartBounds.Height = height;
 
         }
+        /// <summary>
+        /// 
+        /// </summary>
         public int ChartWidth
         { get { return ChartBounds.Width; } }
+        /// <summary>
+        /// 
+        /// </summary>
         public int ChartHeight
         { get { return ChartBounds.Height; } }
         /// <summary>
@@ -433,7 +441,20 @@ namespace YamuraViewControls
             //    System.Diagnostics.Debug.WriteLine("OnChartMouseMove error: " + ex.Message);
             //}
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public String SaveSetup()
+        { 
+            String rStr = string.Empty;
+
+            return rStr;
+        }
     }
+    /// <summary>
+    /// 
+    /// </summary>
     public class ChartChannel
     {
         String channelName;
@@ -598,6 +619,9 @@ namespace YamuraViewControls
             return true;
         }
     }
+    /// <summary>
+    /// 
+    /// </summary>
     public partial class DisplayDataSet
     {
         public Dictionary<String, ChartChannel> channels = new Dictionary<String, ChartChannel>();

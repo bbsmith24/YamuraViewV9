@@ -46,6 +46,13 @@
             exitToolStripMenuItem = new ToolStripMenuItem();
             checkAutoAddTimer = new System.Windows.Forms.Timer(components);
             selectAutoAddFolder = new FolderBrowserDialog();
+            saveConfigurationToolStripMenuItem = new ToolStripMenuItem();
+            loadConfigurationToolStripMenuItem = new ToolStripMenuItem();
+            toolStripSeparator1 = new ToolStripSeparator();
+            toolStripSeparator2 = new ToolStripSeparator();
+            toolStripSeparator3 = new ToolStripSeparator();
+            saveConfigFileDialog = new SaveFileDialog();
+            openConfigFileDialog = new OpenFileDialog();
             ((System.ComponentModel.ISupportInitialize)splitContainer1).BeginInit();
             splitContainer1.Panel1.SuspendLayout();
             splitContainer1.Panel2.SuspendLayout();
@@ -141,7 +148,7 @@
             // 
             // fileToolStripMenuItem
             // 
-            fileToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { addRunsMenuItem, clearRunsToolStripMenuItem, setAutoloadFolderToolStripMenuItem, timeAlignSetupToolStripMenuItem, distanceAlignSetupToolStripMenuItem, exitToolStripMenuItem });
+            fileToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { addRunsMenuItem, clearRunsToolStripMenuItem, toolStripSeparator2, saveConfigurationToolStripMenuItem, loadConfigurationToolStripMenuItem, setAutoloadFolderToolStripMenuItem, toolStripSeparator3, timeAlignSetupToolStripMenuItem, distanceAlignSetupToolStripMenuItem, toolStripSeparator1, exitToolStripMenuItem });
             fileToolStripMenuItem.Name = "fileToolStripMenuItem";
             fileToolStripMenuItem.Size = new Size(37, 20);
             fileToolStripMenuItem.Text = "File";
@@ -191,6 +198,39 @@
             checkAutoAddTimer.Interval = 30000;
             checkAutoAddTimer.Tick += CheckAutoAddTimerClick;
             // 
+            // saveConfigurationToolStripMenuItem
+            // 
+            saveConfigurationToolStripMenuItem.Name = "saveConfigurationToolStripMenuItem";
+            saveConfigurationToolStripMenuItem.Size = new Size(182, 22);
+            saveConfigurationToolStripMenuItem.Text = "Save Configuration";
+            saveConfigurationToolStripMenuItem.Click += saveConfigurationToolStripMenuItem_Click;
+            // 
+            // loadConfigurationToolStripMenuItem
+            // 
+            loadConfigurationToolStripMenuItem.Name = "loadConfigurationToolStripMenuItem";
+            loadConfigurationToolStripMenuItem.Size = new Size(182, 22);
+            loadConfigurationToolStripMenuItem.Text = "Load Configuration";
+            loadConfigurationToolStripMenuItem.Click += loadConfigurationToolStripMenuItem_Click;
+            // 
+            // toolStripSeparator1
+            // 
+            toolStripSeparator1.Name = "toolStripSeparator1";
+            toolStripSeparator1.Size = new Size(179, 6);
+            // 
+            // toolStripSeparator2
+            // 
+            toolStripSeparator2.Name = "toolStripSeparator2";
+            toolStripSeparator2.Size = new Size(179, 6);
+            // 
+            // toolStripSeparator3
+            // 
+            toolStripSeparator3.Name = "toolStripSeparator3";
+            toolStripSeparator3.Size = new Size(179, 6);
+            // 
+            // openConfigFileDialog
+            // 
+            openConfigFileDialog.FileName = "openFileDialog1";
+            // 
             // YamuraView
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -234,5 +274,12 @@
         private ToolStripMenuItem distanceAlignSetupToolStripMenuItem;
         private System.Windows.Forms.Timer checkAutoAddTimer;
         private FolderBrowserDialog selectAutoAddFolder;
+        private ToolStripSeparator toolStripSeparator2;
+        private ToolStripMenuItem saveConfigurationToolStripMenuItem;
+        private ToolStripMenuItem loadConfigurationToolStripMenuItem;
+        private ToolStripSeparator toolStripSeparator3;
+        private ToolStripSeparator toolStripSeparator1;
+        private SaveFileDialog saveConfigFileDialog;
+        private OpenFileDialog openConfigFileDialog;
     }
 }
