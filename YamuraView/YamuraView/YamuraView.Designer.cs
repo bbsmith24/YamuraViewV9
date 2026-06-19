@@ -40,17 +40,17 @@
             fileToolStripMenuItem = new ToolStripMenuItem();
             addRunsMenuItem = new ToolStripMenuItem();
             clearRunsToolStripMenuItem = new ToolStripMenuItem();
+            toolStripSeparator2 = new ToolStripSeparator();
+            saveConfigurationToolStripMenuItem = new ToolStripMenuItem();
+            loadConfigurationToolStripMenuItem = new ToolStripMenuItem();
             setAutoloadFolderToolStripMenuItem = new ToolStripMenuItem();
+            toolStripSeparator3 = new ToolStripSeparator();
             timeAlignSetupToolStripMenuItem = new ToolStripMenuItem();
             distanceAlignSetupToolStripMenuItem = new ToolStripMenuItem();
+            toolStripSeparator1 = new ToolStripSeparator();
             exitToolStripMenuItem = new ToolStripMenuItem();
             checkAutoAddTimer = new System.Windows.Forms.Timer(components);
             selectAutoAddFolder = new FolderBrowserDialog();
-            saveConfigurationToolStripMenuItem = new ToolStripMenuItem();
-            loadConfigurationToolStripMenuItem = new ToolStripMenuItem();
-            toolStripSeparator1 = new ToolStripSeparator();
-            toolStripSeparator2 = new ToolStripSeparator();
-            toolStripSeparator3 = new ToolStripSeparator();
             saveConfigFileDialog = new SaveFileDialog();
             openConfigFileDialog = new OpenFileDialog();
             ((System.ComponentModel.ISupportInitialize)splitContainer1).BeginInit();
@@ -139,6 +139,7 @@
             // 
             // menuStrip1
             // 
+            menuStrip1.BackColor = SystemColors.Control;
             menuStrip1.Items.AddRange(new ToolStripItem[] { fileToolStripMenuItem });
             menuStrip1.Location = new Point(0, 0);
             menuStrip1.Name = "menuStrip1";
@@ -152,6 +153,7 @@
             fileToolStripMenuItem.Name = "fileToolStripMenuItem";
             fileToolStripMenuItem.Size = new Size(37, 20);
             fileToolStripMenuItem.Text = "File";
+            fileToolStripMenuItem.DropDownOpening += fileToolStripMenuItem_DropDownOpening;
             // 
             // addRunsMenuItem
             // 
@@ -166,37 +168,10 @@
             clearRunsToolStripMenuItem.Size = new Size(182, 22);
             clearRunsToolStripMenuItem.Text = "Clear Runs";
             // 
-            // setAutoloadFolderToolStripMenuItem
+            // toolStripSeparator2
             // 
-            setAutoloadFolderToolStripMenuItem.Name = "setAutoloadFolderToolStripMenuItem";
-            setAutoloadFolderToolStripMenuItem.Size = new Size(182, 22);
-            setAutoloadFolderToolStripMenuItem.Text = "Set Autoload folder";
-            setAutoloadFolderToolStripMenuItem.Click += SetAutoLoadFolderClick;
-            // 
-            // timeAlignSetupToolStripMenuItem
-            // 
-            timeAlignSetupToolStripMenuItem.Name = "timeAlignSetupToolStripMenuItem";
-            timeAlignSetupToolStripMenuItem.Size = new Size(182, 22);
-            timeAlignSetupToolStripMenuItem.Text = "Time Align setup";
-            timeAlignSetupToolStripMenuItem.Click += timeAlignSetupToolStripMenuItem_Click;
-            // 
-            // distanceAlignSetupToolStripMenuItem
-            // 
-            distanceAlignSetupToolStripMenuItem.Name = "distanceAlignSetupToolStripMenuItem";
-            distanceAlignSetupToolStripMenuItem.Size = new Size(182, 22);
-            distanceAlignSetupToolStripMenuItem.Text = "Distance Align setup";
-            // 
-            // exitToolStripMenuItem
-            // 
-            exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-            exitToolStripMenuItem.Size = new Size(182, 22);
-            exitToolStripMenuItem.Text = "Exit";
-            // 
-            // checkAutoAddTimer
-            // 
-            checkAutoAddTimer.Enabled = true;
-            checkAutoAddTimer.Interval = 30000;
-            checkAutoAddTimer.Tick += CheckAutoAddTimerClick;
+            toolStripSeparator2.Name = "toolStripSeparator2";
+            toolStripSeparator2.Size = new Size(179, 6);
             // 
             // saveConfigurationToolStripMenuItem
             // 
@@ -212,20 +187,48 @@
             loadConfigurationToolStripMenuItem.Text = "Load Configuration";
             loadConfigurationToolStripMenuItem.Click += loadConfigurationToolStripMenuItem_Click;
             // 
-            // toolStripSeparator1
+            // setAutoloadFolderToolStripMenuItem
             // 
-            toolStripSeparator1.Name = "toolStripSeparator1";
-            toolStripSeparator1.Size = new Size(179, 6);
-            // 
-            // toolStripSeparator2
-            // 
-            toolStripSeparator2.Name = "toolStripSeparator2";
-            toolStripSeparator2.Size = new Size(179, 6);
+            setAutoloadFolderToolStripMenuItem.Name = "setAutoloadFolderToolStripMenuItem";
+            setAutoloadFolderToolStripMenuItem.Size = new Size(182, 22);
+            setAutoloadFolderToolStripMenuItem.Text = "Set Autoload folder";
+            setAutoloadFolderToolStripMenuItem.Click += SetAutoLoadFolderClick;
             // 
             // toolStripSeparator3
             // 
             toolStripSeparator3.Name = "toolStripSeparator3";
             toolStripSeparator3.Size = new Size(179, 6);
+            // 
+            // timeAlignSetupToolStripMenuItem
+            // 
+            timeAlignSetupToolStripMenuItem.Name = "timeAlignSetupToolStripMenuItem";
+            timeAlignSetupToolStripMenuItem.Size = new Size(182, 22);
+            timeAlignSetupToolStripMenuItem.Text = "Time Align setup";
+            timeAlignSetupToolStripMenuItem.Click += timeAlignSetupToolStripMenuItem_Click;
+            // 
+            // distanceAlignSetupToolStripMenuItem
+            // 
+            distanceAlignSetupToolStripMenuItem.Name = "distanceAlignSetupToolStripMenuItem";
+            distanceAlignSetupToolStripMenuItem.Size = new Size(182, 22);
+            distanceAlignSetupToolStripMenuItem.Text = "Distance Align setup";
+            // 
+            // toolStripSeparator1
+            // 
+            toolStripSeparator1.Name = "toolStripSeparator1";
+            toolStripSeparator1.Size = new Size(179, 6);
+            // 
+            // exitToolStripMenuItem
+            // 
+            exitToolStripMenuItem.Name = "exitToolStripMenuItem";
+            exitToolStripMenuItem.Size = new Size(182, 22);
+            exitToolStripMenuItem.Text = "Exit";
+            exitToolStripMenuItem.Click += exitToolStripMenuItem_Click;
+            // 
+            // checkAutoAddTimer
+            // 
+            checkAutoAddTimer.Enabled = true;
+            checkAutoAddTimer.Interval = 30000;
+            checkAutoAddTimer.Tick += CheckAutoAddTimerClick;
             // 
             // openConfigFileDialog
             // 
@@ -235,9 +238,11 @@
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
+            BackColor = SystemColors.Control;
             ClientSize = new Size(800, 450);
             Controls.Add(splitContainer1);
             Controls.Add(menuStrip1);
+            ForeColor = SystemColors.Control;
             Icon = (Icon)resources.GetObject("$this.Icon");
             MainMenuStrip = menuStrip1;
             Name = "YamuraView";
@@ -275,8 +280,8 @@
         private System.Windows.Forms.Timer checkAutoAddTimer;
         private FolderBrowserDialog selectAutoAddFolder;
         private ToolStripSeparator toolStripSeparator2;
-        private ToolStripMenuItem saveConfigurationToolStripMenuItem;
-        private ToolStripMenuItem loadConfigurationToolStripMenuItem;
+        public ToolStripMenuItem saveConfigurationToolStripMenuItem;
+        public ToolStripMenuItem loadConfigurationToolStripMenuItem;
         private ToolStripSeparator toolStripSeparator3;
         private ToolStripSeparator toolStripSeparator1;
         private SaveFileDialog saveConfigFileDialog;

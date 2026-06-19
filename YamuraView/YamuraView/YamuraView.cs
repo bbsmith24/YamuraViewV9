@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows.Forms.Design;
 using System.Windows.Forms.VisualStyles;
+using System.Xml.Linq;
 using Win32Interop.Methods;
 using Win32Interop.Structs;
 using YamuraViewControls;
@@ -1520,17 +1521,49 @@ namespace YamuraView
 
         private void saveConfigurationToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            String setupStr = String.Empty;
-            foreach(Chart curChart in chartControls)
+            if (saveConfigFileDialog.ShowDialog() == DialogResult.Cancel)
             {
-                setupStr += curChart.SaveSetup();
+                return;
             }
-
+            XDocument setupDoc = new XDocument(new XDeclaration("1.0", "utf-8", "yes"),
+                                               new XElement("Setup"));
+            foreach (Chart curChart in chartControls)
+            {
+                curChart.SaveSetup(setupDoc);
+            }
+            setupDoc.Save(saveConfigFileDialog.FileName);
         }
 
         private void loadConfigurationToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            if (openConfigFileDialog.ShowDialog() == DialogResult.Cancel)
+            {
+                return;
+            }
+            XDocument setupDoc = XDocument.Load(openConfigFileDialog.FileName);
+            foreach (Chart curChart in chartControls)
+            {
+                curChart.ApplySetup(setupDoc);
+            }
+        }
 
+        private void fileToolStripMenuItem_DropDownOpening(object sender, EventArgs e)
+        {
+            if (dataLogger.runData.Count == 0)
+            {
+                saveConfigurationToolStripMenuItem.Enabled = false;
+                loadConfigurationToolStripMenuItem.Enabled = true;
+            }
+            else
+            {
+                saveConfigurationToolStripMenuItem.Enabled = true;
+                loadConfigurationToolStripMenuItem.Enabled = false;
+            }
+        }
+
+        private void exitToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Close();
         }
     }
 }

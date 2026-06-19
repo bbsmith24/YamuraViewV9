@@ -9,6 +9,8 @@ using System.Runtime.Intrinsics.X86;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Xml;
+using System.Xml.Linq;
 using YamuraViewControls;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 using static YamuraViewControls.ChartView;
@@ -442,14 +444,62 @@ namespace YamuraViewControls
             //}
         }
         /// <summary>
-        /// 
+        /// generate XML file for settings to save
         /// </summary>
         /// <returns></returns>
-        public String SaveSetup()
-        { 
-            String rStr = string.Empty;
+        public void SaveSetup(XDocument xmlDoc)
+        {
+            String localName = ChartName.Replace(' ', '_');
+            xmlDoc.Element("Setup")?.Add(new XElement(localName));
+            xmlDoc.Element("Setup")?.Element(localName)?.Add(new XElement("X_Axis", 
+                       new XAttribute("Name", chartProperties1.CmbXAxis.Text), 
+                       new XAttribute("ID", chartProperties1.CmbXAxis.SelectedIndex)));
+            
+            for(int itemIdx = 0; itemIdx < chartProperties1.CmbXAxis.Items.Count; itemIdx++)
+            {
+                xmlDoc.Element("Setup")?.Element(localName)?.Element("X_Axis").Add(new XElement("Item" + itemIdx.ToString(), chartProperties1.CmbXAxis.Items[itemIdx].ToString()));
+            }
 
-            return rStr;
+            xmlDoc.Element("Setup")?.Element(localName)?.Add(new XElement("DisplayMode",
+                       new XAttribute("Name", chartProperties1.cmbChartMode.Text),
+                       new XAttribute("ID", chartProperties1.cmbChartMode.SelectedIndex)));
+            xmlDoc.Element("Setup")?.Element(localName)?.Add(new XElement("Channels"));
+            foreach (TreeNode channelNode in chartProperties1.axisChannelTree.Nodes)
+            {
+                
+                XElement channelElement = new XElement(channelNode.Text, new XAttribute("Show", (channelNode.Checked.ToString())));
+                xmlDoc.Element("Setup")?.Element(localName)?.Element("Channels")?.Add(channelElement);
+            }
+        }
+        /// <summary>
+        /// apply settings from XML file
+        /// </summary>
+        /// <param name="xmlDoc"></param>
+        public void ApplySetup(XDocument xmlDoc)
+        {
+            String localName = ChartName.Replace(' ', '_');
+            chartProperties1.CmbXAxis.Items.Clear();
+            foreach (XElement axisItem in xmlDoc.Element("Setup")?.Element(localName)?.Element("X_Axis").Elements())
+            {
+                if(!chartProperties1.CmbXAxis.Items.Contains(axisItem.Value))
+                {
+                    chartProperties1.CmbXAxis.Items.Add(axisItem.Value);
+                }
+            }
+            chartProperties1.CmbXAxis.Text = xmlDoc.Element("Setup")?.Element(localName)?.Element("X_Axis")?.Attribute("Name")?.Value;
+            chartProperties1.cmbChartMode.Text = xmlDoc.Element("Setup")?.Element(localName)?.Element("DisplayMode")?.Attribute("Name")?.Value;
+            if (xmlDoc.Element("Setup")?.Element(localName)?.Element("Channels")?.Elements() != null)
+            {
+                foreach (XElement channelElement in xmlDoc?.Element("Setup")?.Element(localName)?.Element("Channels")?.Elements())
+                {
+                    String nodeName = channelElement.Name.ToString();
+                    chartProperties1.axisChannelTree.Nodes.Add(nodeName, nodeName);
+                    if((bool)channelElement?.Attribute("Show") == true)
+                    {
+                        chartProperties1.axisChannelTree.Nodes[nodeName].Checked = true;
+                    }
+                }
+            }
         }
     }
     /// <summary>

@@ -23,3 +23,4 @@ E:\GitHub\YamuraViewV9\YamuraViewV9\YamuraView\YamuraView\obj\Release\net9.0-win
 E:\GitHub\YamuraViewV9\YamuraViewV9\YamuraView\YamuraView\obj\Release\net9.0-windows\YamuraView.pdb
 E:\GitHub\YamuraViewV9\YamuraViewV9\YamuraView\YamuraView\obj\Release\net9.0-windows\YamuraView.genruntimeconfig.cache
 E:\GitHub\YamuraViewV9\YamuraViewV9\YamuraView\YamuraView\obj\Release\net9.0-windows\ref\YamuraView.dll
+E:\GitHub\YamuraViewV9\YamuraViewV9\YamuraView\YamuraView\obj\Release\net9.0-windows\YamuraView.Properties.Resource1.resources

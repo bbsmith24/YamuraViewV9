@@ -188,8 +188,6 @@
         }
 
         #endregion
-
-        private TriStateTreeView axisChannelTree;
         private System.Windows.Forms.ComboBox cmbXAxis;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label3;
@@ -200,9 +198,10 @@
         private System.Windows.Forms.ToolStripTextBox txtAxisMaxValue;
         private System.Windows.Forms.ToolStripMenuItem closeToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem invertToolStripMenuItem;
-        private ComboBox cmbChartMode;
         private Label label5;
         private ToolStripMenuItem traceColorMenuItem;
         private ColorDialog colorDialog1;
+        public TriStateTreeView axisChannelTree;
+        public ComboBox cmbChartMode;
     }
 }
