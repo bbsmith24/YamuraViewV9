@@ -1276,11 +1276,11 @@ namespace YamuraView
                         FolderToWatchFiles.Add(fileName, fileName);
                     }
                 }
-                if (dataLogger.runData.Count > 1)
-                {
-                    AlignGPS();
-                    AlignTime();
-                }
+                //if (dataLogger.runData.Count > 1)
+                //{
+                //    AlignGPS();
+                //    AlignTime();
+                //}
             }
         }
         private void CheckAutoAddTimerClick(object sender, EventArgs e)
@@ -1334,18 +1334,18 @@ namespace YamuraView
                 FolderToWatchFiles.Add(loadFileName, loadFileName);
             }
             #endregion
-            if (dataLogger.runData.Count > 1)
-            {
-                AlignGPS();
-                AlignTime();
-            }
+            //if (dataLogger.runData.Count > 1)
+            //{
+            //    AlignGPS();
+            //    AlignTime();
+            //}
         }
         /// <summary>
         /// align most recent added data set to first data set using GPS data
         /// </summary>
         public void AlignGPS()
         {
-            if (!distanceAlign)
+            if ((dataLogger.runData.Count() <= 1) || (!distanceAlign))
             {
                 return;
             }
@@ -1367,12 +1367,18 @@ namespace YamuraView
                 gpsLong1 = dataLogger.runData[0].channels["Longitude"].DataPoints.ElementAt(gps1Idx).Value;
                 distance1 = dataLogger.runData[0].channels["Distance-GPS"].DataPoints.ElementAt(gps1Idx).Value;
                 // GPS points from last added data set
-                for (int gps2Idx = 0; gps2Idx < dataLogger.runData[0].channels["Latitude"].DataPoints.Count; gps2Idx++)
+                for (int gps2Idx = 0; gps2Idx < dataLogger.runData[lastRunIdx].channels["Latitude"].DataPoints.Count; gps2Idx++)
                 {
-                    gpsLat2 = dataLogger.runData[lastRunIdx].channels["Latitude"].DataPoints.ElementAt(gps2Idx).Value;
-                    gpsLong2 = dataLogger.runData[lastRunIdx].channels["Longitude"].DataPoints.ElementAt(gps2Idx).Value;
-                    distance2 = dataLogger.runData[lastRunIdx].channels["Distance-GPS"].DataPoints.ElementAt(gps2Idx).Value;
-
+                    try
+                    {
+                        gpsLat2 = dataLogger.runData[lastRunIdx].channels["Latitude"].DataPoints.ElementAt(gps2Idx).Value;
+                        gpsLong2 = dataLogger.runData[lastRunIdx].channels["Longitude"].DataPoints.ElementAt(gps2Idx).Value;
+                        distance2 = dataLogger.runData[lastRunIdx].channels["Distance-GPS"].DataPoints.ElementAt(gps2Idx).Value;
+                    }
+                    catch 
+                    {
+                        continue;
+                    }
                     distanceBetweenPositions = GPSDistance(gpsLat1, gpsLong1, gpsLat2, gpsLong2);
                     if (distanceBetweenPositions < minDistanceBetweenPositions)
                     {
@@ -1386,10 +1392,10 @@ namespace YamuraView
                             }
                             break;
                         }
-                        if (distanceOffsetSet)
-                        {
-                            break;
-                        }
+                        //if (distanceOffsetSet)
+                        //{
+                        //    break;
+                        //}
                     }
                 }
                 if (distanceOffsetSet)

@@ -369,8 +369,8 @@ namespace YamuraViewControls
                         // scale to display range in X and Y
                         chartGraphics.ScaleTransform(displayScale[0], displayScale[1]);
                         // translate by -1 * minimum display range + axis offset (scrolling)
-                        chartGraphics.TranslateTransform(-1 * primaryX.AxisDisplayRange[0] + 
-                                                         0,
+                        chartGraphics.TranslateTransform(-1 * (primaryX.AxisDisplayRange[0] -
+                                                              primaryX.AxisOffset),
                                                          -1 * yAxis.Value.AxisDisplayRange[0] + 
                                                          0);
                         // set pen width to 0 (1 pixel)
@@ -829,7 +829,7 @@ namespace YamuraViewControls
                 float panelX = mx - ChartOwner.ChartBorder;
 
                 // Compute data-space X (axis units)
-                float dataX = (panelX / displayScaleX) + primaryXAxis.AxisDisplayRange[0] - primaryXAxis.AxisOffset;
+                float dataX = (panelX / displayScaleX) + primaryXAxis.AxisDisplayRange[0] + primaryXAxis.AxisOffset;
 
                 ChartControlMouseTrackEventArgs outArgs = new ChartControlMouseTrackEventArgs();
 
