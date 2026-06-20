@@ -153,14 +153,14 @@
             fileToolStripMenuItem.Name = "fileToolStripMenuItem";
             fileToolStripMenuItem.Size = new Size(37, 20);
             fileToolStripMenuItem.Text = "File";
-            fileToolStripMenuItem.DropDownOpening += fileToolStripMenuItem_DropDownOpening;
+            fileToolStripMenuItem.DropDownOpening += FileToolStripMenuItem_DropDownOpening;
             // 
             // addRunsMenuItem
             // 
             addRunsMenuItem.Name = "addRunsMenuItem";
             addRunsMenuItem.Size = new Size(182, 22);
             addRunsMenuItem.Text = "Add Runs";
-            addRunsMenuItem.Click += addRunsMenuItem_Click;
+            addRunsMenuItem.Click += AddRunsMenuItem_Click;
             // 
             // clearRunsToolStripMenuItem
             // 
@@ -178,21 +178,21 @@
             saveConfigurationToolStripMenuItem.Name = "saveConfigurationToolStripMenuItem";
             saveConfigurationToolStripMenuItem.Size = new Size(182, 22);
             saveConfigurationToolStripMenuItem.Text = "Save Configuration";
-            saveConfigurationToolStripMenuItem.Click += saveConfigurationToolStripMenuItem_Click;
+            saveConfigurationToolStripMenuItem.Click += SaveConfigurationToolStripMenuItem_Click;
             // 
             // loadConfigurationToolStripMenuItem
             // 
             loadConfigurationToolStripMenuItem.Name = "loadConfigurationToolStripMenuItem";
             loadConfigurationToolStripMenuItem.Size = new Size(182, 22);
             loadConfigurationToolStripMenuItem.Text = "Load Configuration";
-            loadConfigurationToolStripMenuItem.Click += loadConfigurationToolStripMenuItem_Click;
+            loadConfigurationToolStripMenuItem.Click += LoadConfigurationToolStripMenuItem_Click;
             // 
             // setAutoloadFolderToolStripMenuItem
             // 
             setAutoloadFolderToolStripMenuItem.Name = "setAutoloadFolderToolStripMenuItem";
             setAutoloadFolderToolStripMenuItem.Size = new Size(182, 22);
             setAutoloadFolderToolStripMenuItem.Text = "Set Autoload folder";
-            setAutoloadFolderToolStripMenuItem.Click += SetAutoLoadFolderClick;
+            setAutoloadFolderToolStripMenuItem.Click += SetAutoLoadFolder_Click;
             // 
             // toolStripSeparator3
             // 
@@ -204,7 +204,7 @@
             timeAlignSetupToolStripMenuItem.Name = "timeAlignSetupToolStripMenuItem";
             timeAlignSetupToolStripMenuItem.Size = new Size(182, 22);
             timeAlignSetupToolStripMenuItem.Text = "Time Align setup";
-            timeAlignSetupToolStripMenuItem.Click += timeAlignSetupToolStripMenuItem_Click;
+            timeAlignSetupToolStripMenuItem.Click += TimeAlignSetupToolStripMenuItem_Click;
             // 
             // distanceAlignSetupToolStripMenuItem
             // 
@@ -222,13 +222,13 @@
             exitToolStripMenuItem.Name = "exitToolStripMenuItem";
             exitToolStripMenuItem.Size = new Size(182, 22);
             exitToolStripMenuItem.Text = "Exit";
-            exitToolStripMenuItem.Click += exitToolStripMenuItem_Click;
+            exitToolStripMenuItem.Click += ExitToolStripMenuItem_Click;
             // 
             // checkAutoAddTimer
             // 
             checkAutoAddTimer.Enabled = true;
             checkAutoAddTimer.Interval = 30000;
-            checkAutoAddTimer.Tick += CheckAutoAddTimerClick;
+            checkAutoAddTimer.Tick += CheckAutoAddTimer_Tick;
             // 
             // openConfigFileDialog
             // 

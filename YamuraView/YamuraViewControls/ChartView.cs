@@ -290,7 +290,7 @@ namespace YamuraViewControls
                     #region X axis display offset
                     if (ChartOwner.XChannelName == "Time")
                     {
-                        // primaryX.AxisOffset = ChartOwner.dataSets[curChanInfo.DataSetIndex].TimeOffset;
+                        primaryX.AxisOffset = ChartOwner.dataSets[curChanInfo.DataSetIndex].TimeOffset;
                     }
                     else if (ChartOwner.XChannelName == "Distance")
                     {

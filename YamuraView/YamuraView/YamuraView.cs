@@ -1,19 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.IO;
-using System.Linq;
-using System.Security.Permissions;
+﻿using System.ComponentModel;
 using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using System.Windows.Forms.Design;
-using System.Windows.Forms.VisualStyles;
 using System.Xml.Linq;
-using Win32Interop.Methods;
-using Win32Interop.Structs;
 using YamuraViewControls;
 
 namespace YamuraView
@@ -29,9 +16,6 @@ namespace YamuraView
         public static DataLogger dataLogger = new DataLogger();
 
         float gpsDist = 0.0F;
-
-        #endregion
-
         public String FolderToWatch { get; private set; }
         public SortedList<String, String> folderToWatchFiles = new System.Collections.Generic.SortedList<String, String>();
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
@@ -43,11 +27,17 @@ namespace YamuraView
         List<YamuraViewControls.Chart> chartControls = new List<YamuraViewControls.Chart>();
         public bool timeAlign = true;
         public bool distanceAlign = true;
+        #endregion
 
+        #region constructors
+        /// <summary>
+        /// 
+        /// </summary>
         public YamuraView()
         {
             InitializeComponent();
             FolderToWatch = @"C:\ftp_transfer";
+            #region setup charts
             StripChart.ChartViewType = YamuraViewControls.Chart.ChartType.Stripchart;
             StripChart.ChartName = "Strip Chart";
             StripChart.EqualScale = false;
@@ -59,7 +49,8 @@ namespace YamuraView
             TractionCircle.ChartViewType = YamuraViewControls.Chart.ChartType.XYChart;
             TractionCircle.ChartName = "Traction Circle";
             TractionCircle.EqualScale = true;
-
+            #endregion
+            #region add chart controls
             chartControls.Add(StripChart);
             chartControls.Add(TrackMap);
             chartControls.Add(TractionCircle);
@@ -69,7 +60,7 @@ namespace YamuraView
             chartControls[1].CursorUpdateSource = false;
             chartControls[2].CursorMode = YamuraViewControls.ChartView.CursorStyle.BOX;
             chartControls[2].CursorUpdateSource = false;
-
+            #endregion
             #region chart control event handlers
             chartControls[0].chartProperties1.ChartXAxisChangeEvent += chartControls[0].chartView1.OnChartXAxisChange;
             chartControls[1].chartProperties1.ChartXAxisChangeEvent += chartControls[1].chartView1.OnChartXAxisChange;
@@ -101,9 +92,12 @@ namespace YamuraView
                     FolderToWatchFiles.Add(file, file);
                 }
             }
+            checkAutoAddTimer.Interval = 30000;
             checkAutoAddTimer.Start();
             #endregion
         }
+        #endregion
+
         #region read various log file formats
         /// <summary>
         /// 
@@ -1169,7 +1163,105 @@ namespace YamuraView
         /// <summary>
         /// 
         /// </summary>
+        /// <summary>
+        /// align most recent added data set to first data set using GPS data
+        /// </summary>
+        public void AlignGPS()
+        {
+            if ((dataLogger.runData.Count() <= 1) || (!distanceAlign))
+            {
+                return;
+            }
+            float distanceBetweenPositions = 0.0F;
+            float minDistanceBetweenPositions = float.MaxValue;
+            float distanceOffset = 0.0F;
+            float gpsLat1;
+            float gpsLong1;
+            float gpsLat2;
+            float gpsLong2;
+            float distance1 = 0.0F;
+            float distance2 = 0.0F;
+            int lastRunIdx = dataLogger.runData.Count - 1;
+            bool distanceOffsetSet = false;
+            // GPS points from first data set
+            for (int gps1Idx = 0; gps1Idx < dataLogger.runData[0].channels["Latitude"].DataPoints.Count; gps1Idx++)
+            {
+                gpsLat1 = dataLogger.runData[0].channels["Latitude"].DataPoints.ElementAt(gps1Idx).Value;
+                gpsLong1 = dataLogger.runData[0].channels["Longitude"].DataPoints.ElementAt(gps1Idx).Value;
+                distance1 = dataLogger.runData[0].channels["Distance-GPS"].DataPoints.ElementAt(gps1Idx).Value;
+                // GPS points from last added data set
+                for (int gps2Idx = 0; gps2Idx < dataLogger.runData[lastRunIdx].channels["Latitude"].DataPoints.Count; gps2Idx++)
+                {
+                    try
+                    {
+                        gpsLat2 = dataLogger.runData[lastRunIdx].channels["Latitude"].DataPoints.ElementAt(gps2Idx).Value;
+                        gpsLong2 = dataLogger.runData[lastRunIdx].channels["Longitude"].DataPoints.ElementAt(gps2Idx).Value;
+                        distance2 = dataLogger.runData[lastRunIdx].channels["Distance-GPS"].DataPoints.ElementAt(gps2Idx).Value;
+                    }
+                    catch
+                    {
+                        continue;
+                    }
+                    distanceBetweenPositions = GPSDistance(gpsLat1, gpsLong1, gpsLat2, gpsLong2);
+                    if (distanceBetweenPositions < minDistanceBetweenPositions)
+                    {
+                        minDistanceBetweenPositions = distanceBetweenPositions;
+                        if (minDistanceBetweenPositions == 0.0F)
+                        {
+                            if (!distanceOffsetSet)
+                            {
+                                distanceOffset = distance1 - distance2;
+                                distanceOffsetSet = true;
+                            }
+                            break;
+                        }
+                    }
+                }
+                if (distanceOffsetSet)
+                {
+                    break;
+                }
+            }
+            dataLogger.runData[lastRunIdx].DistanceOffset = distanceOffset;
+        }
+        /// <summary>
+        /// align most recent added data set to first data set using accerlation data 
+        /// first delta acceleration > threshold on defined axis is assumed to be the start of the run
+        /// GPS data can't align time since there may be holds aafter the first matching location point
+        /// </summary>
+        public void AlignTime()
+        {
+            if (!timeAlign)
+            {
+                return;
+            }
+            float priorAccel = 0.0F;
+            float curAccel = 0.0F;
+            float accelThreshold = 0.5F; // g's
+            float timeOffset = 0.0F;
+            int lastRunIdx = dataLogger.runData.Count - 1;
+
+            // acceleration from last added data set
+            foreach (RunData dataSet in dataLogger.runData)
+            {
+                priorAccel = 0.0F;
+                foreach (KeyValuePair<float, float> dataPoint in dataSet.channels["gX"].DataPoints)
+                {
+                    curAccel = dataPoint.Value;
+                    if (Math.Abs(curAccel - priorAccel) > accelThreshold)
+                    {
+                        timeOffset = dataPoint.Key;
+                        break;
+                    }
+                    priorAccel = curAccel;
+                }
+                dataSet.TimeOffset = timeOffset;
+                //System.Diagnostics.Debug.WriteLine("run " + dataSet.runName + " time offset " + dataSet.TimeOffset.ToString());
+            }
+        }
         #endregion
+       
+        #region add data to charts
         public void AddLatestDataToCharts()
         {
             // no data to update
@@ -1239,12 +1331,64 @@ namespace YamuraView
             }
             #endregion
         }
+        #endregion
+
+        #region GPS support
+        /// <summary>
+        /// great circle distance between 2 lat/long points in feet
+        /// </summary>
+        /// <param name="lat1Deg"></param>
+        /// <param name="long1Deg"></param>
+        /// <param name="lat2Deg"></param>
+        /// <param name="long2Deg"></param>
+        /// <returns></returns>
+        public float GPSDistance(float lat1Deg, float long1Deg, float lat2Deg, float long2Deg)
+        {
+            // This uses the ‘haversine’ formula to calculate the great - circle distance between two points 
+            // the shortest distance over the earth’s surface – giving an ‘as- the - crow - flies’ distance between the points 
+            // (ignoring any hills they fly over, of course!).
+            // Haversine formula:	a = sin²(deltaLat / 2) + cos lat1 ⋅ cos lat2 ⋅ sin²(deltaLong / 2)
+            // c = 2 ⋅ atan2( √a, √(1−a) )
+            // d = R ⋅ c
+            // where   'lat' is latitude, 'long' is longitude, R is earth’s radius (mean radius = 6371km);
+
+            double R = 6371e3F; // meters
+            R = R * 3.28084; // feet
+            double phi1 = DegreesToRadians(lat1Deg);
+            double phi2 = DegreesToRadians(lat2Deg);
+            double long1 = DegreesToRadians(lat1Deg);
+            double long2 = DegreesToRadians(lat2Deg);
+            double delta_phi = phi2 - phi1;
+            double delta_lambda = DegreesToRadians(long2 - long1);
+
+            ;
+            double a = Math.Pow(Math.Sin(delta_phi / 2), 2) +
+                       Math.Cos(phi1) * Math.Cos(phi2) *
+                       Math.Pow(Math.Sin(delta_lambda / 2), 2);
+            double c = 2 * Math.Atan2(Math.Sqrt(a), Math.Sqrt(1 - a));
+
+            double d = R * c;
+            return (float)d;
+        }
+        /// <summary>
+        /// convert degrees to radians
+        /// </summary>
+        /// <param name="deg"></param>
+        /// <returns></returns>
+        private float DegreesToRadians(double deg)
+        {
+            double rad = (deg * Math.PI) / 180.0;
+            return (float)rad;
+        }
+        #endregion
+        
+        #region event handlers
         /// <summary>
         /// 
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void addRunsMenuItem_Click(object sender, EventArgs e)
+        private void AddRunsMenuItem_Click(object sender, EventArgs e)
         {
             if (openLogFile.ShowDialog() != DialogResult.OK)
             {
@@ -1276,14 +1420,14 @@ namespace YamuraView
                         FolderToWatchFiles.Add(fileName, fileName);
                     }
                 }
-                //if (dataLogger.runData.Count > 1)
-                //{
-                //    AlignGPS();
-                //    AlignTime();
-                //}
             }
         }
-        private void CheckAutoAddTimerClick(object sender, EventArgs e)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void CheckAutoAddTimer_Tick(object sender, EventArgs e)
         {
             bool loadFile = false;
             String loadFileName = "";
@@ -1341,158 +1485,11 @@ namespace YamuraView
             //}
         }
         /// <summary>
-        /// align most recent added data set to first data set using GPS data
-        /// </summary>
-        public void AlignGPS()
-        {
-            if ((dataLogger.runData.Count() <= 1) || (!distanceAlign))
-            {
-                return;
-            }
-            float distanceBetweenPositions = 0.0F;
-            float minDistanceBetweenPositions = float.MaxValue;
-            float distanceOffset = 0.0F;
-            float gpsLat1;
-            float gpsLong1;
-            float gpsLat2;
-            float gpsLong2;
-            float distance1 = 0.0F;
-            float distance2 = 0.0F;
-            int lastRunIdx = dataLogger.runData.Count - 1;
-            bool distanceOffsetSet = false;
-            // GPS points from first data set
-            for (int gps1Idx = 0; gps1Idx < dataLogger.runData[0].channels["Latitude"].DataPoints.Count; gps1Idx++)
-            {
-                gpsLat1 = dataLogger.runData[0].channels["Latitude"].DataPoints.ElementAt(gps1Idx).Value;
-                gpsLong1 = dataLogger.runData[0].channels["Longitude"].DataPoints.ElementAt(gps1Idx).Value;
-                distance1 = dataLogger.runData[0].channels["Distance-GPS"].DataPoints.ElementAt(gps1Idx).Value;
-                // GPS points from last added data set
-                for (int gps2Idx = 0; gps2Idx < dataLogger.runData[lastRunIdx].channels["Latitude"].DataPoints.Count; gps2Idx++)
-                {
-                    try
-                    {
-                        gpsLat2 = dataLogger.runData[lastRunIdx].channels["Latitude"].DataPoints.ElementAt(gps2Idx).Value;
-                        gpsLong2 = dataLogger.runData[lastRunIdx].channels["Longitude"].DataPoints.ElementAt(gps2Idx).Value;
-                        distance2 = dataLogger.runData[lastRunIdx].channels["Distance-GPS"].DataPoints.ElementAt(gps2Idx).Value;
-                    }
-                    catch 
-                    {
-                        continue;
-                    }
-                    distanceBetweenPositions = GPSDistance(gpsLat1, gpsLong1, gpsLat2, gpsLong2);
-                    if (distanceBetweenPositions < minDistanceBetweenPositions)
-                    {
-                        minDistanceBetweenPositions = distanceBetweenPositions;
-                        if (minDistanceBetweenPositions == 0.0F)
-                        {
-                            if (!distanceOffsetSet)
-                            {
-                                distanceOffset = distance1 - distance2;
-                                distanceOffsetSet = true;
-                            }
-                            break;
-                        }
-                        //if (distanceOffsetSet)
-                        //{
-                        //    break;
-                        //}
-                    }
-                }
-                if (distanceOffsetSet)
-                {
-                    break;
-                }
-            }
-            dataLogger.runData[lastRunIdx].DistanceOffset = distanceOffset;
-        }
-        /// <summary>
-        /// align most recent added data set to first data set using accerlation data 
-        /// first delta acceleration > threshold on defined axis is assumed to be the start of the run
-        /// GPS data can't align time since there may be holds aafter the first matching location point
-        /// </summary>
-        public void AlignTime()
-        {
-            if (!timeAlign)
-            {
-                return;
-            }
-            float priorAccel = 0.0F;
-            float curAccel = 0.0F;
-            float accelThreshold = 0.5F; // g's
-            float timeOffset = 0.0F;
-            int lastRunIdx = dataLogger.runData.Count - 1;
-
-            // acceleration from last added data set
-            foreach (RunData dataSet in dataLogger.runData)
-            {
-                priorAccel = 0.0F;
-                foreach (KeyValuePair<float, float> dataPoint in dataSet.channels["gX"].DataPoints)
-                {
-                    curAccel = dataPoint.Value;
-                    if (Math.Abs(curAccel - priorAccel) > accelThreshold)
-                    {
-                        timeOffset = dataPoint.Key;
-                        break;
-                    }
-                    priorAccel = curAccel;
-                }
-                dataSet.TimeOffset = timeOffset;
-                //System.Diagnostics.Debug.WriteLine("run " + dataSet.runName + " time offset " + dataSet.TimeOffset.ToString());
-            }
-        }
-
-        /// <summary>
-        /// great circle distance between 2 lat/long points in feet
-        /// </summary>
-        /// <param name="lat1Deg"></param>
-        /// <param name="long1Deg"></param>
-        /// <param name="lat2Deg"></param>
-        /// <param name="long2Deg"></param>
-        /// <returns></returns>
-        public float GPSDistance(float lat1Deg, float long1Deg, float lat2Deg, float long2Deg)
-        {
-            // This uses the ‘haversine’ formula to calculate the great - circle distance between two points 
-            // the shortest distance over the earth’s surface – giving an ‘as- the - crow - flies’ distance between the points 
-            // (ignoring any hills they fly over, of course!).
-            // Haversine formula:	a = sin²(deltaLat / 2) + cos lat1 ⋅ cos lat2 ⋅ sin²(deltaLong / 2)
-            // c = 2 ⋅ atan2( √a, √(1−a) )
-            // d = R ⋅ c
-            // where   'lat' is latitude, 'long' is longitude, R is earth’s radius (mean radius = 6371km);
-
-            double R = 6371e3F; // meters
-            R = R * 3.28084; // feet
-            double phi1 = DegreesToRadians(lat1Deg);
-            double phi2 = DegreesToRadians(lat2Deg);
-            double long1 = DegreesToRadians(lat1Deg);
-            double long2 = DegreesToRadians(lat2Deg);
-            double delta_phi = phi2 - phi1;
-            double delta_lambda = DegreesToRadians(long2 - long1);
-
-            ;
-            double a = Math.Pow(Math.Sin(delta_phi / 2), 2) +
-                       Math.Cos(phi1) * Math.Cos(phi2) *
-                       Math.Pow(Math.Sin(delta_lambda / 2), 2);
-            double c = 2 * Math.Atan2(Math.Sqrt(a), Math.Sqrt(1 - a));
-
-            double d = R * c;
-            return (float)d;
-        }
-        /// <summary>
-        /// convert degrees to radians
-        /// </summary>
-        /// <param name="deg"></param>
-        /// <returns></returns>
-        private float DegreesToRadians(double deg)
-        {
-            double rad = (deg * Math.PI) / 180.0;
-            return (float)rad;
-        }
-        /// <summary>
         /// 
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void timeAlignSetupToolStripMenuItem_Click(object sender, EventArgs e)
+        private void TimeAlignSetupToolStripMenuItem_Click(object sender, EventArgs e)
         {
             TimeAlignDialog timeAlignDialog = new TimeAlignDialog();
             timeAlignDialog.timeAligned = timeAlign;
@@ -1500,14 +1497,13 @@ namespace YamuraView
             {
                 return;
             }
-            //timeAlign = timeAlignDialog.TimeAligned;
         }
         /// <summary>
         /// 
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void SetAutoLoadFolderClick(object sender, EventArgs e)
+        private void SetAutoLoadFolder_Click(object sender, EventArgs e)
         {
             if (selectAutoAddFolder.ShowDialog() == DialogResult.Cancel)
             { return; }
@@ -1524,8 +1520,12 @@ namespace YamuraView
             }
             #endregion        
         }
-
-        private void saveConfigurationToolStripMenuItem_Click(object sender, EventArgs e)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void SaveConfigurationToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (saveConfigFileDialog.ShowDialog() == DialogResult.Cancel)
             {
@@ -1539,8 +1539,12 @@ namespace YamuraView
             }
             setupDoc.Save(saveConfigFileDialog.FileName);
         }
-
-        private void loadConfigurationToolStripMenuItem_Click(object sender, EventArgs e)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void LoadConfigurationToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (openConfigFileDialog.ShowDialog() == DialogResult.Cancel)
             {
@@ -1552,8 +1556,12 @@ namespace YamuraView
                 curChart.ApplySetup(setupDoc);
             }
         }
-
-        private void fileToolStripMenuItem_DropDownOpening(object sender, EventArgs e)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void FileToolStripMenuItem_DropDownOpening(object sender, EventArgs e)
         {
             if (dataLogger.runData.Count == 0)
             {
@@ -1566,10 +1574,15 @@ namespace YamuraView
                 loadConfigurationToolStripMenuItem.Enabled = false;
             }
         }
-
-        private void exitToolStripMenuItem_Click(object sender, EventArgs e)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void ExitToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Close();
         }
+        #endregion
     }
 }
