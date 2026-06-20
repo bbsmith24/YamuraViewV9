@@ -30,7 +30,12 @@ namespace YamuraViewControls
         public Chart ChartOwner
         {
             get { return chartOwner; }
-            set { chartOwner = value; }
+            set
+            {
+                chartOwner = value;
+                if (chartOwner != null)
+                    chkShowOverlay.Checked = chartOwner.ShowOverlay;
+            }
         }
 
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
@@ -116,6 +121,17 @@ namespace YamuraViewControls
             {
                 cmbXAxis.Text = value;
             }
+        }
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        public bool ShowOverlay
+        {
+            get { return chkShowOverlay.Checked; }
+            set { chkShowOverlay.Checked = value; }
+        }
+        private void chkShowOverlay_CheckedChanged(object sender, EventArgs e)
+        {
+            if (ChartOwner != null)
+                ChartOwner.ShowOverlay = chkShowOverlay.Checked;
         }
         /// <summary>
         /// 
@@ -407,11 +423,6 @@ namespace YamuraViewControls
         }
 
         private void btnResetDistanceALign_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void label3_Click(object sender, EventArgs e)
         {
 
         }

@@ -38,6 +38,7 @@
             txtAxisMaxValue = new ToolStripTextBox();
             closeToolStripMenuItem = new ToolStripMenuItem();
             traceColorMenuItem = new ToolStripMenuItem();
+            chkShowOverlay = new CheckBox();
             cmbXAxis = new ComboBox();
             label2 = new Label();
             label3 = new Label();
@@ -52,10 +53,10 @@
             axisChannelTree.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             axisChannelTree.ContextMenuStrip = channelsContext;
             axisChannelTree.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            axisChannelTree.Location = new Point(14, 108);
+            axisChannelTree.Location = new Point(14, 152);
             axisChannelTree.Margin = new Padding(4, 3, 4, 3);
             axisChannelTree.Name = "axisChannelTree";
-            axisChannelTree.Size = new Size(405, 335);
+            axisChannelTree.Size = new Size(405, 304);
             axisChannelTree.TabIndex = 30;
             axisChannelTree.AfterCheck += axisChannelTree_AfterCheck;
             // 
@@ -112,6 +113,19 @@
             traceColorMenuItem.Text = "Trace Color";
             traceColorMenuItem.Click += traceColorMenuItem_Click;
             // 
+            // chkShowOverlay
+            // 
+            chkShowOverlay.AutoSize = true;
+            chkShowOverlay.Checked = true;
+            chkShowOverlay.CheckState = CheckState.Checked;
+            chkShowOverlay.Location = new Point(14, 100);
+            chkShowOverlay.Name = "chkShowOverlay";
+            chkShowOverlay.Size = new Size(134, 19);
+            chkShowOverlay.TabIndex = 42;
+            chkShowOverlay.Text = "Show Values Overlay";
+            chkShowOverlay.UseVisualStyleBackColor = true;
+            chkShowOverlay.CheckedChanged += chkShowOverlay_CheckedChanged;
+            // 
             // cmbXAxis
             // 
             cmbXAxis.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
@@ -136,13 +150,12 @@
             // label3
             // 
             label3.AutoSize = true;
-            label3.Location = new Point(14, 90);
+            label3.Location = new Point(14, 134);
             label3.Margin = new Padding(4, 0, 4, 0);
             label3.Name = "label3";
             label3.Size = new Size(56, 15);
             label3.TabIndex = 33;
             label3.Text = "Channels";
-            label3.Click += label3_Click;
             // 
             // cmbChartMode
             // 
@@ -166,13 +179,15 @@
             label5.Size = new Size(70, 15);
             label5.TabIndex = 40;
             label5.Text = "Chart Mode";
-            // 
+            //
             // ChartProperties
-            // 
+            //
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
+            ForeColor = SystemColors.ControlText;
             Controls.Add(cmbChartMode);
             Controls.Add(label5);
+            Controls.Add(chkShowOverlay);
             Controls.Add(label3);
             Controls.Add(cmbXAxis);
             Controls.Add(label2);
@@ -191,6 +206,7 @@
         private System.Windows.Forms.ComboBox cmbXAxis;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.CheckBox chkShowOverlay;
         private System.Windows.Forms.ContextMenuStrip channelsContext;
         private System.Windows.Forms.ToolStripTextBox lblAxisMin;
         private System.Windows.Forms.ToolStripTextBox txtAxisMinValue;

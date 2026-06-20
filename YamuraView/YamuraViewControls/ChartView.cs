@@ -134,6 +134,13 @@ namespace YamuraViewControls
 
         public float[] displayScale = new float[2];
 
+        // cursor overlay state
+        private SortedList<string, SortedList<string, float>> _cursorValues = null;
+        private float _cursorDataX = float.NaN;
+        private Panel _overlayPanel;
+        private bool _hasCursorPos = false;
+        private Point _savedCursorPos = Point.Empty;
+
         public ChartView()
         {
             InitializeComponent();
@@ -146,7 +153,11 @@ namespace YamuraViewControls
             StartMouseDrag = new List<bool>();
             StartMouseDrag.Add(false);
             hScrollBar.Scroll += HScrollBar_Scroll;
-            
+            chartPanel.MouseLeave += ChartPanel_MouseLeave;
+            _overlayPanel = new Panel { BackColor = Color.Black, Visible = false, Enabled = false };
+            _overlayPanel.Paint += OverlayPanel_Paint;
+            chartPanel.Controls.Add(_overlayPanel);
+            _overlayPanel.BringToFront();
 
             //chartPanel.MouseMove -= chartPanel_MouseMove;
             //chartPanel.MouseMove += chartPanel_MouseMove;
@@ -176,6 +187,14 @@ namespace YamuraViewControls
                 return;
             }
             DrawChartView(e.Graphics);
+            // after every repaint, restore XOR cursor if mouse is still over chart
+            // DrawChartView resets ChartLastCursorPos to (0,0), so use _savedCursorPos
+            if (_hasCursorPos && StartMouseMove.Count > 0)
+            {
+                DrawCursorAtScreenPoint(_savedCursorPos);
+                StartMouseMove[0] = true;
+                ChartLastCursorPos[0] = _savedCursorPos;
+            }
         }
         /// <summary>
         /// 
@@ -749,21 +768,21 @@ namespace YamuraViewControls
                 // Mouse position relative to chartPanel
                 Point mousePt = chartPanel.PointToClient(Cursor.Position);
 
-                // Erase previous cursor if drawn
+                // erase previous XOR cursor
                 if (StartMouseMove[0])
                 {
                     DrawCursorAtScreenPoint(ChartLastCursorPos[0]);
                     StartMouseMove[0] = false;
                 }
-                // Only draw cursor if inside panel area
-                if ((mousePt.X >= 0) && 
-                    (mousePt.Y >= 0) && 
-                    (mousePt.X <= chartPanel.Width) && 
-                    (mousePt.Y <= chartPanel.Height))
+                // draw XOR cursor at current position
+                if ((mousePt.X >= 0) && (mousePt.Y >= 0) &&
+                    (mousePt.X <= chartPanel.Width) && (mousePt.Y <= chartPanel.Height))
                 {
                     DrawCursorAtScreenPoint(mousePt);
                     StartMouseMove[0] = true;
                     ChartLastCursorPos[0] = mousePt;
+                    _hasCursorPos = true;
+                    _savedCursorPos = mousePt;
                 }
 
                 // Map mouse X -> data-space X using the primary X axis transform
@@ -872,6 +891,10 @@ namespace YamuraViewControls
                         }
                     }
                 }
+                // update overlay panel (only the small panel repaints, not the main chart)
+                _cursorDataX = dataX;
+                _cursorValues = outArgs.YAxisValues;
+                UpdateOverlayPanel(mousePt);
                 // Raise event for listeners (other charts) with mapped X and channel values
                 ChartMouseTrackEvent?.Invoke(this, outArgs);
             }
@@ -908,14 +931,103 @@ namespace YamuraViewControls
         /// <param name="e"></param>
         public void OnAxisOffsetUpdate(object sender, AxisOffsetUpdateEventArgs e)
         {
-            //// offset channel on X axis
-            //string associatedAxisName = e.RunIdx.ToString() + "-" + e.ChannelName;
-            //if (e.AxisIdx == 0)
-            //{
-            //    ChartOwner.Y_Axes[AxisIdx].AssociatedChannels[associatedAxisName].AxisOffset[0] = e.OffsetVal;
-            //}
-            //chartPanel.Invalidate();
         }
+
+        private void ChartPanel_MouseLeave(object sender, EventArgs e)
+        {
+            _hasCursorPos = false;
+            _cursorValues = null;
+            _overlayPanel.Visible = false;
+            if (StartMouseMove.Count > 0 && StartMouseMove[0])
+            {
+                DrawCursorAtScreenPoint(ChartLastCursorPos[0]);
+                StartMouseMove[0] = false;
+            }
+        }
+
+        private void UpdateOverlayPanel(Point cursorPt)
+        {
+            if (ChartOwner == null) return;
+            if (!ChartOwner.ShowOverlay)
+            {
+                _overlayPanel.Visible = false;
+                return;
+            }
+            int border = ChartOwner.ChartBorder;
+            float lineHeight = Font.Height + 3;
+            int lineCount = 1; // x-axis header
+            if (_cursorValues != null)
+                foreach (var ds in _cursorValues)
+                    foreach (var ch in ds.Value)
+                        foreach (var axis in ChartOwner.Y_Axes.Values)
+                            foreach (var chan in axis.AssociatedChannels)
+                                if (chan.DataSetName == ds.Key && chan.ChannelName == ch.Key && chan.ShowChannel)
+                                    lineCount++;
+            int panelW = 195;
+            int panelH = (int)(lineHeight * lineCount) + 6;
+            // place on right side when cursor is in left half, left side when in right half
+            int x = cursorPt.X < chartPanel.Width / 2
+                ? chartPanel.Width - border - 4 - panelW
+                : border + 4;
+            bool overlayPanelMoved = false;
+            if (_overlayPanel.Location.X != x)
+            {
+                overlayPanelMoved = true;
+            }
+            _overlayPanel.Location = new Point(x, border + 4);
+            _overlayPanel.Size = new Size(panelW, panelH);
+            _overlayPanel.Visible = true;
+            _overlayPanel.Invalidate();
+            if (overlayPanelMoved)
+            {
+                chartPanel.Invalidate();
+            }
+        }
+
+        private void OverlayPanel_Paint(object sender, PaintEventArgs e)
+        {
+            if (_cursorValues == null || ChartOwner == null)
+                return;
+
+            Graphics g = e.Graphics;
+            float lineHeight = Font.Height + 3;
+            float x = 3f;
+            float y = 3f;
+
+            string xLabel = float.IsNaN(_cursorDataX) ? "" :
+                ChartOwner.XChannelName == "Distance" ? $"Dist: {_cursorDataX:F2} ft" :
+                                                         $"Time: {_cursorDataX:F3} s";
+
+            using (Brush w = new SolidBrush(Color.White))
+                g.DrawString(xLabel, Font, w, x, y);
+            y += lineHeight;
+
+            foreach (var ds in _cursorValues)
+            {
+                foreach (var ch in ds.Value)
+                {
+                    Color channelColor = Color.White;
+                    bool visible = false;
+                    foreach (var axis in ChartOwner.Y_Axes.Values)
+                        foreach (var chan in axis.AssociatedChannels)
+                            if (chan.DataSetName == ds.Key && chan.ChannelName == ch.Key && chan.ShowChannel)
+                            {
+                                channelColor = chan.ChannelColor;
+                                visible = true;
+                            }
+                    if (!visible)
+                        continue;
+                    string valueStr = float.IsNaN(ch.Value) ? "---" : ch.Value.ToString("G4");
+                    string label = _cursorValues.Count > 1
+                        ? $"{ch.Key} ({ds.Key}): {valueStr}"
+                        : $"{ch.Key}: {valueStr}";
+                    using (Brush brush = new SolidBrush(channelColor))
+                        g.DrawString(label, Font, brush, x, y);
+                    y += lineHeight;
+                }
+            }
+        }
+
         /// <summary>
         /// binary-search nearest-key lookup for SortedList<float,float>
         /// </summary>

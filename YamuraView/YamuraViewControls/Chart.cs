@@ -123,6 +123,8 @@ namespace YamuraViewControls
         public string XChannelName { get; set; }
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public int ChartBorder { get; set; }
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        public bool ShowOverlay { get; set; } = true;
         String chartName = "Data";
         [Browsable(true)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
@@ -314,7 +316,8 @@ namespace YamuraViewControls
 
             xmlDoc.Element("Setup")?.Element(localName)?.Add(new XElement("DisplayMode",
                        new XAttribute("Name", chartProperties1.cmbChartMode.Text),
-                       new XAttribute("ID", chartProperties1.cmbChartMode.SelectedIndex)));
+                       new XAttribute("ID", chartProperties1.cmbChartMode.SelectedIndex),
+                       new XAttribute("ShowOverlay", chartProperties1.ShowOverlay.ToString())));
             xmlDoc.Element("Setup")?.Element(localName)?.Add(new XElement("Channels"));
             foreach (TreeNode channelNode in chartProperties1.axisChannelTree.Nodes)
             {
@@ -340,6 +343,9 @@ namespace YamuraViewControls
             }
             chartProperties1.CmbXAxis.Text = xmlDoc.Element("Setup")?.Element(localName)?.Element("X_Axis")?.Attribute("Name")?.Value;
             chartProperties1.cmbChartMode.Text = xmlDoc.Element("Setup")?.Element(localName)?.Element("DisplayMode")?.Attribute("Name")?.Value;
+            bool showOverlay = (bool?)xmlDoc.Element("Setup")?.Element(localName)?.Element("DisplayMode")?.Attribute("ShowOverlay") ?? true;
+            chartProperties1.ShowOverlay = showOverlay;
+            ShowOverlay = showOverlay;
             if (xmlDoc.Element("Setup")?.Element(localName)?.Element("Channels")?.Elements() != null)
             {
                 foreach (XElement channelElement in xmlDoc?.Element("Setup")?.Element(localName)?.Element("Channels")?.Elements())
