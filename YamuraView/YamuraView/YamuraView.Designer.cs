@@ -230,9 +230,14 @@
             checkAutoAddTimer.Interval = 30000;
             checkAutoAddTimer.Tick += CheckAutoAddTimer_Tick;
             // 
+            // saveConfigFileDialog
+            // 
+            saveConfigFileDialog.Filter = "YamuraView Config|*.xml";
+            // 
             // openConfigFileDialog
             // 
             openConfigFileDialog.FileName = "openFileDialog1";
+            openConfigFileDialog.Filter = "YamuraView Config|*.xml";
             // 
             // YamuraView
             // 

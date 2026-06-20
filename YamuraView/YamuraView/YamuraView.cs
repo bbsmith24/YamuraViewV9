@@ -243,6 +243,9 @@ namespace YamuraView
                     {
                         gpsDist += GPSDistance(priorLatVal, priorLongVal, latVal, longVal);
                         dataLogger.runData[runIdx].channels["Distance-GPS"].AddPoint(timestampSeconds, gpsDist);
+                        // update prior position
+                        priorLatVal = latVal;
+                        priorLongVal = longVal;
                     }
                 }
                 #endregion
@@ -297,7 +300,7 @@ namespace YamuraView
 
             String runName = GetFileName(fileName, false);
             dataLogger.runData.Add(new RunData(runName));
-            runIdx = dataLogger.runData.Count;
+            runIdx = dataLogger.runData.Count - 1;
 
             dataLogger.runData[runIdx].AddChannel("Time", "Timestamp", "Internal", runName, 1.0F);
 
@@ -515,7 +518,6 @@ namespace YamuraView
                             Byte digitalVals = inFile.ReadByte();
                             UInt16[] a2d = new UInt16[8];
                             #region read the digital data
-                            //System.Diagnostics.Debug.Write(absTime.ToString() + "\tA2D\tdigital\t");
                             for (int idx = 0; idx < 8; idx++)
                             {
                                 channelName = "D_" + ((recordType - 0x30) + idx).ToString();
@@ -524,11 +526,9 @@ namespace YamuraView
                                     dataLogger.runData[runIdx].AddChannel(channelName, "Digital channel " + channelName, "D", runName, 1.0F);
                                 }
                                 dataLogger.runData[runIdx].channels[channelName].AddPoint((float)absTime, (float)((digitalVals >> idx) & 0x01));
-                                //System.Diagnostics.Debug.Write(((digitalVals >> idx) & 0x01));
                             }
                             #endregion
                             #region read the a2d data
-                            //System.Diagnostics.Debug.Write("\tanalog\t");
                             for (int idx = 0; idx < 8; idx++)
                             {
                                 a2d[idx] = inFile.ReadUInt16();
@@ -538,9 +538,7 @@ namespace YamuraView
                                     dataLogger.runData[runIdx].AddChannel(channelName, "Analog to Digital channel " + channelName, "A2D", runName, 1.0F);
                                 }
                                 dataLogger.runData[runIdx].channels[channelName].AddPoint((float)absTime, (float)a2d[idx]);
-                                //System.Diagnostics.Debug.Write("\t" + ((float)a2d[idx]).ToString());
                             }
-                            //System.Diagnostics.Debug.WriteLine("");
                             #endregion
                         }
                         /// IMU/accelerometer node (0x40)
@@ -648,69 +646,6 @@ namespace YamuraView
                             offsetTime = offsetTime < 0.0F ? absTime : offsetTime;
                             absTime -= offsetTime;
                             dataLogger.runData[runIdx].channels["Time"].AddPoint((float)absTime, (float)absTime);
-                            //deltaTime = absTime - lastSample[recordType - 0x30];
-                            //lastSample[recordType - 0x30] = absTime;
-                            //UInt16 seq = inFile.ReadUInt16();
-
-                            //float[] t = new float[8];
-                            //int row = 0;
-                            //int col = 0;
-                            //switch (seq)
-                            //{
-                            //    case 0:
-                            //        row = 0;
-                            //        col = 0;
-                            //        break;
-                            //    case 1:
-                            //        row = 0;
-                            //        col = 8;
-                            //        break;
-                            //    case 2:
-                            //        row = 1;
-                            //        col = 0;
-                            //        break;
-                            //    case 3:
-                            //        row = 1;
-                            //        col = 8;
-                            //        break;
-                            //    case 4:
-                            //        row = 2;
-                            //        col = 0;
-                            //        break;
-                            //    case 5:
-                            //        row = 2;
-                            //        col = 8;
-                            //        break;
-                            //    case 6:
-                            //        row = 3;
-                            //        col = 0;
-                            //        break;
-                            //    case 7:
-                            //        row = 3;
-                            //        col = 8;
-                            //        break;
-                            //}
-                            //for (int idx = 0; idx < 8; idx++)
-                            //{
-                            //    tempArray[row, col + idx] = inFile.ReadSingle();
-                            //}
-                            //if (seq == 7)
-                            //{
-                            //    deltaTime = absTime - lastSample[3];
-                            //    lastSample[3] = absTime;
-                            //    outStr.AppendFormat("0x{0:X02}\tIR\t{1}\t{2}", recordType,
-                            //                                                    absTime,
-                            //                                                    deltaTime);
-                            //    for (row = 0; row < 4; row++)
-                            //    {
-                            //        for (col = 0; col < 16; col++)
-                            //        {
-                            //            outStr.AppendFormat("\t{0:F2}", tempArray[row, col]);
-                            //        }
-
-                            //    }
-                            //    outStr.Append(System.Environment.NewLine);
-                            //}
                         }
                         /// Shock travel (0x70-0x7F)
                         else if ((recordType >= 0x70) && (recordType <= 0x7F))
@@ -720,10 +655,6 @@ namespace YamuraView
                             offsetTime = offsetTime < 0.0F ? absTime : offsetTime;
                             absTime -= offsetTime;
                             dataLogger.runData[runIdx].channels["Time"].AddPoint(absTime, absTime);
-                            //UInt32 speedVal = inFile.ReadUInt32();
-                            //deltaTime = absTime - lastSample[recordType - 0x30];
-                            //lastSample[recordType - 0x30] = absTime;
-                            //// not implemented on hardware
                         }
                         /// Wheel Speed node (4 groups - 0x80-0x83; 0x84-0x87; 0x88-0x8B; 0x8C-0x8F)
                         else if ((recordType >= 0x80) && (recordType <= 0x8F))
@@ -756,10 +687,6 @@ namespace YamuraView
                             offsetTime = offsetTime < 0.0F ? absTime : offsetTime;
                             absTime -= offsetTime;
                             dataLogger.runData[runIdx].channels["Time"].AddPoint(absTime, absTime);
-                            //UInt32 speedVal = inFile.ReadUInt32();
-                            //deltaTime = absTime - lastSample[recordType - 0x30];
-                            //lastSample[recordType - 0x30] = absTime;
-                            //// not implemented on hardware
                         }
                         /// CAN interface (0xA0)
                         else if (recordType == 0xA0)
@@ -769,10 +696,6 @@ namespace YamuraView
                             offsetTime = offsetTime < 0.0F ? absTime : offsetTime;
                             absTime -= offsetTime;
                             dataLogger.runData[runIdx].channels["Time"].AddPoint(absTime, absTime);
-                            //UInt32 speedVal = inFile.ReadUInt32();
-                            //deltaTime = absTime - lastSample[recordType - 0x30];
-                            //lastSample[recordType - 0x30] = absTime;
-                            //// not implemented on hardware
                         }
                         /// unknown message
                         else
@@ -891,19 +814,6 @@ namespace YamuraView
                 errInfo.FileInfoText = errStr.ToString();
                 errInfo.ShowDialog();
             }
-            //foreach (var channel in dataLogger.runData[runIdx].channels)
-            //{
-            //    System.Diagnostics.Debug.WriteLine(string.Format("channel {0} has {1} points X range {2}, {3}, {4} Y range {5}, {6}, {7}",
-            //                                                                                                           channel.Key,
-            //                                                                                                           channel.Value.dataPoints.Count(),
-            //                                                                                                           channel.Value.XRange[0],
-            //                                                                                                           channel.Value.XRange[1],
-            //                                                                                                           channel.Value.XRange[2],
-            //                                                                                                           channel.Value.YRange[0],
-            //                                                                                                           channel.Value.YRange[1],
-            //                                                                                                           channel.Value.YRange[2]
-            //                                                                                                           ));
-            //}
             AlignGPS();
             AlignTime();
             /// update displays with new data
@@ -1255,12 +1165,11 @@ namespace YamuraView
                     }
                     priorAccel = curAccel;
                 }
-                dataSet.TimeOffset = timeOffset;
-                //System.Diagnostics.Debug.WriteLine("run " + dataSet.runName + " time offset " + dataSet.TimeOffset.ToString());
+                //dataSet.TimeOffset = timeOffset;
             }
         }
         #endregion
-       
+
         #region add data to charts
         public void AddLatestDataToCharts()
         {
@@ -1356,12 +1265,11 @@ namespace YamuraView
             R = R * 3.28084; // feet
             double phi1 = DegreesToRadians(lat1Deg);
             double phi2 = DegreesToRadians(lat2Deg);
-            double long1 = DegreesToRadians(lat1Deg);
-            double long2 = DegreesToRadians(lat2Deg);
+            double long1 = DegreesToRadians(long1Deg);
+            double long2 = DegreesToRadians(long2Deg);
             double delta_phi = phi2 - phi1;
-            double delta_lambda = DegreesToRadians(long2 - long1);
+            double delta_lambda = long2 - long1;
 
-            ;
             double a = Math.Pow(Math.Sin(delta_phi / 2), 2) +
                        Math.Cos(phi1) * Math.Cos(phi2) *
                        Math.Pow(Math.Sin(delta_lambda / 2), 2);
@@ -1381,7 +1289,7 @@ namespace YamuraView
             return (float)rad;
         }
         #endregion
-        
+
         #region event handlers
         /// <summary>
         /// 
@@ -1452,16 +1360,10 @@ namespace YamuraView
             #region no new file to load, return
             if (!loadFile)
             {
-                //System.Diagnostics.Debug.WriteLine("*******************************************");
-                //System.Diagnostics.Debug.WriteLine("* No new files to auto load in " + FolderToWatch);
-                //System.Diagnostics.Debug.WriteLine("*******************************************");
                 return;
             }
             #endregion
             #region load various file formats
-            //System.Diagnostics.Debug.WriteLine("*******************************************");
-            //System.Diagnostics.Debug.WriteLine("* Auto loading file: " + loadFileName);
-            //System.Diagnostics.Debug.WriteLine("*******************************************");
             if (loadFileName.EndsWith("TXT", StringComparison.CurrentCultureIgnoreCase))
             {
                 ReadTXTFile(loadFileName);
@@ -1478,11 +1380,6 @@ namespace YamuraView
                 FolderToWatchFiles.Add(loadFileName, loadFileName);
             }
             #endregion
-            //if (dataLogger.runData.Count > 1)
-            //{
-            //    AlignGPS();
-            //    AlignTime();
-            //}
         }
         /// <summary>
         /// 
@@ -1497,6 +1394,7 @@ namespace YamuraView
             {
                 return;
             }
+            timeAlign = timeAlignDialog.timeAligned;
         }
         /// <summary>
         /// 
