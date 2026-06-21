@@ -242,8 +242,8 @@ namespace YamuraViewControls
                     // time based x axis
                     if (ChartOwner.XChannelName == "Time")
                     {
-                        primaryX.AxisDisplayRange[0] = (dataSet.channels["Time"].XRange[0]) < primaryX.AxisDisplayRange[0] ? dataSet.channels["Time"].XRange[0] : primaryX.AxisDisplayRange[0];
-                        primaryX.AxisDisplayRange[1] = (dataSet.channels["Time"].XRange[1]) > primaryX.AxisDisplayRange[1] ? dataSet.channels["Time"].XRange[1] : primaryX.AxisDisplayRange[1];
+                        primaryX.AxisDisplayRange[0] = (dataSet.channels["Time"].XRange[0]) < primaryX.AxisDisplayRange[0] + dataSet.TimeOffset ? dataSet.channels["Time"].XRange[0] + dataSet.TimeOffset : primaryX.AxisDisplayRange[0];
+                        primaryX.AxisDisplayRange[1] = (dataSet.channels["Time"].XRange[1]) > primaryX.AxisDisplayRange[1] + dataSet.TimeOffset ? dataSet.channels["Time"].XRange[1] + dataSet.TimeOffset : primaryX.AxisDisplayRange[1];
                         primaryX.AxisDisplayRange[2] = (dataSet.channels["Time"].XRange[1]) - dataSet.channels["Time"].XRange[0];
                     }
                     // distance based x axis
@@ -802,7 +802,7 @@ namespace YamuraViewControls
                     // x axis is time, no need to get distance
                     if (ChartOwner.XChannelName == "Time")
                     {
-                        timeAtCursor = dataX;
+                        timeAtCursor = dataX - curDataSet.TimeOffset;
                     }
                     // have distance, need to get time from the xDistance channel of current data set
                     else if (ChartOwner.XChannelName == "Distance")

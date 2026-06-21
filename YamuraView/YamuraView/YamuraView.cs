@@ -27,6 +27,9 @@ namespace YamuraView
         List<YamuraViewControls.Chart> chartControls = new List<YamuraViewControls.Chart>();
         public bool timeAlign = true;
         public bool distanceAlign = true;
+        public string timeAlignChannel = "gX";
+        public float timeAlignThreshold = 0.5f;
+        public bool timeAlignRisingEdge = true;
         #endregion
 
         #region constructors
@@ -1141,31 +1144,48 @@ namespace YamuraView
         /// </summary>
         public void AlignTime()
         {
-            if (!timeAlign)
-            {
+            if (!timeAlign || dataLogger.runData.Count == 0)
                 return;
-            }
-            float priorAccel = 0.0F;
-            float curAccel = 0.0F;
-            float accelThreshold = 0.5F; // g's
-            float timeOffset = 0.0F;
-            int lastRunIdx = dataLogger.runData.Count - 1;
 
-            // acceleration from last added data set
+            // find threshold-crossing time for each run
+            var crossingTimes = new List<float>();
             foreach (RunData dataSet in dataLogger.runData)
             {
-                priorAccel = 0.0F;
-                foreach (KeyValuePair<float, float> dataPoint in dataSet.channels["gX"].DataPoints)
+                float crossing = float.NaN;
+                if (!dataSet.channels.ContainsKey(timeAlignChannel))
                 {
-                    curAccel = dataPoint.Value;
-                    if (Math.Abs(curAccel - priorAccel) > accelThreshold)
-                    {
-                        timeOffset = dataPoint.Key;
-                        break;
-                    }
-                    priorAccel = curAccel;
+                    crossingTimes.Add(float.NaN);
+                    continue;
                 }
-                //dataSet.TimeOffset = timeOffset;
+                float prev = float.NaN;
+                foreach (KeyValuePair<float, float> pt in dataSet.channels[timeAlignChannel].DataPoints)
+                {
+                    float val = pt.Value;
+                    if (!float.IsNaN(prev))
+                    {
+                        bool crossed = timeAlignRisingEdge
+                            ? (prev < timeAlignThreshold && val >= timeAlignThreshold)
+                            : (prev > timeAlignThreshold && val <= timeAlignThreshold);
+                        if (crossed)
+                        {
+                            crossing = pt.Key;
+                            break;
+                        }
+                    }
+                    prev = val;
+                }
+                crossingTimes.Add(crossing);
+            }
+
+            // use run 0's crossing as reference; skip runs where channel is missing or never crossed
+            float reference = crossingTimes[0];
+            if (float.IsNaN(reference))
+                return;
+
+            for (int i = 0; i < dataLogger.runData.Count; i++)
+            {
+                if (!float.IsNaN(crossingTimes[i]))
+                    dataLogger.runData[i].TimeOffset = reference - crossingTimes[i];
             }
         }
         #endregion
@@ -1389,12 +1409,25 @@ namespace YamuraView
         private void TimeAlignSetupToolStripMenuItem_Click(object sender, EventArgs e)
         {
             TimeAlignDialog timeAlignDialog = new TimeAlignDialog();
-            timeAlignDialog.timeAligned = timeAlign;
+
+            // populate channel list from first run that has data
+            if (dataLogger.runData.Count > 0)
+                timeAlignDialog.PopulateChannels(dataLogger.runData[0].channels.Keys);
+
+            timeAlignDialog.SetState(timeAlign, timeAlignChannel, timeAlignThreshold, timeAlignRisingEdge);
+
             if (timeAlignDialog.ShowDialog() != DialogResult.OK)
-            {
                 return;
-            }
+
             timeAlign = timeAlignDialog.timeAligned;
+            timeAlignChannel = timeAlignDialog.alignChannel ?? timeAlignChannel;
+            timeAlignThreshold = timeAlignDialog.alignThreshold;
+            timeAlignRisingEdge = timeAlignDialog.risingEdge;
+
+            if (timeAlign)
+            {
+                AlignTime();
+            }
         }
         /// <summary>
         /// 
@@ -1430,7 +1463,11 @@ namespace YamuraView
                 return;
             }
             XDocument setupDoc = new XDocument(new XDeclaration("1.0", "utf-8", "yes"),
-                                               new XElement("Setup"));
+                                               new XElement("Setup",
+                                                   new XAttribute("TimeAlign", timeAlign),
+                                                   new XAttribute("TimeAlignChannel", timeAlignChannel ?? ""),
+                                                   new XAttribute("TimeAlignThreshold", timeAlignThreshold),
+                                                   new XAttribute("TimeAlignRisingEdge", timeAlignRisingEdge)));
             foreach (Chart curChart in chartControls)
             {
                 curChart.SaveSetup(setupDoc);
@@ -1449,6 +1486,11 @@ namespace YamuraView
                 return;
             }
             XDocument setupDoc = XDocument.Load(openConfigFileDialog.FileName);
+            XElement root = setupDoc.Element("Setup");
+            timeAlign          = (bool?)root?.Attribute("TimeAlign")          ?? false;
+            timeAlignChannel   = (string)root?.Attribute("TimeAlignChannel")  ?? "gX";
+            timeAlignThreshold = (float?)root?.Attribute("TimeAlignThreshold") ?? 0.5f;
+            timeAlignRisingEdge = (bool?)root?.Attribute("TimeAlignRisingEdge") ?? true;
             foreach (Chart curChart in chartControls)
             {
                 curChart.ApplySetup(setupDoc);
