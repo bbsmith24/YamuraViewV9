@@ -7,6 +7,7 @@ using System.Drawing.Drawing2D;
 using System.Linq;
 using System.Runtime.Intrinsics.X86;
 using System.Text;
+using System.Threading.Channels;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Xml;
@@ -268,6 +269,15 @@ namespace YamuraViewControls
             int runIdx = 0;
             foreach (KeyValuePair<string, SortedList<string, float>> channels in e.YAxisValues)
             {
+                for(int dataSetIdx = 0; dataSetIdx < dataSets.Count; dataSetIdx++)
+                {
+                    if(channels.Key == dataSets[dataSetIdx].DataSetName)
+                    {
+                        runIdx = dataSetIdx;
+                        break;
+                    }
+                }
+                
                 foreach (KeyValuePair<string, float> channel in channels.Value)
                 {
                     if (Name == "TractionCircle")
@@ -293,7 +303,8 @@ namespace YamuraViewControls
                         }
                     }
                 }
-                chartView1.DrawCursorAtScaledPoint(scaledPoint, runIdx);
+                Color runColor = runIdx < autoColors.Count ? autoColors[runIdx % 7] : Color.White;
+                chartView1.DrawCursorAtScaledPoint(scaledPoint, runIdx, runColor);
                 runIdx++;
             }
         }

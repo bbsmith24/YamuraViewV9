@@ -510,7 +510,7 @@ namespace YamuraViewControls
         /// </summary>
         /// <param name="x"></param>
         /// <param name="y"></param>
-        internal void DrawCursorAtScreenPoint(Point drawPoint)
+        internal void DrawCursorAtScreenPoint(Point drawPoint, Color cursorColor = default)
         {
             Rectangle locationBox = new Rectangle(0, 0, 0, 0);
             IntPtr lpPoint = new IntPtr();
@@ -519,9 +519,10 @@ namespace YamuraViewControls
             {
                 #region create GDI objects
                 IntPtr hDC = drawGraphics.GetHdc();
+                Color penColor = cursorColor == default ? Color.Black : cursorColor;
                 IntPtr newPen = Gdi32.CreatePen((int)PenStyles.PS_SOLID,
                                                 dragZoomPenWidth,
-                                                NotRGB(Color.Black));
+                                                NotRGB(penColor));
                 IntPtr newBrush = Gdi32.GetStockObject((int)StockObjects.BLACK_BRUSH);
                 IntPtr oldPen = Gdi32.SelectObject(hDC, newPen);
                 IntPtr oldBrush = Gdi32.SelectObject(hDC, newBrush);
@@ -588,7 +589,7 @@ namespace YamuraViewControls
         /// </summary>
         /// <param name="scaledPoint"></param>
         /// <param name="runIdx"></param>
-        public void DrawCursorAtScaledPoint(PointF scaledPoint, int runIdx)
+        public void DrawCursorAtScaledPoint(PointF scaledPoint, int runIdx, Color cursorColor = default)
         {
             if(StartMouseMove.Count < (runIdx + 1))
             {
@@ -603,30 +604,23 @@ namespace YamuraViewControls
             {
                 return;
             }
-            // scale to screen conversion (from DrawChartView)
-
-            // displayScaleX matches the drawing transform used elsewhere
-            //screenPoint.X = (int)((scaledPoint.X - ChartOwner.X_Axes.ElementAt(0).Value.AxisDisplayRange[0]) * displayScale[0]) - ChartOwner.ChartBorder;
-            //screenPoint.Y = (int)((scaledPoint.Y - ChartOwner.Y_Axes.ElementAt(0).Value.AxisDisplayRange[1]) * displayScale[1]) - ChartOwner.ChartBorder;
-            screenPoint.X = (int)((scaledPoint.X - ChartOwner.X_Axes.ElementAt(0).Value.AxisDisplayRange[0]) * displayScale[0]) + ChartOwner.ChartBorder;
-            screenPoint.Y = (int)((scaledPoint.Y - ChartOwner.Y_Axes.ElementAt(0).Value.AxisDisplayRange[1]) * displayScale[1]) + ChartOwner.ChartBorder;
-            //screenPoint = ScaleDataToDisplay(scaledPoint,
-            //                   displayScale[0], displayScale[1],
-            //                   ChartOwner.X_Axes.ElementAt(0).Value.AxisDisplayRange[0], ChartOwner.Y_Axes.ElementAt(0).Value.AxisDisplayRange[0],
-            //                   Bounds);
-            //Point screenPointInt = new Point((int)screenPoint.X, (int)screenPoint.Y);
+            // scale to screen conversion
+            int border = ChartOwner.ChartBorder;
+            Axis primaryY = ChartOwner.Y_Axes.ElementAtOrDefault(0).Value;
+            screenPoint.X = border + (int)((scaledPoint.X - primaryX.AxisDisplayRange[0]) * displayScale[0]);
+            screenPoint.Y = (ChartOwner.ChartHeight - border) + (int)((scaledPoint.Y - (primaryY?.AxisDisplayRange[0] ?? 0)) * displayScale[1]);
             if (StartMouseMove[runIdx])
             {
-                DrawCursorAtScreenPoint(ChartLastCursorPos[runIdx]);
+                DrawCursorAtScreenPoint(ChartLastCursorPos[runIdx], cursorColor);
                 StartMouseMove[runIdx] = false;
             }
-            // Only draw if inside panel area
-            if ((screenPoint.X >= 0) &&
-                (screenPoint.Y >= 0) &&
-                (screenPoint.X <= chartPanel.Width) &&
-                (screenPoint.Y <= chartPanel.Height))
+            // Only draw if inside chart area (within border)
+            if ((screenPoint.X >= border) &&
+                (screenPoint.Y >= border) &&
+                (screenPoint.X <= chartPanel.Width - border) &&
+                (screenPoint.Y <= chartPanel.Height - border))
             {
-                DrawCursorAtScreenPoint(screenPoint);
+                DrawCursorAtScreenPoint(screenPoint, cursorColor);
                 StartMouseMove[runIdx] = true;
                 ChartLastCursorPos[runIdx] = screenPoint;
             }
@@ -753,11 +747,14 @@ namespace YamuraViewControls
             //SortedList<string, SortedList<string, float>> valuesAtCursor = new SortedList<string, SortedList<string, float>>();
             try
             {
+                #region no data, return
                 if (ChartOwner == null || ChartOwner.X_Axes == null || ChartOwner.X_Axes.Count == 0)
+                {
                     return;
+                }
+                #endregion
 
-                // Ensure cursor storage exists for index 0
-                if (StartMouseMove.Count == 0)
+                #region cursor track in local view
                 {
                     StartMouseMove.Add(false);
                     StartMouseDrag.Add(false);
@@ -784,102 +781,80 @@ namespace YamuraViewControls
                     _hasCursorPos = true;
                     _savedCursorPos = mousePt;
                 }
+                #endregion
 
+                // time works, distance isn't right yet
+                #region send points to draw in views
                 // Map mouse X -> data-space X using the primary X axis transform
                 Axis primaryXAxis = ChartOwner.X_Axes.ElementAtOrDefault(0).Value;
 
                 // panel X relative to chart area (subtract border)
                 float panelX = mousePt.X - ChartOwner.ChartBorder;
-
-                // Compute data-space X (axis units)
-                float dataX = (panelX / displayScale[0]) + primaryXAxis.AxisDisplayRange[0] + primaryXAxis.AxisOffset;
-
+                float dataX = 0.0F;
                 ChartControlMouseTrackEventArgs outArgs = new ChartControlMouseTrackEventArgs();
 
                 // For each dataset compute dataset-specific time corresponding to dataX
-                for (int dsIdx = 0; dsIdx < ChartOwner.dataSets.Count; dsIdx++)
+                for (int dataSetIdx = 0; dataSetIdx < ChartOwner.dataSets.Count; dataSetIdx++)
                 {
-                    var ds = ChartOwner.dataSets[dsIdx];
-                    timeAtCursor = dataX;
-
+                    // Compute data-space X (axis units)
+                    dataX = (panelX / displayScale[0]) + primaryXAxis.AxisDisplayRange[0]/* + primaryXAxis.AxisOffset*/;
+                    var curDataSet = ChartOwner.dataSets[dataSetIdx];
+                    // x axis is time, no need to get distance
                     if (ChartOwner.XChannelName == "Time")
                     {
                         timeAtCursor = dataX;
-                        if (ds.channels.TryGetValue("xDistance", out ChartChannel xDistChan) &&
-                            TryFindNearestKeyByValue(xDistChan.DataPoints, timeAtCursor, out float foundKey))
-                        {
-                            distanceAtCursor = xDistChan.DataPoints[foundKey];
-                        }
                     }
+                    // have distance, need to get time from the xDistance channel of current data set
                     else if (ChartOwner.XChannelName == "Distance")
                     {
-                        if (ds.channels != null && ds.channels.TryGetValue("Distance", out ChartChannel xt) && xt.DataPoints != null && xt.DataPoints.Count > 0)
-                        //if (ds.channels != null && ds.channels.TryGetValue("xDistance", out ChartChannel xt) && xt.DataPoints != null && xt.DataPoints.Count > 0)
-                        {
-
-                            if (TryFindNearestKeyByValue(xt.DataPoints, dataX, out float foundKey))
-                            {
-                                timeAtCursor = foundKey;
-                                distanceAtCursor = xt.DataPoints[foundKey];
-                            }
-                        }
+                        distanceAtCursor = dataX - curDataSet.DistanceOffset;
+                        timeAtCursor = curDataSet.channels["xDistance"].dataPoints.FirstOrDefault(i => i.Key >= distanceAtCursor).Value;
                     }
                     else
                     {
-                        if (ds.channels != null && ds.channels.TryGetValue(ChartOwner.XChannelName, out ChartChannel axisChan) && axisChan.DataPoints != null && axisChan.DataPoints.Count > 0)
+                        if (curDataSet.channels != null && curDataSet.channels.TryGetValue(ChartOwner.XChannelName, out ChartChannel axisChan) && axisChan.DataPoints != null && axisChan.DataPoints.Count > 0)
                         {
                             if (TryFindNearestKeyByValue(axisChan.DataPoints, dataX, out float foundKey))
                             {
                                 timeAtCursor = foundKey;
                             }
-                            if (ds.channels.TryGetValue("xDistance", out ChartChannel xDistChan2) &&
+                            if (curDataSet.channels.TryGetValue("xDistance", out ChartChannel xDistChan2) &&
                                 TryFindNearestKeyByValue(xDistChan2.DataPoints, timeAtCursor, out foundKey))
                             {
                                 distanceAtCursor = xDistChan2.DataPoints[foundKey];
                             }
                         }
                     }
-                    if (!outArgs.XAxisValues.ContainsKey(ds.DataSetName))
+                    if (!outArgs.XAxisValues.ContainsKey(curDataSet.DataSetName))
                     {
-                        outArgs.XAxisValues.Add(ds.DataSetName, timeAtCursor);
+                        outArgs.XAxisValues.Add(curDataSet.DataSetName, timeAtCursor);
                     }
-                }
+                    //}
 
-                // For each displayed channel, find Y value at the computed dataset time using TryFindNearestValue
-                foreach (KeyValuePair<string, Axis> axisKvp in ChartOwner.Y_Axes)
-                {
-                    Axis yAxis = axisKvp.Value;
-                    if (yAxis == null)
+                    // For each displayed channel, find Y value at the computed dataset time using TryFindNearestValue
+                    foreach (KeyValuePair<string, Axis> axisKvp in ChartOwner.Y_Axes)
                     {
-                        continue;
-                    }
-                    foreach (ChartChannel chan in yAxis.AssociatedChannels)
-                    {
-                        // skip hidden channels unless source is GPS or IMU
-                        // (for track map and traction circle updates)
-                        // will need to change this if I allow anything on X axis in other charts
-                        if ((!chan.ShowChannel) && ((chan.ChannelSource != "IMU") &&
-                                                    (chan.ChannelSource != "GPS") &&
-                                                    (chan.ChannelSource != "Calculated")))
-                        { 
-                            continue; 
-                        }
-                        float sampleTime = outArgs.XAxisValues[chan.DataSetName];
-                        float foundY = 0.0F;
-                        if (chan.DataPoints != null && chan.DataPoints.Count > 0 && TryFindNearestValue(chan.DataPoints, sampleTime, out foundY))
+                        Axis yAxis = axisKvp.Value;
+                        if (yAxis == null)
                         {
-                            if (!outArgs.YAxisValues.ContainsKey(chan.DataSetName))
-                            {
-                                outArgs.YAxisValues.Add(chan.DataSetName, new SortedList<string, float>());
-                            }
-                            if(!outArgs.YAxisValues[chan.DataSetName].ContainsKey(chan.ChannelName))
-                            {
-                                outArgs.YAxisValues[chan.DataSetName].Add(chan.ChannelName, foundY);
-                            }
+                            continue;
                         }
-                        else
+                        foreach (ChartChannel chan in yAxis.AssociatedChannels)
                         {
-                            foundY = float.NaN;
+                            if(chan.DataSetName != curDataSet.DataSetName)
+                            {
+                                continue;
+                            }
+                            // skip hidden channels unless source is GPS or IMU
+                            // (for track map and traction circle updates)
+                            // will need to change this if I allow anything on X axis in other charts
+                            if ((!chan.ShowChannel) && ((chan.ChannelSource != "IMU") &&
+                                                        (chan.ChannelSource != "GPS") &&
+                                                        (chan.ChannelSource != "Calculated")))
+                            {
+                                continue;
+                            }
+                            float foundY = chan.dataPoints.FirstOrDefault(i => i.Key >= timeAtCursor).Value;
                             if (!outArgs.YAxisValues.ContainsKey(chan.DataSetName))
                             {
                                 outArgs.YAxisValues.Add(chan.DataSetName, new SortedList<string, float>());
@@ -889,6 +864,10 @@ namespace YamuraViewControls
                                 outArgs.YAxisValues[chan.DataSetName].Add(chan.ChannelName, foundY);
                             }
                         }
+                        if (!outArgs.YAxisValues[curDataSet.DataSetName].ContainsKey("Time"))
+                        {
+                            outArgs.YAxisValues[curDataSet.DataSetName].Add("Time", outArgs.XAxisValues[curDataSet.DataSetName]);
+                        }
                     }
                 }
                 // update overlay panel (only the small panel repaints, not the main chart)
@@ -897,6 +876,7 @@ namespace YamuraViewControls
                 UpdateOverlayPanel(mousePt);
                 // Raise event for listeners (other charts) with mapped X and channel values
                 ChartMouseTrackEvent?.Invoke(this, outArgs);
+                #endregion
             }
             catch (Exception ex)
             {
