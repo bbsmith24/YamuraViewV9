@@ -217,6 +217,11 @@ namespace YamuraViewControls
                 channelsContext.Items["lblAxisMax"].Visible = true;
                 channelsContext.Items["txtAxisMinValue"].Visible = true;
                 channelsContext.Items["txtAxisMaxValue"].Visible = true;
+
+                // show invert with state from first child channel
+                bool curInvert = axisChannelTree.SelectedNode.Nodes.Count > 0
+                    && axisChannelTree.SelectedNode.Nodes[0].Tag is ChartChannel ch && ch.InvertChannel;
+                invertToolStripMenuItem.Text = curInvert ? "Invert (on)" : "Invert";
             }
             else
             {
@@ -230,6 +235,9 @@ namespace YamuraViewControls
 
                 channelsContext.Items["assignGraphMenuItem"].Visible = true;
                 PopulateAssignGraphMenu();
+
+                bool curInvert = axisChannelTree.SelectedNode.Tag is ChartChannel selChan && selChan.InvertChannel;
+                invertToolStripMenuItem.Text = curInvert ? "Invert (on)" : "Invert";
             }
         }
         /// <summary>
@@ -324,36 +332,33 @@ namespace YamuraViewControls
         /// <param name="e"></param>
         private void invertToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            //// selected channel
-            //if (axisChannelTree.SelectedNode.Parent != null)
-            //{
-            //    string channelName = axisChannelTree.SelectedNode.Text;
-            //    int runIdx = Convert.ToInt32(channelName.Substring(0, channelName.IndexOf('-')));
-            //    channelName = channelName.Substring(channelName.IndexOf('-') + 1);
-            //    foreach (KeyValuePair<float, DataPoint>kvp in ChartOwner.channels[channelName].DataPoints)
-            //    {
-            //        ChartOwner.channels[channelName].DataPoints[kvp.Key].PointValue = ChartOwner.channels[channelName].DataRange[1] - kvp.Value.PointValue + ChartOwner.channels[channelName].DataRange[0];
-            //    }
-            //    ClearGraphicsPathEvent(this, new EventArgs());
-            //}
-            //// all channels
-            //else
-            //{
-            //    string channelName = axisChannelTree.SelectedNode.Text;
-            //    for (int runIdx = 0; runIdx < ChartOwner.channels.Count; runIdx++)
-            //    {
-            //        if(!ChartOwner.channels.ContainsKey(channelName))
-            //        {
-            //            continue;
-            //        }
-            //        foreach (KeyValuePair<float, DataPoint> kvp in ChartOwner.channels[channelName].DataPoints)
-            //        {
-            //            ChartOwner.channels[channelName].DataPoints[kvp.Key].PointValue = ChartOwner.channels[channelName].DataRange[0];
-            //        }
-            //    }
-            //    ClearGraphicsPathEvent(this, new EventArgs());
-            //}
+            if (axisChannelTree.SelectedNode == null || ChartOwner == null) return;
 
+            // resolve channel name: parent node text when leaf is selected, else the node itself
+            TreeNode parentNode = axisChannelTree.SelectedNode.Parent != null
+                ? axisChannelTree.SelectedNode.Parent
+                : axisChannelTree.SelectedNode;
+            string channelName = parentNode.Text;
+
+            // determine new state by toggling current first-instance value
+            bool newInvert = true;
+            if (parentNode.Nodes.Count > 0 && parentNode.Nodes[0].Tag is ChartChannel firstChan)
+                newInvert = !firstChan.InvertChannel;
+
+            // apply to all instances of this channel name
+            foreach (var axis in ChartOwner.Y_Axes.Values)
+                foreach (var chan in axis.AssociatedChannels)
+                    if (chan.ChannelName == channelName)
+                        chan.InvertChannel = newInvert;
+
+            // update tree node text indicator
+            string baseName = channelName.EndsWith(" (inv)") ? channelName[..^6] : channelName;
+            parentNode.Text = newInvert ? baseName + " (inv)" : baseName;
+            // keep the node key / channel name in sync so lookups still work
+            // (node.Name stays as original channelName — only Text changes for display)
+
+            // redraw — inversion is applied in the transform, no path rebuild needed
+            ChartOwner.Invalidate(true);
         }
         #region Auto align
         //private void btnDoAutoAlign_Click(object sender, EventArgs e)

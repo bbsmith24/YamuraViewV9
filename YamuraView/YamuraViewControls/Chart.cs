@@ -143,8 +143,9 @@ namespace YamuraViewControls
             }
         }
 
-        // graph index assignments loaded from XML, applied in UpdateData when ChartChannels are tagged to nodes
+        // graph index / invert state loaded from XML, applied in UpdateData when ChartChannels are tagged to nodes
         Dictionary<string, int> pendingGraphIndices = new Dictionary<string, int>();
+        HashSet<string> pendingInvertChannels = new HashSet<string>();
 
         List<Color> autoColors = new List<Color> { Color.Red,
                                                    Color.Green,
@@ -211,6 +212,8 @@ namespace YamuraViewControls
                         newNode.Checked = associatedChannel.ShowChannel;
                         if (pendingGraphIndices.TryGetValue(associatedChannel.ChannelName, out int pendingG))
                             associatedChannel.GraphIndex = pendingG;
+                        if (pendingInvertChannels.Contains(associatedChannel.ChannelName))
+                            associatedChannel.InvertChannel = true;
                     }
                 }
             }
@@ -338,11 +341,16 @@ namespace YamuraViewControls
             foreach (TreeNode channelNode in chartProperties1.axisChannelTree.Nodes)
             {
                 int gIdx = 0;
+                bool inverted = false;
                 if (channelNode.Nodes.Count > 0 && channelNode.Nodes[0].Tag is ChartChannel savedChan)
+                {
                     gIdx = savedChan.GraphIndex;
+                    inverted = savedChan.InvertChannel;
+                }
                 XElement channelElement = new XElement(channelNode.Text,
                     new XAttribute("Show", channelNode.Checked.ToString()),
-                    new XAttribute("Graph", gIdx.ToString()));
+                    new XAttribute("Graph", gIdx.ToString()),
+                    new XAttribute("Invert", inverted.ToString()));
                 xmlDoc.Element("Setup")?.Element(localName)?.Element("Channels")?.Add(channelElement);
             }
         }
@@ -367,6 +375,7 @@ namespace YamuraViewControls
             chartProperties1.ShowOverlay = showOverlay;
             ShowOverlay = showOverlay;
             pendingGraphIndices.Clear();
+            pendingInvertChannels.Clear();
             if (xmlDoc.Element("Setup")?.Element(localName)?.Element("Channels")?.Elements() != null)
             {
                 foreach (XElement channelElement in xmlDoc?.Element("Setup")?.Element(localName)?.Element("Channels")?.Elements())
@@ -379,6 +388,8 @@ namespace YamuraViewControls
                     }
                     if (int.TryParse(channelElement.Attribute("Graph")?.Value, out int gIdx))
                         pendingGraphIndices[nodeName] = gIdx;
+                    if (bool.TryParse(channelElement.Attribute("Invert")?.Value, out bool inv) && inv)
+                        pendingInvertChannels.Add(nodeName);
                 }
             }
         }
@@ -482,6 +493,12 @@ namespace YamuraViewControls
         {
             get { return graphIndex; }
             set { graphIndex = value; }
+        }
+        bool invertChannel = false;
+        public bool InvertChannel
+        {
+            get { return invertChannel; }
+            set { invertChannel = value; }
         }
         Color channelColor = Color.Black;
         public Color ChannelColor

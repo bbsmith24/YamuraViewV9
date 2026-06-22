@@ -422,9 +422,10 @@ namespace YamuraViewControls
                         #region draw to transformed graphic context
                         using (Pen pathPen = new Pen(curChanInfo.ChannelColor))
                         {
-                            float negScaleY = -chanScaleY;
+                            float chanYMax = (ChartMode == ChartViewMode.NORMALIZED) ? curChanInfo.YRange[1] : graphYMax[graphIdx];
+                            float negScaleY   = curChanInfo.InvertChannel ?  chanScaleY : -chanScaleY;
+                            float adjustYBorder = curChanInfo.InvertChannel ? (-chanYMax) * chanScaleY : (-chanYMin) * negScaleY;
                             float adjustXBorder = (-(primaryX.AxisDisplayRange[0] - primaryX.AxisOffset)) * localScaleX;
-                            float adjustYBorder = (-chanYMin) * negScaleY;
 
                             chartGraphics.TranslateTransform((float)border + adjustXBorder, (float)subBottom + adjustYBorder);
                             chartGraphics.ScaleTransform(localScaleX, negScaleY);
