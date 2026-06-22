@@ -174,42 +174,13 @@ namespace YamuraView
         }
         public void AddPoint(float timeStamp, float value)
         {
-            if(DataPoints.ContainsKey(timeStamp))
-            {
-                DataPoints[timeStamp] = value;
-            }
-            else
-            {
-                DataPoints.Add(timeStamp, value);
-            }
+            DataPoints[timeStamp] = value;
             xRange[0] = timeStamp < xRange[0] ? timeStamp : xRange[0];
             xRange[1] = timeStamp > xRange[1] ? timeStamp : xRange[1];
             xRange[2] = xRange[1] - xRange[0];
             yRange[0] = value < yRange[0] ? value : yRange[0];
             yRange[1] = value > yRange[1] ? value : yRange[1];
             yRange[2] = yRange[1] - yRange[0];
-        }
-        public bool FindPointAtTime(float timeStamp, ref float foundValue)
-        {
-            float priorTime = dataPoints.LastOrDefault(i => i.Key <= timeStamp).Key;
-            float nextTime = dataPoints.FirstOrDefault(i => i.Key >= timeStamp).Key;
-            // exact match
-            if (priorTime == timeStamp)
-            {
-                foundValue = dataPoints[priorTime];
-            }
-            // check for window size?
-            // prior time is nearest
-            else if ((timeStamp - priorTime) < (nextTime - timeStamp))
-            {
-                foundValue = dataPoints[priorTime];
-            }
-            // next time is nearest
-            else
-            {
-                foundValue = dataPoints[nextTime];
-            }
-            return true;
         }
     }
 }

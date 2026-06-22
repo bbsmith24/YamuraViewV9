@@ -303,7 +303,7 @@ namespace YamuraViewControls
                         }
                     }
                 }
-                Color runColor = runIdx < autoColors.Count ? autoColors[runIdx % 7] : Color.White;
+                Color runColor = runIdx < autoColors.Count ? autoColors[runIdx % autoColors.Count] : Color.White;
                 chartView1.DrawCursorAtScaledPoint(scaledPoint, runIdx, runColor);
                 runIdx++;
             }
@@ -515,28 +515,28 @@ namespace YamuraViewControls
             yRange[1] = valueY > yRange[1] ? valueY : yRange[1];
             yRange[2] = yRange[1] - yRange[0];
         }
-        public bool FindPointAtTime(float timeStamp, ref float foundValue)
-        {
-            float priorTime = dataPoints.LastOrDefault(i => i.Key <= timeStamp).Key;
-            float nextTime = dataPoints.FirstOrDefault(i => i.Key >= timeStamp).Key;
-            // exact match
-            if (priorTime == timeStamp)
-            {
-                foundValue = dataPoints[priorTime];
-            }
-            // check for window size?
-            // prior time is nearest
-            else if ((timeStamp - priorTime) < (nextTime - timeStamp))
-            {
-                foundValue = dataPoints[priorTime];
-            }
-            // next time is nearest
-            else
-            {
-                foundValue = dataPoints[nextTime];
-            }
-            return true;
-        }
+        //public bool FindPointAtTime(float timeStamp, ref float foundValue)
+        //{
+        //    float priorTime = dataPoints.LastOrDefault(i => i.Key <= timeStamp).Key;
+        //    float nextTime = dataPoints.FirstOrDefault(i => i.Key >= timeStamp).Key;
+        //    // exact match
+        //    if (priorTime == timeStamp)
+        //    {
+        //        foundValue = dataPoints[priorTime];
+        //    }
+        //    // check for window size?
+        //    // prior time is nearest
+        //    else if ((timeStamp - priorTime) < (nextTime - timeStamp))
+        //    {
+        //        foundValue = dataPoints[priorTime];
+        //    }
+        //    // next time is nearest
+        //    else
+        //    {
+        //        foundValue = dataPoints[nextTime];
+        //    }
+        //    return true;
+        //}
     }
     /// <summary>
     /// 

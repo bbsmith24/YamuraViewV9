@@ -19,14 +19,19 @@ namespace YamuraViewControls
 {
     public partial class ChartView : UserControl
     {
+        #region delegates
         //public delegate void ChartMouseMove(object sender, ChartControlMouseTrackEventArgs e);
         public delegate void ChartMouseTrack(object sender, ChartControlMouseTrackEventArgs e);
         public delegate void ChartXAxisChange(object sender, ChartControlXAxisChangeEventArgs e);
         public delegate void AxisOffsetUpdate(object sender, AxisOffsetUpdateEventArgs e);
         public delegate void ClearGraphicsPath(object sender, EventArgs e);
+        #endregion
 
+        #region events
         public event ChartMouseTrack ChartMouseTrackEvent;
+        #endregion
 
+        #region enums
         public enum DrawMode
         {
             R2_BLACK = 1,  // Pixel is always black.
@@ -61,6 +66,9 @@ namespace YamuraViewControls
             NORMALIZED,
             ABSOLUTE
         }
+        #endregion
+
+        #region members
         Chart chartOwner;
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public Chart ChartOwner
@@ -140,7 +148,12 @@ namespace YamuraViewControls
         private Panel _overlayPanel;
         private bool _hasCursorPos = false;
         private Point _savedCursorPos = Point.Empty;
-
+        static public SolidBrush overlayBrush = new SolidBrush(Color.White);
+        ChartControlMouseTrackEventArgs outArgs = new ChartControlMouseTrackEventArgs();
+        #endregion
+        /// <summary>
+        /// 
+        /// </summary>
         public ChartView()
         {
             InitializeComponent();
@@ -158,9 +171,12 @@ namespace YamuraViewControls
             _overlayPanel.Paint += OverlayPanel_Paint;
             chartPanel.Controls.Add(_overlayPanel);
             _overlayPanel.BringToFront();
-
-            //chartPanel.MouseMove -= chartPanel_MouseMove;
-            //chartPanel.MouseMove += chartPanel_MouseMove;
+            // double buffer for draw speed
+            // removed now for cursor ghosting when update panel moves 
+            //chartPanel.GetType()
+            //    .GetProperty("DoubleBuffered",
+            //        System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)
+            //    ?.SetValue(chartPanel, true);
         }
         #region control message handlers
         /// <summary>
@@ -220,8 +236,6 @@ namespace YamuraViewControls
             #region initializations
             // has first point on channel been processed - used to set initial point of path without drawing line from 0,0
             bool initialValue = false;
-            // x and y scale
-            displayScale = new float[] { 1.0F, 1.0F };
             // path points and pen for drawing channels
             PointF[] points = new PointF[] { new PointF(), new PointF() };
             Pen pathPen = new Pen(Color.Red);
@@ -332,13 +346,17 @@ namespace YamuraViewControls
                             // use data point time to look up distance in xTime channel
                             else if (ChartOwner.XChannelName == "Distance")
                             {
-                                float timeDistance = ChartOwner.dataSets[curChanInfo.DataSetIndex].channels["Distance"].dataPoints.FirstOrDefault(i => i.Key >= curData.Key).Value;
+                                //float timeDistance = ChartOwner.dataSets[curChanInfo.DataSetIndex].channels["Distance"].dataPoints.FirstOrDefault(i => i.Key >= curData.Key).Value;
+                                float timeDistance;
+                                FindNearestValueToKey(ChartOwner.dataSets[curChanInfo.DataSetIndex].channels["Distance"].dataPoints, curData.Key, out timeDistance);
                                 points[1] = new PointF(timeDistance, curData.Value);
                             }
                             // x axis is not time - use time from current channel point, find nearest time to that time in axis channel
                             else
                             {
-                                float tst = ChartOwner.dataSets[curChanInfo.DataSetIndex].channels[ChartOwner.XChannelName].dataPoints.FirstOrDefault(i => i.Key >= curData.Key).Value;
+                                //float tst = ChartOwner.dataSets[curChanInfo.DataSetIndex].channels[ChartOwner.XChannelName].dataPoints.FirstOrDefault(i => i.Key >= curData.Key).Value;
+                                float tst;
+                                FindNearestValueToKey(ChartOwner.dataSets[curChanInfo.DataSetIndex].channels[ChartOwner.XChannelName].dataPoints, curData.Key, out tst);
                                 points[1] = new PointF(tst, curData.Value);
                             }
                             if (initialValue)
@@ -360,7 +378,7 @@ namespace YamuraViewControls
                     }
                     #endregion
                     #region draw to transformed graphic context
-                    pathPen = new Pen(curChanInfo.ChannelColor);
+                    //pathPen = new Pen(curChanInfo.ChannelColor);
                     {
                         displayScale[0] = (float)(ChartOwner.ChartWidth - (2 *ChartOwner.ChartBorder)) / primaryX.AxisDisplayRange[2];
                         displayScale[1] = (float)(ChartOwner.ChartHeight - (2 * ChartOwner.ChartBorder)) / yAxis.Value.AxisDisplayRange[2];
@@ -387,18 +405,22 @@ namespace YamuraViewControls
                         // scale to display range in X and Y
                         chartGraphics.ScaleTransform(displayScale[0], displayScale[1]);
                         // set pen width to 0 (1 pixel)
-                        pathPen.Width = 0;
                         // draw the path
-                        chartGraphics.DrawPath(pathPen, curChanInfo.ChannelPath);
-                        // for traction circle, draw scale
-                        if (ChartOwner.ChartName == "Traction Circle")
+                        //using (Pen pathPen = new Pen(curChanInfo.ChannelColor))
                         {
-                            pathPen.Color = Color.DarkGray;
-                            chartGraphics.DrawEllipse(pathPen, new RectangleF(-0.5F, -0.5F, 1.0F, 1.0F));
-                            chartGraphics.DrawEllipse(pathPen, new RectangleF(-1.0F, -1.0F, 2.0F, 2.0F));
-                            chartGraphics.DrawEllipse(pathPen, new RectangleF(-1.5F, -1.5F, 3.0F, 3.0F));
-                            chartGraphics.DrawLine(pathPen, new PointF(0, -1.75F), new PointF(0, 1.75F));
-                            chartGraphics.DrawLine(pathPen, new PointF(-1.75F, 0), new PointF(1.75F, 0));
+                            pathPen.Width = 0;
+                            pathPen.Color = curChanInfo.ChannelColor;
+                            chartGraphics.DrawPath(pathPen, curChanInfo.ChannelPath);
+                            // for traction circle, draw scale
+                            if (ChartOwner.ChartName == "Traction Circle")
+                            {
+                                pathPen.Color = Color.DarkGray;
+                                chartGraphics.DrawEllipse(pathPen, new RectangleF(-0.5F, -0.5F, 1.0F, 1.0F));
+                                chartGraphics.DrawEllipse(pathPen, new RectangleF(-1.0F, -1.0F, 2.0F, 2.0F));
+                                chartGraphics.DrawEllipse(pathPen, new RectangleF(-1.5F, -1.5F, 3.0F, 3.0F));
+                                chartGraphics.DrawLine(pathPen, new PointF(0, -1.75F), new PointF(0, 1.75F));
+                                chartGraphics.DrawLine(pathPen, new PointF(-1.75F, 0), new PointF(1.75F, 0));
+                            }
                         }
                         // reset to original orientation
                         chartGraphics.ResetTransform();
@@ -755,13 +777,6 @@ namespace YamuraViewControls
                 #endregion
 
                 #region cursor track in local view
-                {
-                    StartMouseMove.Add(false);
-                    StartMouseDrag.Add(false);
-                    ChartStartCursorPos.Add(new Point(0, 0));
-                    ChartLastCursorPos.Add(new Point(0, 0));
-                }
-
                 // Mouse position relative to chartPanel
                 Point mousePt = chartPanel.PointToClient(Cursor.Position);
 
@@ -791,7 +806,9 @@ namespace YamuraViewControls
                 // panel X relative to chart area (subtract border)
                 float panelX = mousePt.X - ChartOwner.ChartBorder;
                 float dataX = 0.0F;
-                ChartControlMouseTrackEventArgs outArgs = new ChartControlMouseTrackEventArgs();
+                //ChartControlMouseTrackEventArgs outArgs = new ChartControlMouseTrackEventArgs();
+                outArgs.XAxisValues.Clear();
+                outArgs.YAxisValues.Clear();
 
                 // For each dataset compute dataset-specific time corresponding to dataX
                 for (int dataSetIdx = 0; dataSetIdx < ChartOwner.dataSets.Count; dataSetIdx++)
@@ -808,23 +825,26 @@ namespace YamuraViewControls
                     else if (ChartOwner.XChannelName == "Distance")
                     {
                         distanceAtCursor = dataX - curDataSet.DistanceOffset;
-                        timeAtCursor = curDataSet.channels["xDistance"].dataPoints.FirstOrDefault(i => i.Key >= distanceAtCursor).Value;
+                        //timeAtCursor = curDataSet.channels["xDistance"].dataPoints.FirstOrDefault(i => i.Key >= distanceAtCursor).Value;
+                        FindNearestValueToKey(curDataSet.channels["xDistance"].dataPoints, distanceAtCursor, out timeAtCursor);
                     }
-                    else
-                    {
-                        if (curDataSet.channels != null && curDataSet.channels.TryGetValue(ChartOwner.XChannelName, out ChartChannel axisChan) && axisChan.DataPoints != null && axisChan.DataPoints.Count > 0)
-                        {
-                            if (TryFindNearestKeyByValue(axisChan.DataPoints, dataX, out float foundKey))
-                            {
-                                timeAtCursor = foundKey;
-                            }
-                            if (curDataSet.channels.TryGetValue("xDistance", out ChartChannel xDistChan2) &&
-                                TryFindNearestKeyByValue(xDistChan2.DataPoints, timeAtCursor, out foundKey))
-                            {
-                                distanceAtCursor = xDistChan2.DataPoints[foundKey];
-                            }
-                        }
-                    }
+                    // strip charts with x axis other than time or distance not supported yet
+                    //else
+                    //{
+                    //    if (curDataSet.channels != null && curDataSet.channels.TryGetValue(ChartOwner.XChannelName, out ChartChannel axisChan) && axisChan.DataPoints != null && axisChan.DataPoints.Count > 0)
+                    //    {
+                    //        if (FindNearestKeyToValue(axisChan.DataPoints, dataX, out float foundKey))
+                    //        {
+                    //            timeAtCursor = foundKey;
+                    //        }
+                    //        if (curDataSet.channels.TryGetValue("xDistance", out ChartChannel xDistChan2) &&
+                    //            //FindNearestKeyToValue(xDistChan2.DataPoints, timeAtCursor, out foundKey))
+                    //            FindNearestKeyToValue(curDataSet.channels["xTime"].dataPoints, timeAtCursor, out foundKey))
+                    //        {
+                    //            distanceAtCursor = xDistChan2.DataPoints[foundKey];
+                    //        }
+                    //    }
+                    //}
                     if (!outArgs.XAxisValues.ContainsKey(curDataSet.DataSetName))
                     {
                         outArgs.XAxisValues.Add(curDataSet.DataSetName, timeAtCursor);
@@ -854,7 +874,9 @@ namespace YamuraViewControls
                             {
                                 continue;
                             }
-                            float foundY = chan.dataPoints.FirstOrDefault(i => i.Key >= timeAtCursor).Value;
+                            //float foundY = chan.dataPoints.FirstOrDefault(i => i.Key >= timeAtCursor).Value;
+                            float foundY;
+                            FindNearestValueToKey(chan.dataPoints, timeAtCursor, out foundY);
                             if (!outArgs.YAxisValues.ContainsKey(chan.DataSetName))
                             {
                                 outArgs.YAxisValues.Add(chan.DataSetName, new SortedList<string, float>());
@@ -899,6 +921,7 @@ namespace YamuraViewControls
             {
                 foreach (ChartChannel curChanInfo in yAxis.Value.AssociatedChannels)
                 {
+                    curChanInfo.ChannelPath?.Dispose();
                     curChanInfo.ChannelPath = new GraphicsPath();
                 }
             }
@@ -912,7 +935,11 @@ namespace YamuraViewControls
         public void OnAxisOffsetUpdate(object sender, AxisOffsetUpdateEventArgs e)
         {
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void ChartPanel_MouseLeave(object sender, EventArgs e)
         {
             _hasCursorPos = false;
@@ -924,7 +951,11 @@ namespace YamuraViewControls
                 StartMouseMove[0] = false;
             }
         }
-
+        bool firstUpdate = true;
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="cursorPt"></param>
         private void UpdateOverlayPanel(Point cursorPt)
         {
             if (ChartOwner == null) return;
@@ -958,12 +989,19 @@ namespace YamuraViewControls
             _overlayPanel.Size = new Size(panelW, panelH);
             _overlayPanel.Visible = true;
             _overlayPanel.Invalidate();
+            // removing this ghosts the cursor
+            // cursor ghosts when chartPanel is set to double buffer
             if (overlayPanelMoved)
             {
+                //DrawCursorAtScreenPoint(ChartLastCursorPos[0]);
                 chartPanel.Invalidate();
             }
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void OverlayPanel_Paint(object sender, PaintEventArgs e)
         {
             if (_cursorValues == null || ChartOwner == null)
@@ -978,8 +1016,9 @@ namespace YamuraViewControls
                 ChartOwner.XChannelName == "Distance" ? $"Dist: {_cursorDataX:F2} ft" :
                                                          $"Time: {_cursorDataX:F3} s";
 
-            using (Brush w = new SolidBrush(Color.White))
-                g.DrawString(xLabel, Font, w, x, y);
+            //using (Brush w = new SolidBrush(Color.White))
+            overlayBrush.Color = Color.White;
+            g.DrawString(xLabel, Font, overlayBrush, x, y);
             y += lineHeight;
 
             foreach (var ds in _cursorValues)
@@ -1001,13 +1040,13 @@ namespace YamuraViewControls
                     string label = _cursorValues.Count > 1
                         ? $"{ch.Key} ({ds.Key}): {valueStr}"
                         : $"{ch.Key}: {valueStr}";
-                    using (Brush brush = new SolidBrush(channelColor))
-                        g.DrawString(label, Font, brush, x, y);
+                    //using (Brush overlaybrush = new SolidBrush(channelColor))
+                        overlayBrush.Color = channelColor;
+                        g.DrawString(label, Font, overlayBrush, x, y);
                     y += lineHeight;
                 }
             }
         }
-
         /// <summary>
         /// binary-search nearest-key lookup for SortedList<float,float>
         /// </summary>
@@ -1015,12 +1054,13 @@ namespace YamuraViewControls
         /// <param name="key"></param>
         /// <param name="foundValue"></param>
         /// <returns></returns>
-        public static bool TryFindNearestValue(SortedList<float, float> sorted, float key, out float foundValue)
+        public static bool FindNearestValueToKey(SortedList<float, float> sorted, float key, out float foundValue)
         {
             foundValue = 0f;
             if (sorted == null || sorted.Count == 0)
+            {
                 return false;
-
+            }
             IList<float> keys = sorted.Keys;
             int lo = 0;
             int hi = keys.Count - 1;
@@ -1061,12 +1101,13 @@ namespace YamuraViewControls
         /// <param name="targetValue"></param>
         /// <param name="foundKey"></param>
         /// <returns></returns>
-        public bool TryFindNearestKeyByValue(SortedList<float, float> sorted, float targetValue, out float foundKey)
+        public bool FindNearestKeyToValue(SortedList<float, float> sorted, float targetValue, out float foundKey)
         {
             foundKey = 0f;
             if (sorted == null || sorted.Count == 0)
+            {
                 return false;
-
+            }
             float bestDiff = float.MaxValue;
             bool found = false;
 
@@ -1080,7 +1121,6 @@ namespace YamuraViewControls
                     found = true;
                 }
             }
-
             return found;
         }
     }
@@ -1260,28 +1300,28 @@ namespace YamuraViewControls
             yRange[0] = value < yRange[0] ? value : yRange[0];
             yRange[1] = value > yRange[1] ? value : yRange[1];
         }
-        public bool FindPointAtTime(float timeStamp, ref float foundValue)
-        {
-            float priorTime = dataPoints.LastOrDefault(i => i.Key <= timeStamp).Key;
-            float nextTime = dataPoints.FirstOrDefault(i => i.Key >= timeStamp).Key;
-            // exact match
-            if (priorTime == timeStamp)
-            {
-                foundValue = dataPoints[priorTime];
-            }
-            // check for window size?
-            // prior time is nearest
-            else if ((timeStamp - priorTime) < (nextTime - timeStamp))
-            {
-                foundValue = dataPoints[priorTime];
-            }
-            // next time is nearest
-            else
-            {
-                foundValue = dataPoints[nextTime];
-            }
-            return true;
-        }
+        //public bool FindPointAtTime(float timeStamp, ref float foundValue)
+        //{
+        //    float priorTime = dataPoints.LastOrDefault(i => i.Key <= timeStamp).Key;
+        //    float nextTime = dataPoints.FirstOrDefault(i => i.Key >= timeStamp).Key;
+        //    // exact match
+        //    if (priorTime == timeStamp)
+        //    {
+        //        foundValue = dataPoints[priorTime];
+        //    }
+        //    // check for window size?
+        //    // prior time is nearest
+        //    else if ((timeStamp - priorTime) < (nextTime - timeStamp))
+        //    {
+        //        foundValue = dataPoints[priorTime];
+        //    }
+        //    // next time is nearest
+        //    else
+        //    {
+        //        foundValue = dataPoints[nextTime];
+        //    }
+        //    return true;
+        //}
     }
 }
 
