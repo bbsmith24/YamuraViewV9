@@ -38,6 +38,7 @@
             txtAxisMaxValue = new ToolStripTextBox();
             closeToolStripMenuItem = new ToolStripMenuItem();
             traceColorMenuItem = new ToolStripMenuItem();
+            assignGraphMenuItem = new ToolStripMenuItem();
             chkShowOverlay = new CheckBox();
             cmbXAxis = new ComboBox();
             label2 = new Label();
@@ -62,7 +63,7 @@
             // 
             // channelsContext
             // 
-            channelsContext.Items.AddRange(new ToolStripItem[] { invertToolStripMenuItem, lblAxisMin, txtAxisMinValue, lblAxisMax, txtAxisMaxValue, closeToolStripMenuItem, traceColorMenuItem });
+            channelsContext.Items.AddRange(new ToolStripItem[] { invertToolStripMenuItem, lblAxisMin, txtAxisMinValue, lblAxisMax, txtAxisMaxValue, closeToolStripMenuItem, traceColorMenuItem, assignGraphMenuItem });
             channelsContext.Name = "channelsContext";
             channelsContext.Size = new Size(161, 170);
             channelsContext.Closed += channelsContext_Closed;
@@ -112,6 +113,12 @@
             traceColorMenuItem.Size = new Size(160, 22);
             traceColorMenuItem.Text = "Trace Color";
             traceColorMenuItem.Click += traceColorMenuItem_Click;
+            //
+            // assignGraphMenuItem
+            //
+            assignGraphMenuItem.Name = "assignGraphMenuItem";
+            assignGraphMenuItem.Size = new Size(160, 22);
+            assignGraphMenuItem.Text = "Assign to Graph";
             // 
             // chkShowOverlay
             // 
@@ -216,6 +223,7 @@
         private System.Windows.Forms.ToolStripMenuItem invertToolStripMenuItem;
         private Label label5;
         private ToolStripMenuItem traceColorMenuItem;
+        private ToolStripMenuItem assignGraphMenuItem;
         private ColorDialog colorDialog1;
         public TriStateTreeView axisChannelTree;
         public ComboBox cmbChartMode;

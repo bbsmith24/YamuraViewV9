@@ -213,7 +213,19 @@ namespace YamuraViewControls
             }
         }
         /// <summary>
-        /// 
+        /// returns number of stacked graph bands needed (max GraphIndex across visible channels + 1)
+        /// </summary>
+        private int ComputeGraphCount()
+        {
+            int max = 0;
+            foreach (var yAxisKvp in ChartOwner.Y_Axes)
+                foreach (var chan in yAxisKvp.Value.AssociatedChannels)
+                    if (chan.ShowChannel && chan.GraphIndex > max)
+                        max = chan.GraphIndex;
+            return max + 1;
+        }
+        /// <summary>
+        ///
         /// </summary>
         /// <param name="chartGraphics"></param>
         void DrawChartView(Graphics chartGraphics)
@@ -234,11 +246,8 @@ namespace YamuraViewControls
             }
             #endregion
             #region initializations
-            // has first point on channel been processed - used to set initial point of path without drawing line from 0,0
             bool initialValue = false;
-            // path points and pen for drawing channels
             PointF[] points = new PointF[] { new PointF(), new PointF() };
-            Pen pathPen = new Pen(Color.Red);
             #endregion
             #region get X axis display range based on all visible channels
             Axis primaryX = ChartOwner.X_Axes.ElementAtOrDefault(0).Value;
@@ -251,167 +260,176 @@ namespace YamuraViewControls
             primaryX.AxisDisplayRange[2] = 0;
             foreach (DisplayDataSet dataSet in ChartOwner.dataSets)
             {
-                foreach (KeyValuePair<string, ChartChannel> chanInfo in dataSet.channels)
+                if (ChartOwner.XChannelName == "Time")
                 {
-                    // time based x axis
-                    if (ChartOwner.XChannelName == "Time")
-                    {
-                        primaryX.AxisDisplayRange[0] = (dataSet.channels["Time"].XRange[0]) < primaryX.AxisDisplayRange[0] + dataSet.TimeOffset ? dataSet.channels["Time"].XRange[0] + dataSet.TimeOffset : primaryX.AxisDisplayRange[0];
-                        primaryX.AxisDisplayRange[1] = (dataSet.channels["Time"].XRange[1]) > primaryX.AxisDisplayRange[1] + dataSet.TimeOffset ? dataSet.channels["Time"].XRange[1] + dataSet.TimeOffset : primaryX.AxisDisplayRange[1];
-                        primaryX.AxisDisplayRange[2] = (dataSet.channels["Time"].XRange[1]) - dataSet.channels["Time"].XRange[0];
-                    }
-                    // distance based x axis
-                    else if (ChartOwner.XChannelName == "Distance")
-                    {
-                        primaryX.AxisDisplayRange[0] = dataSet.channels["xDistance"].XRange[0] < primaryX.AxisDisplayRange[0] ? dataSet.channels["xDistance"].XRange[0] : primaryX.AxisDisplayRange[0];
-                        primaryX.AxisDisplayRange[1] = dataSet.channels["xDistance"].XRange[1] > primaryX.AxisDisplayRange[1] ? dataSet.channels["xDistance"].XRange[1] : primaryX.AxisDisplayRange[1];
-                        primaryX.AxisDisplayRange[2] = dataSet.channels["xDistance"].XRange[1] - dataSet.channels["xDistance"].XRange[0];
-                    }
-                    // other channel based x axis
-                    else
-                    {
-                        primaryX.AxisDisplayRange[0] = dataSet.channels[ChartOwner.XChannelName].YRange[0] < primaryX.AxisDisplayRange[0] ? dataSet.channels[ChartOwner.XChannelName].YRange[0] : primaryX.AxisDisplayRange[0];
-                        primaryX.AxisDisplayRange[1] = dataSet.channels[ChartOwner.XChannelName].YRange[1] > primaryX.AxisDisplayRange[1] ? dataSet.channels[ChartOwner.XChannelName].YRange[1] : primaryX.AxisDisplayRange[1];
-                        primaryX.AxisDisplayRange[2] = primaryX.AxisDisplayRange[1] - primaryX.AxisDisplayRange[0];
-                    }
+                    float tMin = dataSet.channels["Time"].XRange[0] + dataSet.TimeOffset;
+                    float tMax = dataSet.channels["Time"].XRange[1] + dataSet.TimeOffset;
+                    if (tMin < primaryX.AxisDisplayRange[0]) primaryX.AxisDisplayRange[0] = tMin;
+                    if (tMax > primaryX.AxisDisplayRange[1]) primaryX.AxisDisplayRange[1] = tMax;
+                    primaryX.AxisDisplayRange[2] = dataSet.channels["Time"].XRange[1] - dataSet.channels["Time"].XRange[0];
+                }
+                else if (ChartOwner.XChannelName == "Distance")
+                {
+                    float dMin = dataSet.channels["xDistance"].XRange[0];
+                    float dMax = dataSet.channels["xDistance"].XRange[1];
+                    if (dMin < primaryX.AxisDisplayRange[0]) primaryX.AxisDisplayRange[0] = dMin;
+                    if (dMax > primaryX.AxisDisplayRange[1]) primaryX.AxisDisplayRange[1] = dMax;
+                    primaryX.AxisDisplayRange[2] = dMax - dMin;
+                }
+                else
+                {
+                    float xMin = dataSet.channels[ChartOwner.XChannelName].YRange[0];
+                    float xMax = dataSet.channels[ChartOwner.XChannelName].YRange[1];
+                    if (xMin < primaryX.AxisDisplayRange[0]) primaryX.AxisDisplayRange[0] = xMin;
+                    if (xMax > primaryX.AxisDisplayRange[1]) primaryX.AxisDisplayRange[1] = xMax;
+                    primaryX.AxisDisplayRange[2] = primaryX.AxisDisplayRange[1] - primaryX.AxisDisplayRange[0];
                 }
             }
             #endregion
-            // process each axis
-            foreach (KeyValuePair<string, Axis> yAxis in ChartOwner.Y_Axes)
+
+            int border = ChartOwner.ChartBorder;
+            int drawW = ChartOwner.ChartWidth - 2 * border;
+            int drawH = ChartOwner.ChartHeight - 2 * border;
+            float xRange = primaryX.AxisDisplayRange[2] == 0 ? 1 : primaryX.AxisDisplayRange[2];
+            float scaleX = (float)drawW / xRange;
+
+            // stacked graph layout
+            int graphCount = ComputeGraphCount();
+            int graphGap = graphCount > 1 ? 4 : 0;
+            int subH = (drawH - graphGap * (graphCount - 1)) / Math.Max(1, graphCount);
+
+            // pre-compute absolute Y ranges per graph
+            float[] graphYMin = new float[graphCount];
+            float[] graphYMax = new float[graphCount];
+            for (int g = 0; g < graphCount; g++) { graphYMin[g] = float.MaxValue; graphYMax[g] = float.MinValue; }
+            if (ChartMode == ChartViewMode.ABSOLUTE)
             {
-                #region absolute mode Y axis range
-                // in absolute mode, get full range for Y axis on all displayed channels
-                // update Y axis display range based on associated channels
-                if (ChartMode == ChartViewMode.ABSOLUTE)
-                {
-                    yAxis.Value.AxisDisplayRange[0] = float.MaxValue;
-                    yAxis.Value.AxisDisplayRange[1] = float.MinValue;
-                    yAxis.Value.AxisDisplayRange[2] = 0;
-                    foreach (ChartChannel curChanInfo in yAxis.Value.AssociatedChannels)
-                    {
-                        if (!curChanInfo.ShowChannel)
+                foreach (var yAxisKvp in ChartOwner.Y_Axes)
+                    foreach (var chan in yAxisKvp.Value.AssociatedChannels)
+                        if (chan.ShowChannel && chan.GraphIndex < graphCount)
                         {
-                            continue;
+                            if (chan.YRange[0] < graphYMin[chan.GraphIndex]) graphYMin[chan.GraphIndex] = chan.YRange[0];
+                            if (chan.YRange[1] > graphYMax[chan.GraphIndex]) graphYMax[chan.GraphIndex] = chan.YRange[1];
                         }
-                        yAxis.Value.AxisDisplayRange[0] = curChanInfo.YRange[0] < yAxis.Value.AxisDisplayRange[0] ? curChanInfo.YRange[0] : yAxis.Value.AxisDisplayRange[0];
-                        yAxis.Value.AxisDisplayRange[1] = curChanInfo.YRange[1] > yAxis.Value.AxisDisplayRange[1] ? curChanInfo.YRange[1] : yAxis.Value.AxisDisplayRange[1];
-                        yAxis.Value.AxisDisplayRange[2] = curChanInfo.YRange[1] - curChanInfo.YRange[0];
-                    }
+            }
+
+            // draw each stacked graph band
+            for (int graphIdx = 0; graphIdx < graphCount; graphIdx++)
+            {
+                int subTop    = border + graphIdx * (subH + graphGap);
+                int subBottom = subTop + subH;
+
+                // separator line between bands
+                if (graphIdx > 0)
+                {
+                    using (Pen sepPen = new Pen(Color.FromArgb(80, 80, 90)))
+                        chartGraphics.DrawLine(sepPen, 0, subTop - graphGap / 2, ChartOwner.ChartWidth, subTop - graphGap / 2);
                 }
-                #endregion
-                #region process each associated channel on Y axis
-                foreach (ChartChannel curChanInfo in yAxis.Value.AssociatedChannels)
+
+                float graphYRange = graphYMax[graphIdx] - graphYMin[graphIdx];
+                if (graphYRange == 0) graphYRange = 1;
+                float scaleY = (float)subH / graphYRange;
+
+                // equal scale only applies to single-graph XY views (e.g. TrackMap)
+                float localScaleX = scaleX;
+                if (ChartOwner.EqualScale && graphCount == 1)
                 {
-                    #region Y axis range for normalized display
-                    if (!curChanInfo.ShowChannel)
+                    if (localScaleX < scaleY) scaleY = localScaleX;
+                    else localScaleX = scaleY;
+                }
+
+                // store graph-0 scales for DrawCursorAtScaledPoint (XY charts are always single-graph)
+                if (graphIdx == 0)
+                {
+                    displayScale[0] = localScaleX;
+                    displayScale[1] = -scaleY;
+                }
+
+                foreach (KeyValuePair<string, Axis> yAxisKvp in ChartOwner.Y_Axes)
+                {
+                    Axis yAxis = yAxisKvp.Value;
+
+                    foreach (ChartChannel curChanInfo in yAxis.AssociatedChannels)
                     {
-                        continue;
-                    }
-                    // if chart mode is normalized, get range for Y axis on this channel only and use that for display range so each channel is scaled to fill display area
-                    if (ChartMode == ChartViewMode.NORMALIZED)
-                    {
-                        yAxis.Value.AxisDisplayRange[0] = curChanInfo.YRange[0];
-                        yAxis.Value.AxisDisplayRange[1] = curChanInfo.YRange[1];
-                        yAxis.Value.AxisDisplayRange[2] = curChanInfo.YRange[1] - curChanInfo.YRange[0];
-                    }
-                    #endregion
-                    #region X axis display offset
-                    if (ChartOwner.XChannelName == "Time")
-                    {
-                        primaryX.AxisOffset = ChartOwner.dataSets[curChanInfo.DataSetIndex].TimeOffset;
-                    }
-                    else if (ChartOwner.XChannelName == "Distance")
-                    {
-                        primaryX.AxisOffset = ChartOwner.dataSets[curChanInfo.DataSetIndex].DistanceOffset;
-                    }
-                    else
-                    {
-                        primaryX.AxisOffset = 0.0F;
-                    }
-                    #endregion
-                    #region build unscaled path
-                    if ((curChanInfo.ChannelPath == null) || (curChanInfo.ChannelPath.PointCount == 0))
-                    {
-                        initialValue = true;
-                        foreach (KeyValuePair<float, float> curData in curChanInfo.DataPoints)
+                        if (!curChanInfo.ShowChannel || curChanInfo.GraphIndex != graphIdx)
+                            continue;
+
+                        // per-channel Y range (normalized) or per-graph (absolute)
+                        float chanYMin, chanScaleY;
+                        if (ChartMode == ChartViewMode.NORMALIZED)
                         {
-                            // x axis is time - direct lookup
-                            // key is time, value is data value at time
-                            if (ChartOwner.XChannelName == "Time")
+                            chanYMin = curChanInfo.YRange[0];
+                            float chanYRange = curChanInfo.YRange[1] - curChanInfo.YRange[0];
+                            if (chanYRange == 0) chanYRange = 1;
+                            chanScaleY = (float)subH / chanYRange;
+                            yAxis.AxisDisplayRange[0] = curChanInfo.YRange[0];
+                            yAxis.AxisDisplayRange[1] = curChanInfo.YRange[1];
+                            yAxis.AxisDisplayRange[2] = chanYRange;
+                        }
+                        else
+                        {
+                            chanYMin = graphYMin[graphIdx];
+                            chanScaleY = scaleY;
+                            yAxis.AxisDisplayRange[0] = graphYMin[graphIdx];
+                            yAxis.AxisDisplayRange[1] = graphYMax[graphIdx];
+                            yAxis.AxisDisplayRange[2] = graphYRange;
+                        }
+
+                        #region X axis display offset
+                        if (ChartOwner.XChannelName == "Time")
+                            primaryX.AxisOffset = ChartOwner.dataSets[curChanInfo.DataSetIndex].TimeOffset;
+                        else if (ChartOwner.XChannelName == "Distance")
+                            primaryX.AxisOffset = ChartOwner.dataSets[curChanInfo.DataSetIndex].DistanceOffset;
+                        else
+                            primaryX.AxisOffset = 0.0F;
+                        #endregion
+
+                        #region build unscaled path
+                        if ((curChanInfo.ChannelPath == null) || (curChanInfo.ChannelPath.PointCount == 0))
+                        {
+                            initialValue = true;
+                            foreach (KeyValuePair<float, float> curData in curChanInfo.DataPoints)
                             {
-                                points[1] = new PointF(curData.Key, curData.Value);
-                            }
-                            // x axis is not time
-                            // use data point time to look up distance in xTime channel
-                            else if (ChartOwner.XChannelName == "Distance")
-                            {
-                                //float timeDistance = ChartOwner.dataSets[curChanInfo.DataSetIndex].channels["Distance"].dataPoints.FirstOrDefault(i => i.Key >= curData.Key).Value;
-                                float timeDistance;
-                                FindNearestValueToKey(ChartOwner.dataSets[curChanInfo.DataSetIndex].channels["Distance"].dataPoints, curData.Key, out timeDistance);
-                                points[1] = new PointF(timeDistance, curData.Value);
-                            }
-                            // x axis is not time - use time from current channel point, find nearest time to that time in axis channel
-                            else
-                            {
-                                //float tst = ChartOwner.dataSets[curChanInfo.DataSetIndex].channels[ChartOwner.XChannelName].dataPoints.FirstOrDefault(i => i.Key >= curData.Key).Value;
-                                float tst;
-                                FindNearestValueToKey(ChartOwner.dataSets[curChanInfo.DataSetIndex].channels[ChartOwner.XChannelName].dataPoints, curData.Key, out tst);
-                                points[1] = new PointF(tst, curData.Value);
-                            }
-                            if (initialValue)
-                            {
-                                initialValue = false;
+                                if (ChartOwner.XChannelName == "Time")
+                                    points[1] = new PointF(curData.Key, curData.Value);
+                                else if (ChartOwner.XChannelName == "Distance")
+                                {
+                                    float timeDistance;
+                                    FindNearestValueToKey(ChartOwner.dataSets[curChanInfo.DataSetIndex].channels["Distance"].dataPoints, curData.Key, out timeDistance);
+                                    points[1] = new PointF(timeDistance, curData.Value);
+                                }
+                                else
+                                {
+                                    float tst;
+                                    FindNearestValueToKey(ChartOwner.dataSets[curChanInfo.DataSetIndex].channels[ChartOwner.XChannelName].dataPoints, curData.Key, out tst);
+                                    points[1] = new PointF(tst, curData.Value);
+                                }
+                                if (initialValue)
+                                {
+                                    initialValue = false;
+                                    points[0] = new PointF(points[1].X, points[1].Y);
+                                    continue;
+                                }
+                                if (ChartOwner.ChartName == "Traction Circle")
+                                    curChanInfo.ChannelPath.AddEllipse(new RectangleF(points[0], new SizeF(.001F, .001F)));
+                                else
+                                    curChanInfo.ChannelPath.AddLine(points[0], points[1]);
                                 points[0] = new PointF(points[1].X, points[1].Y);
-                                continue;
-                            }
-                            if (ChartOwner.ChartName == "Traction Circle")
-                            {
-                                curChanInfo.ChannelPath.AddEllipse(new RectangleF(points[0], new SizeF(.001F, .001F)));
-                            }
-                            else
-                            {
-                                curChanInfo.ChannelPath.AddLine(points[0], points[1]);
-                            }
-                            points[0] = new PointF(points[1].X, points[1].Y);
-                        }
-                    }
-                    #endregion
-                    #region draw to transformed graphic context
-                    //pathPen = new Pen(curChanInfo.ChannelColor);
-                    {
-                        displayScale[0] = (float)(ChartOwner.ChartWidth - (2 *ChartOwner.ChartBorder)) / primaryX.AxisDisplayRange[2];
-                        displayScale[1] = (float)(ChartOwner.ChartHeight - (2 * ChartOwner.ChartBorder)) / yAxis.Value.AxisDisplayRange[2];
-                        if (ChartOwner.EqualScale)
-                        {
-                            if (displayScale[0] < displayScale[1])
-                            {
-                                displayScale[1] = displayScale[0];
-                            }
-                            else
-                            {
-                                displayScale[0] = displayScale[1];
                             }
                         }
-                        displayScale[1] *= -1.0F;
+                        #endregion
 
-                        // scaled offset values
-                        float adjustXBorder = (-1 * (primaryX.AxisDisplayRange[0] -    primaryX.AxisOffset)) * displayScale[0];
-                        float adjustYBorder = (-1 * (yAxis.Value.AxisDisplayRange[0] - 0)) *                   displayScale[1];
-
-                        // translate to lower left corner of display area
-                        chartGraphics.TranslateTransform((float)ChartOwner.ChartBorder + adjustXBorder,
-                                                         (float)ChartOwner.ChartHeight - (float)ChartOwner.ChartBorder + adjustYBorder);
-                        // scale to display range in X and Y
-                        chartGraphics.ScaleTransform(displayScale[0], displayScale[1]);
-                        // set pen width to 0 (1 pixel)
-                        // draw the path
-                        //using (Pen pathPen = new Pen(curChanInfo.ChannelColor))
+                        #region draw to transformed graphic context
+                        using (Pen pathPen = new Pen(curChanInfo.ChannelColor))
                         {
+                            float negScaleY = -chanScaleY;
+                            float adjustXBorder = (-(primaryX.AxisDisplayRange[0] - primaryX.AxisOffset)) * localScaleX;
+                            float adjustYBorder = (-chanYMin) * negScaleY;
+
+                            chartGraphics.TranslateTransform((float)border + adjustXBorder, (float)subBottom + adjustYBorder);
+                            chartGraphics.ScaleTransform(localScaleX, negScaleY);
                             pathPen.Width = 0;
-                            pathPen.Color = curChanInfo.ChannelColor;
                             chartGraphics.DrawPath(pathPen, curChanInfo.ChannelPath);
-                            // for traction circle, draw scale
                             if (ChartOwner.ChartName == "Traction Circle")
                             {
                                 pathPen.Color = Color.DarkGray;
@@ -421,13 +439,11 @@ namespace YamuraViewControls
                                 chartGraphics.DrawLine(pathPen, new PointF(0, -1.75F), new PointF(0, 1.75F));
                                 chartGraphics.DrawLine(pathPen, new PointF(-1.75F, 0), new PointF(1.75F, 0));
                             }
+                            chartGraphics.ResetTransform();
                         }
-                        // reset to original orientation
-                        chartGraphics.ResetTransform();
+                        #endregion
                     }
-                    #endregion
                 }
-                #endregion
             }
         }
         /// <summary>

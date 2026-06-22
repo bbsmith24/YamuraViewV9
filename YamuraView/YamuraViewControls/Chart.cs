@@ -143,6 +143,9 @@ namespace YamuraViewControls
             }
         }
 
+        // graph index assignments loaded from XML, applied in UpdateData when ChartChannels are tagged to nodes
+        Dictionary<string, int> pendingGraphIndices = new Dictionary<string, int>();
+
         List<Color> autoColors = new List<Color> { Color.Red,
                                                    Color.Green,
                                                    Color.Blue,
@@ -206,6 +209,8 @@ namespace YamuraViewControls
                         }
                         newNode.Tag = associatedChannel;
                         newNode.Checked = associatedChannel.ShowChannel;
+                        if (pendingGraphIndices.TryGetValue(associatedChannel.ChannelName, out int pendingG))
+                            associatedChannel.GraphIndex = pendingG;
                     }
                 }
             }
@@ -332,8 +337,12 @@ namespace YamuraViewControls
             xmlDoc.Element("Setup")?.Element(localName)?.Add(new XElement("Channels"));
             foreach (TreeNode channelNode in chartProperties1.axisChannelTree.Nodes)
             {
-                
-                XElement channelElement = new XElement(channelNode.Text, new XAttribute("Show", (channelNode.Checked.ToString())));
+                int gIdx = 0;
+                if (channelNode.Nodes.Count > 0 && channelNode.Nodes[0].Tag is ChartChannel savedChan)
+                    gIdx = savedChan.GraphIndex;
+                XElement channelElement = new XElement(channelNode.Text,
+                    new XAttribute("Show", channelNode.Checked.ToString()),
+                    new XAttribute("Graph", gIdx.ToString()));
                 xmlDoc.Element("Setup")?.Element(localName)?.Element("Channels")?.Add(channelElement);
             }
         }
@@ -357,6 +366,7 @@ namespace YamuraViewControls
             bool showOverlay = (bool?)xmlDoc.Element("Setup")?.Element(localName)?.Element("DisplayMode")?.Attribute("ShowOverlay") ?? true;
             chartProperties1.ShowOverlay = showOverlay;
             ShowOverlay = showOverlay;
+            pendingGraphIndices.Clear();
             if (xmlDoc.Element("Setup")?.Element(localName)?.Element("Channels")?.Elements() != null)
             {
                 foreach (XElement channelElement in xmlDoc?.Element("Setup")?.Element(localName)?.Element("Channels")?.Elements())
@@ -367,6 +377,8 @@ namespace YamuraViewControls
                     {
                         chartProperties1.axisChannelTree.Nodes[nodeName].Checked = true;
                     }
+                    if (int.TryParse(channelElement.Attribute("Graph")?.Value, out int gIdx))
+                        pendingGraphIndices[nodeName] = gIdx;
                 }
             }
         }
@@ -464,6 +476,12 @@ namespace YamuraViewControls
         {
             get { return showChannel; }
             set { showChannel = value; }
+        }
+        int graphIndex = 0;
+        public int GraphIndex
+        {
+            get { return graphIndex; }
+            set { graphIndex = value; }
         }
         Color channelColor = Color.Black;
         public Color ChannelColor

@@ -209,20 +209,14 @@ namespace YamuraViewControls
             }
             if (axisChannelTree.SelectedNode.Parent == null)
             {
-                String axisName = axisChannelTree.SelectedNode.Text;
-
                 channelsContext.Items["traceColorMenuItem"].Enabled = false;
                 channelsContext.Items["traceColorMenuItem"].Visible = false;
+                channelsContext.Items["assignGraphMenuItem"].Visible = false;
 
                 channelsContext.Items["lblAxisMin"].Visible = true;
                 channelsContext.Items["lblAxisMax"].Visible = true;
-
                 channelsContext.Items["txtAxisMinValue"].Visible = true;
                 channelsContext.Items["txtAxisMaxValue"].Visible = true;
-
-                //channelsContext.Items["txtAxisMinValue"].Text = ChartOwner.Y_Axes[axisName].AxisValueRange[0].ToString();
-                //channelsContext.Items["txtAxisMaxValue"].Text = ChartOwner.Y_Axes[axisName].AxisValueRange[1].ToString();
-
             }
             else
             {
@@ -233,6 +227,9 @@ namespace YamuraViewControls
 
                 channelsContext.Items["traceColorMenuItem"].Visible = true;
                 channelsContext.Items["traceColorMenuItem"].Enabled = true;
+
+                channelsContext.Items["assignGraphMenuItem"].Visible = true;
+                PopulateAssignGraphMenu();
             }
         }
         /// <summary>
@@ -405,6 +402,45 @@ namespace YamuraViewControls
         {
             ChartOwner.chartView1.ChartMode = cmbChartMode.Text == "Absolute" ? ChartView.ChartViewMode.ABSOLUTE : ChartView.ChartViewMode.NORMALIZED;
             ChartOwner.chartView1.Invalidate();
+        }
+        /// <summary>
+        /// populate "Assign to Graph" submenu with current graph numbers + option to create a new graph
+        /// </summary>
+        private void PopulateAssignGraphMenu()
+        {
+            assignGraphMenuItem.DropDownItems.Clear();
+            int maxGraph = 0;
+            if (ChartOwner != null)
+                foreach (var axis in ChartOwner.Y_Axes.Values)
+                    foreach (var chan in axis.AssociatedChannels)
+                        if (chan.GraphIndex > maxGraph)
+                            maxGraph = chan.GraphIndex;
+
+            for (int g = 0; g <= maxGraph; g++)
+            {
+                int capturedG = g;
+                var item = new ToolStripMenuItem($"Graph {g + 1}");
+                item.Click += (s, e) => AssignChannelToGraph(capturedG);
+                assignGraphMenuItem.DropDownItems.Add(item);
+            }
+            assignGraphMenuItem.DropDownItems.Add(new ToolStripSeparator());
+            var newItem = new ToolStripMenuItem("New Graph");
+            newItem.Click += (s, e) => AssignChannelToGraph(maxGraph + 1);
+            assignGraphMenuItem.DropDownItems.Add(newItem);
+        }
+        /// <summary>
+        /// assign all ChartChannel instances for the selected channel name to graphIndex, then clear paths to redraw
+        /// </summary>
+        private void AssignChannelToGraph(int graphIndex)
+        {
+            if (axisChannelTree.SelectedNode?.Parent == null) return;
+            string channelName = axisChannelTree.SelectedNode.Parent.Text;
+            if (ChartOwner != null)
+                foreach (var axis in ChartOwner.Y_Axes.Values)
+                    foreach (var chan in axis.AssociatedChannels)
+                        if (chan.ChannelName == channelName)
+                            chan.GraphIndex = graphIndex;
+            ClearGraphicsPathEvent?.Invoke(this, EventArgs.Empty);
         }
         /// <summary>
         /// set trace color for selected channel
