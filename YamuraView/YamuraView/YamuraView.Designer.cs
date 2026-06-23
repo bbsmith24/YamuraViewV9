@@ -53,6 +53,7 @@
             selectAutoAddFolder = new FolderBrowserDialog();
             saveConfigFileDialog = new SaveFileDialog();
             openConfigFileDialog = new OpenFileDialog();
+            addDeltaTimeToolStripMenuItem = new ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)splitContainer1).BeginInit();
             splitContainer1.Panel1.SuspendLayout();
             splitContainer1.Panel2.SuspendLayout();
@@ -149,7 +150,7 @@
             // 
             // fileToolStripMenuItem
             // 
-            fileToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { addRunsMenuItem, clearRunsToolStripMenuItem, toolStripSeparator2, saveConfigurationToolStripMenuItem, loadConfigurationToolStripMenuItem, setAutoloadFolderToolStripMenuItem, toolStripSeparator3, timeAlignSetupToolStripMenuItem, distanceAlignSetupToolStripMenuItem, toolStripSeparator1, exitToolStripMenuItem });
+            fileToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { addRunsMenuItem, clearRunsToolStripMenuItem, toolStripSeparator2, saveConfigurationToolStripMenuItem, loadConfigurationToolStripMenuItem, setAutoloadFolderToolStripMenuItem, toolStripSeparator3, timeAlignSetupToolStripMenuItem, distanceAlignSetupToolStripMenuItem, addDeltaTimeToolStripMenuItem, toolStripSeparator1, exitToolStripMenuItem });
             fileToolStripMenuItem.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
             fileToolStripMenuItem.Name = "fileToolStripMenuItem";
             fileToolStripMenuItem.Size = new Size(46, 25);
@@ -241,6 +242,13 @@
             openConfigFileDialog.FileName = "YamuraView.xml";
             openConfigFileDialog.Filter = "YamuraView Config|*.xml";
             // 
+            // addDeltaTimeToolStripMenuItem
+            // 
+            addDeltaTimeToolStripMenuItem.Name = "addDeltaTimeToolStripMenuItem";
+            addDeltaTimeToolStripMenuItem.Size = new Size(221, 26);
+            addDeltaTimeToolStripMenuItem.Text = "Add Delta Time";
+            addDeltaTimeToolStripMenuItem.Click += addDeltaTimeToolStripMenuItem_Click;
+            // 
             // YamuraView
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -294,5 +302,6 @@
         private ToolStripSeparator toolStripSeparator1;
         private SaveFileDialog saveConfigFileDialog;
         private OpenFileDialog openConfigFileDialog;
+        private ToolStripMenuItem addDeltaTimeToolStripMenuItem;
     }
 }

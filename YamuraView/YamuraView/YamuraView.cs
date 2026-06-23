@@ -1,5 +1,6 @@
 ﻿using Microsoft.Win32;
 using System.ComponentModel;
+using System.Drawing.Imaging.Effects;
 using System.Text;
 using System.Xml;
 using System.Xml.Linq;
@@ -818,6 +819,8 @@ namespace YamuraView
                                                          interpolateDist);
                 }
             }
+
+            dataLogger.runData[runIdx].AddChannel("DeltaTime", "DeltaTime", "Calculated", dataLogger.runData[runIdx].runName, 1.0F); 
             /// restore default cursor
             Cursor = Cursors.Default;
             /// show any errors encountered during parsing
@@ -1593,5 +1596,52 @@ namespace YamuraView
         }
         #endregion
 
+        private void addDeltaTimeToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            // hard code runs 0 and 1 for testing
+            // xDistance maps distance -> time; for each distance in run 0, find the time
+            // run 1 reached that same distance, then deltaTime = run0_time - run1_time
+            if (!dataLogger.runData[0].channels.ContainsKey("DeltaTime"))
+            {
+                dataLogger.runData[0].AddChannel("DeltaTime", "DeltaTime", "Calculated", dataLogger.runData[0].runName, 1.0F);
+            }
+            if (!dataLogger.runData[1].channels.ContainsKey("DeltaTime"))
+            {
+                dataLogger.runData[1].AddChannel("DeltaTime", "DeltaTime", "Calculated", dataLogger.runData[1].runName, 1.0F);
+            }
+
+            var run0 = dataLogger.runData[0];
+            var run1 = dataLogger.runData[1];
+            var xDist0 = run0.channels["xDistance"].dataPoints;
+            var xDist1 = run1.channels["xDistance"].dataPoints;
+            float distanceOffsetDelta = run0.DistanceOffset - run1.DistanceOffset;
+
+            foreach (KeyValuePair<float, float> distPoint in xDist0)
+            {
+                // distPoint.Key = raw distance in run 0, distPoint.Value = raw time in run 0
+                float rawTime0 = distPoint.Value;
+                // only compare from the launch point: displayed time (raw + offset) must be > 0 for both runs
+                if (rawTime0 + run0.TimeOffset <= 0)
+                    continue;
+                float lookupDist = distPoint.Key + distanceOffsetDelta;
+                if (!ChartView.FindNearestValueToKey(xDist1, lookupDist, out float rawTime1))
+                    continue;
+                if (rawTime1 + run1.TimeOffset <= 0)
+                    continue;
+                float delta = (rawTime0 + run0.TimeOffset) - (rawTime1 + run1.TimeOffset);
+                run0.channels["DeltaTime"].AddPoint(rawTime0, delta);
+                run1.channels["DeltaTime"].AddPoint(rawTime1, -delta);
+            }
+
+            for (int i = 0; i < chartControls.Count; i++)
+            {
+                chartControls[i].dataSets[0].channels["DeltaTime"].DataPoints = dataLogger.runData[0].channels["DeltaTime"].DataPoints;
+                chartControls[i].dataSets[0].channels["DeltaTime"].XRange = dataLogger.runData[0].channels["DeltaTime"].XRange;
+                chartControls[i].dataSets[0].channels["DeltaTime"].YRange = dataLogger.runData[0].channels["DeltaTime"].YRange;
+                chartControls[i].dataSets[1].channels["DeltaTime"].DataPoints = dataLogger.runData[1].channels["DeltaTime"].DataPoints;
+                chartControls[i].dataSets[1].channels["DeltaTime"].XRange = dataLogger.runData[1].channels["DeltaTime"].XRange;
+                chartControls[i].dataSets[1].channels["DeltaTime"].YRange = dataLogger.runData[1].channels["DeltaTime"].YRange;
+            }
+        }
     }
 }
