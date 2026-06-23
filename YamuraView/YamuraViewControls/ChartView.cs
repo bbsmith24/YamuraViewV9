@@ -141,6 +141,9 @@ namespace YamuraViewControls
         private bool cursorVisible = false;
 
         public float[] displayScale = new float[2];
+        private static readonly Pen SeparatorPen = new Pen(Color.FromArgb(80, 80, 90));
+        float[] graphYMin = new float[4];
+        float[] graphYMax = new float[4];
 
         // cursor overlay state
         private SortedList<string, SortedList<string, float>> _cursorValues = null;
@@ -299,8 +302,11 @@ namespace YamuraViewControls
             int subH = (drawH - graphGap * (graphCount - 1)) / Math.Max(1, graphCount);
 
             // pre-compute absolute Y ranges per graph
-            float[] graphYMin = new float[graphCount];
-            float[] graphYMax = new float[graphCount];
+            if (graphCount > graphYMin.Length) 
+            { 
+                graphYMin = new float[graphCount]; 
+                graphYMax = new float[graphCount]; 
+            }
             for (int g = 0; g < graphCount; g++) { graphYMin[g] = float.MaxValue; graphYMax[g] = float.MinValue; }
             if (ChartMode == ChartViewMode.ABSOLUTE)
             {
@@ -322,8 +328,7 @@ namespace YamuraViewControls
                 // separator line between bands
                 if (graphIdx > 0)
                 {
-                    using (Pen sepPen = new Pen(Color.FromArgb(80, 80, 90)))
-                        chartGraphics.DrawLine(sepPen, 0, subTop - graphGap / 2, ChartOwner.ChartWidth, subTop - graphGap / 2);
+                    chartGraphics.DrawLine(SeparatorPen, 0, subTop - graphGap / 2, ChartOwner.ChartWidth, subTop - graphGap / 2);
                 }
 
                 float graphYRange = graphYMax[graphIdx] - graphYMin[graphIdx];

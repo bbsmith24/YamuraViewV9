@@ -32,10 +32,6 @@
             axisChannelTree = new TriStateTreeView();
             channelsContext = new ContextMenuStrip(components);
             invertToolStripMenuItem = new ToolStripMenuItem();
-            lblAxisMin = new ToolStripTextBox();
-            txtAxisMinValue = new ToolStripTextBox();
-            lblAxisMax = new ToolStripTextBox();
-            txtAxisMaxValue = new ToolStripTextBox();
             closeToolStripMenuItem = new ToolStripMenuItem();
             traceColorMenuItem = new ToolStripMenuItem();
             assignGraphMenuItem = new ToolStripMenuItem();
@@ -45,6 +41,7 @@
             cmbChartMode = new ComboBox();
             label5 = new Label();
             colorDialog1 = new ColorDialog();
+            toolStripSeparator1 = new ToolStripSeparator();
             channelsContext.SuspendLayout();
             SuspendLayout();
             // 
@@ -62,61 +59,37 @@
             // 
             // channelsContext
             // 
-            channelsContext.Items.AddRange(new ToolStripItem[] { invertToolStripMenuItem, lblAxisMin, txtAxisMinValue, lblAxisMax, txtAxisMaxValue, closeToolStripMenuItem, traceColorMenuItem, assignGraphMenuItem });
+            channelsContext.Items.AddRange(new ToolStripItem[] { invertToolStripMenuItem, traceColorMenuItem, assignGraphMenuItem, toolStripSeparator1, closeToolStripMenuItem });
             channelsContext.Name = "channelsContext";
-            channelsContext.Size = new Size(161, 192);
+            channelsContext.Size = new Size(181, 120);
             channelsContext.Closed += channelsContext_Closed;
             channelsContext.Opening += channelsContext_Opening;
             // 
             // invertToolStripMenuItem
             // 
             invertToolStripMenuItem.Name = "invertToolStripMenuItem";
-            invertToolStripMenuItem.Size = new Size(160, 22);
+            invertToolStripMenuItem.Size = new Size(180, 22);
             invertToolStripMenuItem.Text = "Invert";
             invertToolStripMenuItem.Click += invertToolStripMenuItem_Click;
-            // 
-            // lblAxisMin
-            // 
-            lblAxisMin.Name = "lblAxisMin";
-            lblAxisMin.Size = new Size(100, 23);
-            lblAxisMin.Text = "Axis Minimum";
-            // 
-            // txtAxisMinValue
-            // 
-            txtAxisMinValue.Name = "txtAxisMinValue";
-            txtAxisMinValue.Size = new Size(100, 23);
-            txtAxisMinValue.Text = "Axis Minimum Value";
-            // 
-            // lblAxisMax
-            // 
-            lblAxisMax.Name = "lblAxisMax";
-            lblAxisMax.Size = new Size(100, 23);
-            lblAxisMax.Text = "Axis Maximum";
-            // 
-            // txtAxisMaxValue
-            // 
-            txtAxisMaxValue.Name = "txtAxisMaxValue";
-            txtAxisMaxValue.Size = new Size(100, 23);
-            txtAxisMaxValue.Text = "Axis Maximum Value";
             // 
             // closeToolStripMenuItem
             // 
             closeToolStripMenuItem.Name = "closeToolStripMenuItem";
-            closeToolStripMenuItem.Size = new Size(160, 22);
+            closeToolStripMenuItem.Size = new Size(180, 22);
             closeToolStripMenuItem.Text = "Close";
             closeToolStripMenuItem.Click += closeToolStripMenuItem_Click;
             // 
             // traceColorMenuItem
             // 
             traceColorMenuItem.Name = "traceColorMenuItem";
-            traceColorMenuItem.Size = new Size(160, 22);
+            traceColorMenuItem.Size = new Size(180, 22);
             traceColorMenuItem.Text = "Trace Color";
             traceColorMenuItem.Click += traceColorMenuItem_Click;
             // 
             // assignGraphMenuItem
             // 
             assignGraphMenuItem.Name = "assignGraphMenuItem";
-            assignGraphMenuItem.Size = new Size(160, 22);
+            assignGraphMenuItem.Size = new Size(180, 22);
             assignGraphMenuItem.Text = "Assign to Graph";
             // 
             // chkShowOverlay
@@ -179,6 +152,11 @@
             label5.TabIndex = 40;
             label5.Text = "Chart Mode";
             // 
+            // toolStripSeparator1
+            // 
+            toolStripSeparator1.Name = "toolStripSeparator1";
+            toolStripSeparator1.Size = new Size(177, 6);
+            // 
             // ChartProperties
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -194,7 +172,6 @@
             Name = "ChartProperties";
             Size = new Size(434, 457);
             channelsContext.ResumeLayout(false);
-            channelsContext.PerformLayout();
             ResumeLayout(false);
             PerformLayout();
 
@@ -205,10 +182,6 @@
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.CheckBox chkShowOverlay;
         private System.Windows.Forms.ContextMenuStrip channelsContext;
-        private System.Windows.Forms.ToolStripTextBox lblAxisMin;
-        private System.Windows.Forms.ToolStripTextBox txtAxisMinValue;
-        private System.Windows.Forms.ToolStripTextBox lblAxisMax;
-        private System.Windows.Forms.ToolStripTextBox txtAxisMaxValue;
         private System.Windows.Forms.ToolStripMenuItem closeToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem invertToolStripMenuItem;
         private Label label5;
@@ -217,5 +190,6 @@
         private ColorDialog colorDialog1;
         public TriStateTreeView axisChannelTree;
         public ComboBox cmbChartMode;
+        private ToolStripSeparator toolStripSeparator1;
     }
 }

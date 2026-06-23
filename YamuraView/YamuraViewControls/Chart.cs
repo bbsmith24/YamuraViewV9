@@ -196,7 +196,7 @@ namespace YamuraViewControls
                 {
                     if (!chartProperties1.AxisChannelTree.Nodes.ContainsKey(associatedChannel.ChannelName))
                     {
-                        chartProperties1.AxisChannelTree.Nodes.Add(associatedChannel.ChannelName, associatedChannel.ChannelName, 1);
+                        chartProperties1.AxisChannelTree.Nodes.Add(associatedChannel.ChannelName, associatedChannel.ChannelDisplayName, 1);
                     }
                     String proposedName = associatedChannel.ChannelName + " (" + associatedChannel.DataSetName + ")";
                     if (!chartProperties1.AxisChannelTree.Nodes[associatedChannel.ChannelName].Nodes.ContainsKey(proposedName))
@@ -213,7 +213,11 @@ namespace YamuraViewControls
                         if (pendingGraphIndices.TryGetValue(associatedChannel.ChannelName, out int pendingG))
                             associatedChannel.GraphIndex = pendingG;
                         if (pendingInvertChannels.Contains(associatedChannel.ChannelName))
+                        {
                             associatedChannel.InvertChannel = true;
+                            associatedChannel.ChannelDisplayName = associatedChannel.ChannelName + " (inv)";
+                            chartProperties1.AxisChannelTree.Nodes[associatedChannel.ChannelName].Text = associatedChannel.ChannelDisplayName;
+                        }
                     }
                 }
             }
@@ -500,6 +504,12 @@ namespace YamuraViewControls
             get { return invertChannel; }
             set { invertChannel = value; }
         }
+        string channelDisplayName = "";
+        public string ChannelDisplayName
+        {
+            get { return channelDisplayName.Length > 0 ? channelDisplayName : channelName; }
+            set { channelDisplayName = value; }
+        }
         Color channelColor = Color.Black;
         public Color ChannelColor
         {
@@ -509,6 +519,7 @@ namespace YamuraViewControls
         public ChartChannel(String name, String desc, String src, string dataSet, float scale)
         {
             channelName = name;
+            channelDisplayName = name;
             dataSetName = dataSet;
             channelDescription = desc;
             channelSource = src;

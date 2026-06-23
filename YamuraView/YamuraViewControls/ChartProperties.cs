@@ -213,11 +213,6 @@ namespace YamuraViewControls
                 channelsContext.Items["traceColorMenuItem"].Visible = false;
                 channelsContext.Items["assignGraphMenuItem"].Visible = false;
 
-                channelsContext.Items["lblAxisMin"].Visible = true;
-                channelsContext.Items["lblAxisMax"].Visible = true;
-                channelsContext.Items["txtAxisMinValue"].Visible = true;
-                channelsContext.Items["txtAxisMaxValue"].Visible = true;
-
                 // show invert with state from first child channel
                 bool curInvert = axisChannelTree.SelectedNode.Nodes.Count > 0
                     && axisChannelTree.SelectedNode.Nodes[0].Tag is ChartChannel ch && ch.InvertChannel;
@@ -225,11 +220,6 @@ namespace YamuraViewControls
             }
             else
             {
-                channelsContext.Items["lblAxisMin"].Visible = false;
-                channelsContext.Items["lblAxisMax"].Visible = false;
-                channelsContext.Items["txtAxisMinValue"].Visible = false;
-                channelsContext.Items["txtAxisMaxValue"].Visible = false;
-
                 channelsContext.Items["traceColorMenuItem"].Visible = true;
                 channelsContext.Items["traceColorMenuItem"].Enabled = true;
 
@@ -334,30 +324,28 @@ namespace YamuraViewControls
         {
             if (axisChannelTree.SelectedNode == null || ChartOwner == null) return;
 
-            // resolve channel name: parent node text when leaf is selected, else the node itself
-            TreeNode parentNode = axisChannelTree.SelectedNode.Parent != null
-                ? axisChannelTree.SelectedNode.Parent
-                : axisChannelTree.SelectedNode;
-            string channelName = parentNode.Text;
+            // use .Name (permanent key) — never .Text which may include display suffixes
+            TreeNode parentNode = axisChannelTree.SelectedNode.Parent ?? axisChannelTree.SelectedNode;
+            string channelName = parentNode.Name;
 
-            // determine new state by toggling current first-instance value
+            // toggle from current state of first matching instance
             bool newInvert = true;
             if (parentNode.Nodes.Count > 0 && parentNode.Nodes[0].Tag is ChartChannel firstChan)
                 newInvert = !firstChan.InvertChannel;
 
-            // apply to all instances of this channel name
+            // update InvertChannel and ChannelDisplayName on every dataset instance
             foreach (var axis in ChartOwner.Y_Axes.Values)
                 foreach (var chan in axis.AssociatedChannels)
                     if (chan.ChannelName == channelName)
+                    {
                         chan.InvertChannel = newInvert;
+                        chan.ChannelDisplayName = newInvert ? channelName + " (inv)" : channelName;
+                    }
 
-            // update tree node text indicator
-            string baseName = channelName.EndsWith(" (inv)") ? channelName[..^6] : channelName;
-            parentNode.Text = newInvert ? baseName + " (inv)" : baseName;
-            // keep the node key / channel name in sync so lookups still work
-            // (node.Name stays as original channelName — only Text changes for display)
+            // reflect in tree node text from the field — no string stripping needed
+            parentNode.Text = newInvert ? channelName + " (inv)" : channelName;
 
-            // redraw — inversion is applied in the transform, no path rebuild needed
+            // inversion is applied in the transform, no path rebuild needed
             ChartOwner.Invalidate(true);
         }
         #region Auto align
@@ -439,7 +427,7 @@ namespace YamuraViewControls
         private void AssignChannelToGraph(int graphIndex)
         {
             if (axisChannelTree.SelectedNode?.Parent == null) return;
-            string channelName = axisChannelTree.SelectedNode.Parent.Text;
+            string channelName = axisChannelTree.SelectedNode.Parent.Name;
             if (ChartOwner != null)
                 foreach (var axis in ChartOwner.Y_Axes.Values)
                     foreach (var chan in axis.AssociatedChannels)

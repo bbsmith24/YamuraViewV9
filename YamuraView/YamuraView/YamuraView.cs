@@ -1511,8 +1511,8 @@ namespace YamuraView
             }
             XDocument setupDoc = XDocument.Load(fileName);
             XElement root = setupDoc.Element("Setup");
-            timeAlign          = (bool?)root?.Attribute("TimeAlign")          ?? false;
-            timeAlignChannel   = (string)root?.Attribute("TimeAlignChannel")  ?? "gX";
+            timeAlign = (bool?)root?.Attribute("TimeAlign") ?? false;
+            timeAlignChannel = (string)root?.Attribute("TimeAlignChannel") ?? "gX";
             timeAlignThreshold = (float?)root?.Attribute("TimeAlignThreshold") ?? 0.5f;
             timeAlignRisingEdge = (bool?)root?.Attribute("TimeAlignRisingEdge") ?? true;
             foreach (Chart curChart in chartControls)
@@ -1582,6 +1582,16 @@ namespace YamuraView
             SaveInitFile();
             Close();
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void YamuraView_SizeChanged(object sender, EventArgs e)
+        {
+            Invalidate(true);
+        }
         #endregion
+
     }
 }
