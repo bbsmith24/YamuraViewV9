@@ -1,5 +1,7 @@
-﻿using System.ComponentModel;
+﻿using Microsoft.Win32;
+using System.ComponentModel;
 using System.Text;
+using System.Xml;
 using System.Xml.Linq;
 using YamuraViewControls;
 
@@ -17,6 +19,7 @@ namespace YamuraView
 
         float gpsDist = 0.0F;
         public String FolderToWatch { get; private set; }
+        public String ConfigurationFile { get; private set; }
         public SortedList<String, String> folderToWatchFiles = new System.Collections.Generic.SortedList<String, String>();
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public SortedList<String, String> FolderToWatchFiles
@@ -53,6 +56,7 @@ namespace YamuraView
             TractionCircle.ChartName = "Traction Circle";
             TractionCircle.EqualScale = true;
             #endregion
+
             #region add chart controls
             chartControls.Add(StripChart);
             chartControls.Add(TrackMap);
@@ -64,6 +68,7 @@ namespace YamuraView
             chartControls[2].CursorMode = YamuraViewControls.ChartView.CursorStyle.BOX;
             chartControls[2].CursorUpdateSource = false;
             #endregion
+
             #region chart control event handlers
             chartControls[0].chartProperties1.ChartXAxisChangeEvent += chartControls[0].chartView1.OnChartXAxisChange;
             chartControls[1].chartProperties1.ChartXAxisChangeEvent += chartControls[1].chartView1.OnChartXAxisChange;
@@ -86,6 +91,11 @@ namespace YamuraView
             chartControls[0].chartView1.ChartMouseTrackEvent += chartControls[1].OnChartMouseTrack;
             chartControls[0].chartView1.ChartMouseTrackEvent += chartControls[2].OnChartMouseTrack;
             #endregion
+
+            #region load initialization file, create if needed
+            LoadInitFile();
+            #endregion
+
             #region get list of files in folder to watch (for new files to process)
             if (Directory.Exists(FolderToWatch))
             {
@@ -1448,6 +1458,7 @@ namespace YamuraView
                 {
                     FolderToWatchFiles.Add(file, file);
                 }
+                SaveInitFile();
             }
             #endregion        
         }
@@ -1485,7 +1496,20 @@ namespace YamuraView
             {
                 return;
             }
-            XDocument setupDoc = XDocument.Load(openConfigFileDialog.FileName);
+            ReadConfigFile(openConfigFileDialog.FileName);
+            SaveInitFile();
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="fileName"></param>
+        public void ReadConfigFile(String fileName)
+        {
+            if (!File.Exists(fileName))
+            {
+                return;
+            }
+            XDocument setupDoc = XDocument.Load(fileName);
             XElement root = setupDoc.Element("Setup");
             timeAlign          = (bool?)root?.Attribute("TimeAlign")          ?? false;
             timeAlignChannel   = (string)root?.Attribute("TimeAlignChannel")  ?? "gX";
@@ -1495,7 +1519,41 @@ namespace YamuraView
             {
                 curChart.ApplySetup(setupDoc);
             }
+            SaveInitFile();
         }
+        /// <summary>
+        /// Load ini file containing folder to watch and layout to use
+        /// </summary>
+        public void LoadInitFile()
+        {
+            XDocument setupDoc;
+            if (!File.Exists("YamuraLog.ini"))
+            {
+                FolderToWatch = @"C:\ftp_transfer";
+                ConfigurationFile = @"C:\ftp_transfer\YamuraView.xml";
+                ReadConfigFile(ConfigurationFile);
+                SaveInitFile();
+                return;
+            }
+            setupDoc = XDocument.Load("YamuraLog.ini");
+            XElement root = setupDoc.Element("Setup");
+            FolderToWatch = (string?)root?.Attribute("FolderToWatch") ?? @"C:\ftp_transfer";
+            ConfigurationFile = (string)root?.Attribute("Config") ?? @"C:\ftp_transfer\YamuraLog.xml";
+            ReadConfigFile(ConfigurationFile);
+        }
+        /// <summary>
+        /// write the ini file
+        /// </summary>
+        public void SaveInitFile()
+        {
+            XDocument setupDoc;
+            setupDoc = new XDocument(new XDeclaration("1.0", "utf-8", "yes"),
+                                            new XElement("Setup",
+                                                new XAttribute("FolderToWatch", FolderToWatch),
+                                                new XAttribute("Config", ConfigurationFile)));
+            setupDoc.Save("YamuraLog.ini");
+        }
+
         /// <summary>
         /// 
         /// </summary>
@@ -1521,6 +1579,7 @@ namespace YamuraView
         /// <param name="e"></param>
         private void ExitToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            SaveInitFile();
             Close();
         }
         #endregion

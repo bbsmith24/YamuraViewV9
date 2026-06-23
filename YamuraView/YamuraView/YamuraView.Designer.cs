@@ -69,7 +69,7 @@
             splitContainer1.BackColor = SystemColors.Control;
             splitContainer1.BorderStyle = BorderStyle.Fixed3D;
             splitContainer1.Dock = DockStyle.Fill;
-            splitContainer1.Location = new Point(0, 24);
+            splitContainer1.Location = new Point(0, 29);
             splitContainer1.Name = "splitContainer1";
             // 
             // splitContainer1.Panel1
@@ -79,7 +79,7 @@
             // splitContainer1.Panel2
             // 
             splitContainer1.Panel2.Controls.Add(splitContainer2);
-            splitContainer1.Size = new Size(800, 426);
+            splitContainer1.Size = new Size(800, 421);
             splitContainer1.SplitterDistance = 554;
             splitContainer1.SplitterWidth = 5;
             splitContainer1.TabIndex = 0;
@@ -90,7 +90,7 @@
             StripChart.Dock = DockStyle.Fill;
             StripChart.Location = new Point(0, 0);
             StripChart.Name = "StripChart";
-            StripChart.Size = new Size(550, 422);
+            StripChart.Size = new Size(550, 417);
             StripChart.TabIndex = 0;
             // 
             // splitContainer2
@@ -108,8 +108,8 @@
             // splitContainer2.Panel2
             // 
             splitContainer2.Panel2.Controls.Add(TractionCircle);
-            splitContainer2.Size = new Size(241, 426);
-            splitContainer2.SplitterDistance = 234;
+            splitContainer2.Size = new Size(241, 421);
+            splitContainer2.SplitterDistance = 231;
             splitContainer2.SplitterWidth = 5;
             splitContainer2.TabIndex = 0;
             // 
@@ -119,7 +119,7 @@
             TrackMap.Dock = DockStyle.Fill;
             TrackMap.Location = new Point(0, 0);
             TrackMap.Name = "TrackMap";
-            TrackMap.Size = new Size(237, 230);
+            TrackMap.Size = new Size(237, 227);
             TrackMap.TabIndex = 0;
             // 
             // TractionCircle
@@ -128,7 +128,7 @@
             TractionCircle.Dock = DockStyle.Fill;
             TractionCircle.Location = new Point(0, 0);
             TractionCircle.Name = "TractionCircle";
-            TractionCircle.Size = new Size(237, 183);
+            TractionCircle.Size = new Size(237, 181);
             TractionCircle.TabIndex = 0;
             // 
             // openLogFile
@@ -143,84 +143,85 @@
             menuStrip1.Items.AddRange(new ToolStripItem[] { fileToolStripMenuItem });
             menuStrip1.Location = new Point(0, 0);
             menuStrip1.Name = "menuStrip1";
-            menuStrip1.Size = new Size(800, 24);
+            menuStrip1.Size = new Size(800, 29);
             menuStrip1.TabIndex = 1;
             menuStrip1.Text = "menuStrip1";
             // 
             // fileToolStripMenuItem
             // 
             fileToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { addRunsMenuItem, clearRunsToolStripMenuItem, toolStripSeparator2, saveConfigurationToolStripMenuItem, loadConfigurationToolStripMenuItem, setAutoloadFolderToolStripMenuItem, toolStripSeparator3, timeAlignSetupToolStripMenuItem, distanceAlignSetupToolStripMenuItem, toolStripSeparator1, exitToolStripMenuItem });
+            fileToolStripMenuItem.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
             fileToolStripMenuItem.Name = "fileToolStripMenuItem";
-            fileToolStripMenuItem.Size = new Size(37, 20);
+            fileToolStripMenuItem.Size = new Size(46, 25);
             fileToolStripMenuItem.Text = "File";
             fileToolStripMenuItem.DropDownOpening += FileToolStripMenuItem_DropDownOpening;
             // 
             // addRunsMenuItem
             // 
             addRunsMenuItem.Name = "addRunsMenuItem";
-            addRunsMenuItem.Size = new Size(182, 22);
+            addRunsMenuItem.Size = new Size(221, 26);
             addRunsMenuItem.Text = "Add Runs";
             addRunsMenuItem.Click += AddRunsMenuItem_Click;
             // 
             // clearRunsToolStripMenuItem
             // 
             clearRunsToolStripMenuItem.Name = "clearRunsToolStripMenuItem";
-            clearRunsToolStripMenuItem.Size = new Size(182, 22);
+            clearRunsToolStripMenuItem.Size = new Size(221, 26);
             clearRunsToolStripMenuItem.Text = "Clear Runs";
             // 
             // toolStripSeparator2
             // 
             toolStripSeparator2.Name = "toolStripSeparator2";
-            toolStripSeparator2.Size = new Size(179, 6);
+            toolStripSeparator2.Size = new Size(218, 6);
             // 
             // saveConfigurationToolStripMenuItem
             // 
             saveConfigurationToolStripMenuItem.Name = "saveConfigurationToolStripMenuItem";
-            saveConfigurationToolStripMenuItem.Size = new Size(182, 22);
+            saveConfigurationToolStripMenuItem.Size = new Size(221, 26);
             saveConfigurationToolStripMenuItem.Text = "Save Configuration";
             saveConfigurationToolStripMenuItem.Click += SaveConfigurationToolStripMenuItem_Click;
             // 
             // loadConfigurationToolStripMenuItem
             // 
             loadConfigurationToolStripMenuItem.Name = "loadConfigurationToolStripMenuItem";
-            loadConfigurationToolStripMenuItem.Size = new Size(182, 22);
+            loadConfigurationToolStripMenuItem.Size = new Size(221, 26);
             loadConfigurationToolStripMenuItem.Text = "Load Configuration";
             loadConfigurationToolStripMenuItem.Click += LoadConfigurationToolStripMenuItem_Click;
             // 
             // setAutoloadFolderToolStripMenuItem
             // 
             setAutoloadFolderToolStripMenuItem.Name = "setAutoloadFolderToolStripMenuItem";
-            setAutoloadFolderToolStripMenuItem.Size = new Size(182, 22);
+            setAutoloadFolderToolStripMenuItem.Size = new Size(221, 26);
             setAutoloadFolderToolStripMenuItem.Text = "Set Autoload folder";
             setAutoloadFolderToolStripMenuItem.Click += SetAutoLoadFolder_Click;
             // 
             // toolStripSeparator3
             // 
             toolStripSeparator3.Name = "toolStripSeparator3";
-            toolStripSeparator3.Size = new Size(179, 6);
+            toolStripSeparator3.Size = new Size(218, 6);
             // 
             // timeAlignSetupToolStripMenuItem
             // 
             timeAlignSetupToolStripMenuItem.Name = "timeAlignSetupToolStripMenuItem";
-            timeAlignSetupToolStripMenuItem.Size = new Size(182, 22);
+            timeAlignSetupToolStripMenuItem.Size = new Size(221, 26);
             timeAlignSetupToolStripMenuItem.Text = "Time Align setup";
             timeAlignSetupToolStripMenuItem.Click += TimeAlignSetupToolStripMenuItem_Click;
             // 
             // distanceAlignSetupToolStripMenuItem
             // 
             distanceAlignSetupToolStripMenuItem.Name = "distanceAlignSetupToolStripMenuItem";
-            distanceAlignSetupToolStripMenuItem.Size = new Size(182, 22);
+            distanceAlignSetupToolStripMenuItem.Size = new Size(221, 26);
             distanceAlignSetupToolStripMenuItem.Text = "Distance Align setup";
             // 
             // toolStripSeparator1
             // 
             toolStripSeparator1.Name = "toolStripSeparator1";
-            toolStripSeparator1.Size = new Size(179, 6);
+            toolStripSeparator1.Size = new Size(218, 6);
             // 
             // exitToolStripMenuItem
             // 
             exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-            exitToolStripMenuItem.Size = new Size(182, 22);
+            exitToolStripMenuItem.Size = new Size(221, 26);
             exitToolStripMenuItem.Text = "Exit";
             exitToolStripMenuItem.Click += ExitToolStripMenuItem_Click;
             // 
@@ -232,11 +233,12 @@
             // 
             // saveConfigFileDialog
             // 
+            saveConfigFileDialog.FileName = "YamuraView.xml";
             saveConfigFileDialog.Filter = "YamuraView Config|*.xml";
             // 
             // openConfigFileDialog
             // 
-            openConfigFileDialog.FileName = "openFileDialog1";
+            openConfigFileDialog.FileName = "YamuraView.xml";
             openConfigFileDialog.Filter = "YamuraView Config|*.xml";
             // 
             // YamuraView
