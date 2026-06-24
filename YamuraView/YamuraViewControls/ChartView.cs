@@ -653,6 +653,13 @@ namespace YamuraViewControls
             Axis primaryY = ChartOwner.Y_Axes.ElementAtOrDefault(0).Value;
             screenPoint.X = border + (int)((scaledPoint.X - primaryX.AxisDisplayRange[0]) * displayScale[0]);
             screenPoint.Y = (ChartOwner.ChartHeight - border) + (int)((scaledPoint.Y - (primaryY?.AxisDisplayRange[0] ?? 0)) * displayScale[1]);
+            if (StartMouseMove.Count < (runIdx + 1))
+            {
+                StartMouseMove.Add(false);
+                ChartStartCursorPos.Add(new Point());
+                ChartLastCursorPos.Add(new Point());
+                StartMouseDrag.Add(false);
+            }
             if (StartMouseMove[runIdx])
             {
                 DrawCursorAtScreenPoint(ChartLastCursorPos[runIdx], cursorColor);

@@ -247,7 +247,7 @@
             addDeltaTimeToolStripMenuItem.Name = "addDeltaTimeToolStripMenuItem";
             addDeltaTimeToolStripMenuItem.Size = new Size(221, 26);
             addDeltaTimeToolStripMenuItem.Text = "Add Delta Time";
-            addDeltaTimeToolStripMenuItem.Click += addDeltaTimeToolStripMenuItem_Click;
+            addDeltaTimeToolStripMenuItem.Click += AddDeltaTimeToolStripMenuItem_Click;
             // 
             // YamuraView
             // 

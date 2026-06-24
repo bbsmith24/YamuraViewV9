@@ -1,5 +1,6 @@
 ﻿using Microsoft.Win32;
 using System.ComponentModel;
+using System.Diagnostics.Eventing.Reader;
 using System.Drawing.Imaging.Effects;
 using System.Text;
 using System.Xml;
@@ -43,7 +44,22 @@ namespace YamuraView
         public YamuraView()
         {
             InitializeComponent();
+            ConfigurationFile = "";
             FolderToWatch = @"C:\ftp_transfer";
+            if(!Directory.Exists(FolderToWatch))
+            {
+                MessageBox.Show("Select autoload folder", "Autoload", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                if (selectAutoAddFolder.ShowDialog() != DialogResult.Cancel)
+                {
+                    FolderToWatch = selectAutoAddFolder.SelectedPath;
+                }
+                else
+                {
+                    Directory.CreateDirectory(FolderToWatch);
+                    MessageBox.Show("Autoload folder set to\n" + FolderToWatch, "Autoload", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    SaveInitFile();
+                }
+            }
             #region setup charts
             StripChart.ChartViewType = YamuraViewControls.Chart.ChartType.Stripchart;
             StripChart.ChartName = "Strip Chart";
@@ -105,6 +121,10 @@ namespace YamuraView
                 {
                     FolderToWatchFiles.Add(file, file);
                 }
+            }
+            else
+            {
+                MessageBox.Show($"Folder to watch not found:\n{FolderToWatch}\n\nOpen files manually via File menu.", "Folder Not Found", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
             checkAutoAddTimer.Interval = 30000;
             checkAutoAddTimer.Start();
@@ -1323,6 +1343,81 @@ namespace YamuraView
         }
         #endregion
 
+        #region config and init files
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="filename"></param>
+        public void SaveConfigFile(String filename)
+        {
+            XDocument setupDoc = new XDocument(new XDeclaration("1.0", "utf-8", "yes"),
+                                               new XElement("Setup",
+                                                   new XAttribute("TimeAlign", timeAlign),
+                                                   new XAttribute("TimeAlignChannel", timeAlignChannel ?? ""),
+                                                   new XAttribute("TimeAlignThreshold", timeAlignThreshold),
+                                                   new XAttribute("TimeAlignRisingEdge", timeAlignRisingEdge)));
+            foreach (Chart curChart in chartControls)
+            {
+                curChart.SaveSetup(setupDoc);
+            }
+            setupDoc.Save(filename);
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="fileName"></param>
+        public void LoadConfigFile(String fileName)
+        {
+            if (!File.Exists(fileName))
+            {
+                MessageBox.Show($"Default settings file not found:\n{fileName}\n\nStarting with no chart configuration.", "Settings File Not Found", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+            ConfigurationFile = fileName;
+            XDocument setupDoc = XDocument.Load(fileName);
+            XElement root = setupDoc.Element("Setup");
+            timeAlign = (bool?)root?.Attribute("TimeAlign") ?? false;
+            timeAlignChannel = (string)root?.Attribute("TimeAlignChannel") ?? "gX";
+            timeAlignThreshold = (float?)root?.Attribute("TimeAlignThreshold") ?? 0.5f;
+            timeAlignRisingEdge = (bool?)root?.Attribute("TimeAlignRisingEdge") ?? true;
+            foreach (Chart curChart in chartControls)
+            {
+                curChart.ApplySetup(setupDoc);
+            }
+            SaveInitFile();
+        }
+        /// <summary>
+        /// Load ini file containing folder to watch and layout to use
+        /// </summary>
+        public void LoadInitFile()
+        {
+            XDocument setupDoc;
+            if (!File.Exists(FolderToWatch + @"\YamuraView.ini"))
+            {
+                MessageBox.Show("Initialization file\n" + FolderToWatch + "\\YamuraView.ini\nnot found.\nUsing default settings.", "INI File Not Found", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                SaveInitFile();
+                return;
+            }
+            setupDoc = XDocument.Load(FolderToWatch + @"\YamuraView.ini");
+            XElement root = setupDoc.Element("Setup");
+            FolderToWatch = (string?)root?.Attribute("FolderToWatch") ?? @"C:\ftp_transfer";
+            ConfigurationFile = (string)root?.Attribute("Config") ?? @"C:\ftp_transfer\YamuraView.xml";
+            LoadConfigFile(ConfigurationFile);
+        }
+        /// <summary>
+        /// write the ini file
+        /// </summary>
+        public void SaveInitFile()
+        {
+            XDocument setupDoc;
+            setupDoc = new XDocument(new XDeclaration("1.0", "utf-8", "yes"),
+                                            new XElement("Setup",
+                                                new XAttribute("FolderToWatch", FolderToWatch),
+                                                new XAttribute("Config", ConfigurationFile)));
+            setupDoc.Save(FolderToWatch + @"\YamuraView.ini");
+        }
+        #endregion
+
         #region event handlers
         /// <summary>
         /// 
@@ -1476,17 +1571,7 @@ namespace YamuraView
             {
                 return;
             }
-            XDocument setupDoc = new XDocument(new XDeclaration("1.0", "utf-8", "yes"),
-                                               new XElement("Setup",
-                                                   new XAttribute("TimeAlign", timeAlign),
-                                                   new XAttribute("TimeAlignChannel", timeAlignChannel ?? ""),
-                                                   new XAttribute("TimeAlignThreshold", timeAlignThreshold),
-                                                   new XAttribute("TimeAlignRisingEdge", timeAlignRisingEdge)));
-            foreach (Chart curChart in chartControls)
-            {
-                curChart.SaveSetup(setupDoc);
-            }
-            setupDoc.Save(saveConfigFileDialog.FileName);
+            SaveConfigFile(saveConfigFileDialog.FileName);
         }
         /// <summary>
         /// 
@@ -1499,64 +1584,9 @@ namespace YamuraView
             {
                 return;
             }
-            ReadConfigFile(openConfigFileDialog.FileName);
+            LoadConfigFile(openConfigFileDialog.FileName);
             SaveInitFile();
         }
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="fileName"></param>
-        public void ReadConfigFile(String fileName)
-        {
-            if (!File.Exists(fileName))
-            {
-                return;
-            }
-            XDocument setupDoc = XDocument.Load(fileName);
-            XElement root = setupDoc.Element("Setup");
-            timeAlign = (bool?)root?.Attribute("TimeAlign") ?? false;
-            timeAlignChannel = (string)root?.Attribute("TimeAlignChannel") ?? "gX";
-            timeAlignThreshold = (float?)root?.Attribute("TimeAlignThreshold") ?? 0.5f;
-            timeAlignRisingEdge = (bool?)root?.Attribute("TimeAlignRisingEdge") ?? true;
-            foreach (Chart curChart in chartControls)
-            {
-                curChart.ApplySetup(setupDoc);
-            }
-            SaveInitFile();
-        }
-        /// <summary>
-        /// Load ini file containing folder to watch and layout to use
-        /// </summary>
-        public void LoadInitFile()
-        {
-            XDocument setupDoc;
-            if (!File.Exists("YamuraLog.ini"))
-            {
-                FolderToWatch = @"C:\ftp_transfer";
-                ConfigurationFile = @"C:\ftp_transfer\YamuraView.xml";
-                ReadConfigFile(ConfigurationFile);
-                SaveInitFile();
-                return;
-            }
-            setupDoc = XDocument.Load("YamuraLog.ini");
-            XElement root = setupDoc.Element("Setup");
-            FolderToWatch = (string?)root?.Attribute("FolderToWatch") ?? @"C:\ftp_transfer";
-            ConfigurationFile = (string)root?.Attribute("Config") ?? @"C:\ftp_transfer\YamuraLog.xml";
-            ReadConfigFile(ConfigurationFile);
-        }
-        /// <summary>
-        /// write the ini file
-        /// </summary>
-        public void SaveInitFile()
-        {
-            XDocument setupDoc;
-            setupDoc = new XDocument(new XDeclaration("1.0", "utf-8", "yes"),
-                                            new XElement("Setup",
-                                                new XAttribute("FolderToWatch", FolderToWatch),
-                                                new XAttribute("Config", ConfigurationFile)));
-            setupDoc.Save("YamuraLog.ini");
-        }
-
         /// <summary>
         /// 
         /// </summary>
@@ -1595,52 +1625,76 @@ namespace YamuraView
             Invalidate(true);
         }
         #endregion
-
-        private void addDeltaTimeToolStripMenuItem_Click(object sender, EventArgs e)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void AddDeltaTimeToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            SelectBaseRun runSelect = new SelectBaseRun();
+            foreach (var run in dataLogger.runData)
+            {
+                runSelect.cmbSelectRun.Items.Add(run.runName);
+            }
+            if (runSelect.ShowDialog() != DialogResult.OK)
+            { 
+                return; 
+            }
+            int selectedBaseRun = runSelect.cmbSelectRun.SelectedIndex;
             // hard code runs 0 and 1 for testing
             // xDistance maps distance -> time; for each distance in run 0, find the time
             // run 1 reached that same distance, then deltaTime = run0_time - run1_time
-            if (!dataLogger.runData[0].channels.ContainsKey("DeltaTime"))
+            foreach (var run in dataLogger.runData)
             {
-                dataLogger.runData[0].AddChannel("DeltaTime", "DeltaTime", "Calculated", dataLogger.runData[0].runName, 1.0F);
-            }
-            if (!dataLogger.runData[1].channels.ContainsKey("DeltaTime"))
-            {
-                dataLogger.runData[1].AddChannel("DeltaTime", "DeltaTime", "Calculated", dataLogger.runData[1].runName, 1.0F);
-            }
-
-            var run0 = dataLogger.runData[0];
-            var run1 = dataLogger.runData[1];
-            var xDist0 = run0.channels["xDistance"].dataPoints;
-            var xDist1 = run1.channels["xDistance"].dataPoints;
-            float distanceOffsetDelta = run0.DistanceOffset - run1.DistanceOffset;
-
-            foreach (KeyValuePair<float, float> distPoint in xDist0)
-            {
-                // distPoint.Key = raw distance in run 0, distPoint.Value = raw time in run 0
-                float rawTime0 = distPoint.Value;
-                // only compare from the launch point: displayed time (raw + offset) must be > 0 for both runs
-                if (rawTime0 + run0.TimeOffset <= 0)
-                    continue;
-                float lookupDist = distPoint.Key + distanceOffsetDelta;
-                if (!ChartView.FindNearestValueToKey(xDist1, lookupDist, out float rawTime1))
-                    continue;
-                if (rawTime1 + run1.TimeOffset <= 0)
-                    continue;
-                float delta = (rawTime0 + run0.TimeOffset) - (rawTime1 + run1.TimeOffset);
-                run0.channels["DeltaTime"].AddPoint(rawTime0, delta);
-                run1.channels["DeltaTime"].AddPoint(rawTime1, -delta);
+                if (!run.channels.ContainsKey("DeltaTime"))
+                {
+                    run.AddChannel("DeltaTime", "DeltaTime", "Calculated", dataLogger.runData[0].runName, 1.0F);
+                }
+                run.channels["DeltaTime"].dataPoints.Clear();
             }
 
-            for (int i = 0; i < chartControls.Count; i++)
+            var baseRun = dataLogger.runData[selectedBaseRun];
+            var xDist0 = baseRun.channels["xDistance"].dataPoints;
+            int compareIdx = 0;
+            foreach (var compareRun in dataLogger.runData)
             {
-                chartControls[i].dataSets[0].channels["DeltaTime"].DataPoints = dataLogger.runData[0].channels["DeltaTime"].DataPoints;
-                chartControls[i].dataSets[0].channels["DeltaTime"].XRange = dataLogger.runData[0].channels["DeltaTime"].XRange;
-                chartControls[i].dataSets[0].channels["DeltaTime"].YRange = dataLogger.runData[0].channels["DeltaTime"].YRange;
-                chartControls[i].dataSets[1].channels["DeltaTime"].DataPoints = dataLogger.runData[1].channels["DeltaTime"].DataPoints;
-                chartControls[i].dataSets[1].channels["DeltaTime"].XRange = dataLogger.runData[1].channels["DeltaTime"].XRange;
-                chartControls[i].dataSets[1].channels["DeltaTime"].YRange = dataLogger.runData[1].channels["DeltaTime"].YRange;
+                var xDist1 = compareRun.channels["xDistance"].dataPoints;
+                foreach (KeyValuePair<float, float> distPoint0 in xDist0)
+                {
+                    float distanceOffsetDelta = baseRun.DistanceOffset - compareRun.DistanceOffset;
+
+                    // distPoint.Key = raw distance in run 0, distPoint.Value = raw time in run 0
+                    float rawTime0 = distPoint0.Value;
+                    // only compare from the launch point: displayed time (raw + offset) must be > 0 for both runs
+                    if (rawTime0 + baseRun.TimeOffset <= 0)
+                    {
+                        continue;
+                    }
+                    float lookupDist = distPoint0.Key + distanceOffsetDelta;
+                    if (!ChartView.FindNearestValueToKey(xDist1, lookupDist, out float rawTime1))
+                    {
+                        continue;
+                    }
+                    if (rawTime1 + compareRun.TimeOffset <= 0)
+                    {
+                        continue;
+                    }
+                    if (((rawTime0 + baseRun.TimeOffset) < 0) || ((rawTime1 + compareRun.TimeOffset) < 0))
+                    {
+                        continue;
+                    }
+                    float delta = (rawTime0 + baseRun.TimeOffset) - (rawTime1 + compareRun.TimeOffset);
+                    compareRun.channels["DeltaTime"].AddPoint(rawTime1, delta);
+                }
+                // add compare channel to all charts
+                for (int i = 0; i < chartControls.Count; i++)
+                {
+                    chartControls[i].dataSets[compareIdx].channels["DeltaTime"].DataPoints = compareRun.channels["DeltaTime"].DataPoints;
+                    chartControls[i].dataSets[compareIdx].channels["DeltaTime"].XRange = compareRun.channels["DeltaTime"].XRange;
+                    chartControls[i].dataSets[compareIdx].channels["DeltaTime"].YRange = compareRun.channels["DeltaTime"].YRange;
+                }
+                compareIdx++;
             }
         }
     }
