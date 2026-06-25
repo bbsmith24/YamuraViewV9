@@ -123,6 +123,12 @@ namespace YamuraViewControls
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public string XChannelName { get; set; }
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        public float FilterTimeMin { get; set; } = float.NaN;
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        public float FilterTimeMax { get; set; } = float.NaN;
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        public string FilterXChannelName { get; set; } = "";
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public int ChartBorder { get; set; }
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public bool ShowOverlay { get; set; } = true;
@@ -322,6 +328,22 @@ namespace YamuraViewControls
                 chartView1.DrawCursorAtScaledPoint(scaledPoint, runIdx, runColor);
                 runIdx++;
             }
+        }
+        /// <summary>
+        public void OnChartZoomChange(object sender, ChartZoomChangeEventArgs e)
+        {
+            FilterXChannelName = e.XChannelName;
+            if (e.IsReset)
+            {
+                FilterTimeMin = float.NaN;
+                FilterTimeMax = float.NaN;
+            }
+            else
+            {
+                FilterTimeMin = e.RangeMin;
+                FilterTimeMax = e.RangeMax;
+            }
+            Invalidate(true);
         }
         /// <summary>
         /// generate XML file for settings to save

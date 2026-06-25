@@ -25,10 +25,12 @@ namespace YamuraViewControls
         public delegate void ChartXAxisChange(object sender, ChartControlXAxisChangeEventArgs e);
         public delegate void AxisOffsetUpdate(object sender, AxisOffsetUpdateEventArgs e);
         public delegate void ClearGraphicsPath(object sender, EventArgs e);
+        public delegate void ChartZoomChange(object sender, ChartZoomChangeEventArgs e);
         #endregion
 
         #region events
         public event ChartMouseTrack ChartMouseTrackEvent;
+        public event ChartZoomChange ChartZoomChangeEvent;
         #endregion
 
         #region enums
@@ -292,16 +294,30 @@ namespace YamuraViewControls
             }
             else
             {
-                // For other axes (gX, Longitude, …): always recompute from data YRange, as the original code did.
+                // For other axes (gX, Longitude, …): recompute from data, filtered to zoom window if set.
                 primaryX.AxisDisplayRange[0] = float.MaxValue;
                 primaryX.AxisDisplayRange[1] = float.MinValue;
                 primaryX.AxisDisplayRange[2] = 0;
+                bool hasFilter = !float.IsNaN(ChartOwner.FilterTimeMin);
                 foreach (DisplayDataSet dataSet in ChartOwner.dataSets)
                 {
-                    float xMin = dataSet.channels[ChartOwner.XChannelName].YRange[0];
-                    float xMax = dataSet.channels[ChartOwner.XChannelName].YRange[1];
-                    if (xMin < primaryX.AxisDisplayRange[0]) primaryX.AxisDisplayRange[0] = xMin;
-                    if (xMax > primaryX.AxisDisplayRange[1]) primaryX.AxisDisplayRange[1] = xMax;
+                    if (hasFilter && dataSet.channels.ContainsKey(ChartOwner.XChannelName))
+                    {
+                        GetDatasetActualTimeRange(dataSet, out float tMin, out float tMax);
+                        foreach (var kvp in dataSet.channels[ChartOwner.XChannelName].dataPoints)
+                        {
+                            if (kvp.Key < tMin || kvp.Key > tMax) continue;
+                            if (kvp.Value < primaryX.AxisDisplayRange[0]) primaryX.AxisDisplayRange[0] = kvp.Value;
+                            if (kvp.Value > primaryX.AxisDisplayRange[1]) primaryX.AxisDisplayRange[1] = kvp.Value;
+                        }
+                    }
+                    else
+                    {
+                        float xMin = dataSet.channels[ChartOwner.XChannelName].YRange[0];
+                        float xMax = dataSet.channels[ChartOwner.XChannelName].YRange[1];
+                        if (xMin < primaryX.AxisDisplayRange[0]) primaryX.AxisDisplayRange[0] = xMin;
+                        if (xMax > primaryX.AxisDisplayRange[1]) primaryX.AxisDisplayRange[1] = xMax;
+                    }
                     primaryX.AxisDisplayRange[2] = primaryX.AxisDisplayRange[1] - primaryX.AxisDisplayRange[0];
                 }
             }
@@ -327,12 +343,28 @@ namespace YamuraViewControls
             for (int g = 0; g < graphCount; g++) { graphYMin[g] = float.MaxValue; graphYMax[g] = float.MinValue; }
             if (ChartMode == ChartViewMode.ABSOLUTE)
             {
+                bool filterY = !xIsZoomable && !float.IsNaN(ChartOwner.FilterTimeMin);
                 foreach (var yAxisKvp in ChartOwner.Y_Axes)
                     foreach (var chan in yAxisKvp.Value.AssociatedChannels)
                         if (chan.ShowChannel && chan.GraphIndex < graphCount)
                         {
-                            if (chan.YRange[0] < graphYMin[chan.GraphIndex]) graphYMin[chan.GraphIndex] = chan.YRange[0];
-                            if (chan.YRange[1] > graphYMax[chan.GraphIndex]) graphYMax[chan.GraphIndex] = chan.YRange[1];
+                            if (filterY)
+                            {
+                                int dsIdx = chan.DataSetIndex < ChartOwner.dataSets.Count ? chan.DataSetIndex : 0;
+                                DisplayDataSet ds = ChartOwner.dataSets[dsIdx];
+                                GetDatasetActualTimeRange(ds, out float tMin, out float tMax);
+                                foreach (var kvp in chan.dataPoints)
+                                {
+                                    if (kvp.Key < tMin || kvp.Key > tMax) continue;
+                                    if (kvp.Value < graphYMin[chan.GraphIndex]) graphYMin[chan.GraphIndex] = kvp.Value;
+                                    if (kvp.Value > graphYMax[chan.GraphIndex]) graphYMax[chan.GraphIndex] = kvp.Value;
+                                }
+                            }
+                            else
+                            {
+                                if (chan.YRange[0] < graphYMin[chan.GraphIndex]) graphYMin[chan.GraphIndex] = chan.YRange[0];
+                                if (chan.YRange[1] > graphYMax[chan.GraphIndex]) graphYMax[chan.GraphIndex] = chan.YRange[1];
+                            }
                         }
             }
 
@@ -502,6 +534,13 @@ namespace YamuraViewControls
             xAxis.AxisDisplayRange[1] = xAxis.AxisValueRange[1];
             xAxis.AxisDisplayRange[2] = xAxis.AxisValueRange[2];
             UpdateScrollbarFromAxis(xAxis);
+            ChartZoomChangeEvent?.Invoke(this, new ChartZoomChangeEventArgs
+            {
+                RangeMin = xAxis.AxisValueRange[0],
+                RangeMax = xAxis.AxisValueRange[1],
+                XChannelName = ChartOwner.XChannelName,
+                IsReset = true
+            });
             chartPanel.Invalidate();
         }
         internal void chartPanel_MouseDown(object sender, MouseEventArgs e)
@@ -549,6 +588,13 @@ namespace YamuraViewControls
                 xAxis.AxisDisplayRange[2] = newMax - newMin;
 
                 UpdateScrollbarFromAxis(xAxis);
+                ChartZoomChangeEvent?.Invoke(this, new ChartZoomChangeEventArgs
+                {
+                    RangeMin = newMin,
+                    RangeMax = newMax,
+                    XChannelName = ChartOwner.XChannelName,
+                    IsReset = false
+                });
                 StartMouseDrag[0] = false;
                 _dragFeedbackEnd = Point.Empty;
                 chartPanel.Invalidate();
@@ -565,6 +611,26 @@ namespace YamuraViewControls
             hScrollBar.Value = Math.Max(hScrollBar.Minimum,
                                Math.Min(hScrollBar.Maximum - largeChange, (int)(xAxis.AxisDisplayRange[0] * scale)));
             hScrollBar.SmallChange = Math.Max(1, largeChange / 20);
+        }
+        private void GetDatasetActualTimeRange(DisplayDataSet dataSet, out float tMin, out float tMax)
+        {
+            float filterMin = ChartOwner.FilterTimeMin;
+            float filterMax = ChartOwner.FilterTimeMax;
+            if (ChartOwner.FilterXChannelName == "Distance")
+            {
+                // Convert display distance range → actual time via xDistance channel (keyed by distance, value = time)
+                float distMin = filterMin - dataSet.DistanceOffset;
+                float distMax = filterMax - dataSet.DistanceOffset;
+                FindNearestValueToKey(dataSet.channels["xDistance"].dataPoints, distMin, out tMin);
+                FindNearestValueToKey(dataSet.channels["xDistance"].dataPoints, distMax, out tMax);
+            }
+            else
+            {
+                // Time axis: subtract per-dataset offset
+                tMin = filterMin - dataSet.TimeOffset;
+                tMax = filterMax - dataSet.TimeOffset;
+            }
+            if (tMin > tMax) { float tmp = tMin; tMin = tMax; tMax = tmp; }
         }
         public void InitScrollbar()
         {
@@ -583,6 +649,13 @@ namespace YamuraViewControls
             float newStart = e.NewValue / scale;
             xAxis.AxisDisplayRange[0] = newStart;
             xAxis.AxisDisplayRange[1] = newStart + xAxis.AxisDisplayRange[2];
+            ChartZoomChangeEvent?.Invoke(this, new ChartZoomChangeEventArgs
+            {
+                RangeMin = xAxis.AxisDisplayRange[0],
+                RangeMax = xAxis.AxisDisplayRange[1],
+                XChannelName = ChartOwner.XChannelName,
+                IsReset = false
+            });
             chartPanel.Invalidate();
         }
         #endregion
@@ -1302,6 +1375,13 @@ namespace YamuraViewControls
     /// <summary>
     /// 
     /// </summary>
+    public class ChartZoomChangeEventArgs : EventArgs
+    {
+        public float RangeMin { get; set; }
+        public float RangeMax { get; set; }
+        public string XChannelName { get; set; }
+        public bool IsReset { get; set; }
+    }
     public class DataChannel
     {
         String channelName;

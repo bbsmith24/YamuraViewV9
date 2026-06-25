@@ -107,6 +107,8 @@ namespace YamuraView
 
             chartControls[0].chartView1.ChartMouseTrackEvent += chartControls[1].OnChartMouseTrack;
             chartControls[0].chartView1.ChartMouseTrackEvent += chartControls[2].OnChartMouseTrack;
+            chartControls[0].chartView1.ChartZoomChangeEvent += chartControls[1].OnChartZoomChange;
+            chartControls[0].chartView1.ChartZoomChangeEvent += chartControls[2].OnChartZoomChange;
             #endregion
 
             #region load initialization file, create if needed
