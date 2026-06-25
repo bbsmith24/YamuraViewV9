@@ -443,6 +443,7 @@ namespace YamuraViewControls
                         if (chan.ChannelName == channelName)
                             chan.GraphIndex = graphIndex;
             ClearGraphicsPathEvent?.Invoke(this, EventArgs.Empty);
+
         }
         /// <summary>
         /// set trace color for selected channel
