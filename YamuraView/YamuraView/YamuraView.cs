@@ -179,6 +179,7 @@ namespace YamuraView
             String[] splitStr;
             String runName = GetFileName(fileName, false);
 
+            Cursor = Cursors.WaitCursor;
             StreamReader readTemp = new StreamReader(tempLogFile, true);
             while (!readTemp.EndOfStream)
             {
@@ -314,6 +315,7 @@ namespace YamuraView
             System.IO.File.Delete(tempLogFile);
             #endregion
             AddLatestDataToCharts();
+            Cursor = Cursors.Default;
         }
         /// <summary>
         /// 
@@ -487,7 +489,6 @@ namespace YamuraView
                 }
                 inFile.Close();
             }
-            Cursor = Cursors.Default;
 
             if (errStr.Length > 0)
             {
@@ -496,6 +497,7 @@ namespace YamuraView
                 errInfo.ShowDialog();
             }
             AddLatestDataToCharts();
+            Cursor = Cursors.Default;
         }
         /// <summary>
         /// YamuraLog v7 CAN files
@@ -526,7 +528,6 @@ namespace YamuraView
             dataLogger.runData[runIdx].AddChannel("Time", "Timestamp", "Internal", runName, 1.0F);
 
             dataLogger.runData[runIdx].fileName = System.IO.Path.GetFullPath(fileName);
-
 
             Cursor = Cursors.WaitCursor;
             using (BinaryReader inFile = new BinaryReader(File.Open(fileName, FileMode.Open)))
@@ -842,7 +843,6 @@ namespace YamuraView
 
             dataLogger.runData[runIdx].AddChannel("DeltaTime", "DeltaTime", "Calculated", dataLogger.runData[runIdx].runName, 1.0F); 
             /// restore default cursor
-            Cursor = Cursors.Default;
             /// show any errors encountered during parsing
             if (errStr.Length > 0)
             {
@@ -854,6 +854,7 @@ namespace YamuraView
             AlignTime();
             /// update displays with new data
             AddLatestDataToCharts();
+            Cursor = Cursors.Default;
         }
         /// <summary>
         /// 
@@ -1624,7 +1625,6 @@ namespace YamuraView
         {
             Invalidate(true);
         }
-        #endregion
         /// <summary>
         /// 
         /// </summary>
@@ -1641,6 +1641,7 @@ namespace YamuraView
             { 
                 return; 
             }
+            Cursor = Cursors.WaitCursor;
             int selectedBaseRun = runSelect.cmbSelectRun.SelectedIndex;
             // hard code runs 0 and 1 for testing
             // xDistance maps distance -> time; for each distance in run 0, find the time
@@ -1696,6 +1697,8 @@ namespace YamuraView
                 }
                 compareIdx++;
             }
+            Cursor = Cursors.Default;
         }
+        #endregion
     }
 }

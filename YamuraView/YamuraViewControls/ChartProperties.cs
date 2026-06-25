@@ -211,7 +211,8 @@ namespace YamuraViewControls
             {
                 channelsContext.Items["traceColorMenuItem"].Enabled = false;
                 channelsContext.Items["traceColorMenuItem"].Visible = false;
-                channelsContext.Items["assignGraphMenuItem"].Visible = false;
+                channelsContext.Items["assignGraphMenuItem"].Visible = true;
+                PopulateAssignGraphMenu();
 
                 // show invert with state from first child channel
                 bool curInvert = axisChannelTree.SelectedNode.Nodes.Count > 0
@@ -426,8 +427,16 @@ namespace YamuraViewControls
         /// </summary>
         private void AssignChannelToGraph(int graphIndex)
         {
-            if (axisChannelTree.SelectedNode?.Parent == null) return;
-            string channelName = axisChannelTree.SelectedNode.Parent.Name;
+            string channelName = "";
+            if (axisChannelTree.SelectedNode?.Parent == null)// return;
+            {
+                channelName = axisChannelTree.SelectedNode.Name;
+            }
+            else
+            {
+                channelName = axisChannelTree.SelectedNode.Parent.Name;
+            }
+            //string channelName = axisChannelTree.SelectedNode.Parent.Name;
             if (ChartOwner != null)
                 foreach (var axis in ChartOwner.Y_Axes.Values)
                     foreach (var chan in axis.AssociatedChannels)
