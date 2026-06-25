@@ -243,10 +243,13 @@ namespace YamuraViewControls
                     chartProperties1.CmbXAxis.Text = "gX";
                 }
             }
+            // sync scrollbar range/position whenever data is updated
+            if (X_Axes.Count > 0)
+                chartView1.InitScrollbar();
             Invalidate(true);
         }
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="x"></param>
         /// <param name="y"></param>

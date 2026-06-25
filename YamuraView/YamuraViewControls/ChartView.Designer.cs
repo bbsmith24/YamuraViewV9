@@ -41,7 +41,10 @@
             chartPanel.Size = new Size(150, 128);
             chartPanel.TabIndex = 0;
             chartPanel.Paint += chartPanel_Paint;
+            chartPanel.MouseDoubleClick += chartPanel_MouseDoubleClick;
+            chartPanel.MouseDown += chartPanel_MouseDown;
             chartPanel.MouseMove += OnChartMouseMove;
+            chartPanel.MouseUp += chartPanel_MouseUp;
             chartPanel.Resize += chartPanel_Resize;
             // 
             // hScrollBar

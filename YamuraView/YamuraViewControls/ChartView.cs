@@ -153,6 +153,7 @@ namespace YamuraViewControls
         private Point _savedCursorPos = Point.Empty;
         static public SolidBrush overlayBrush = new SolidBrush(Color.White);
         ChartControlMouseTrackEventArgs outArgs = new ChartControlMouseTrackEventArgs();
+        private Point _dragFeedbackEnd = Point.Empty;
         #endregion
         /// <summary>
         /// 
@@ -258,28 +259,44 @@ namespace YamuraViewControls
             {
                 return;
             }
-            primaryX.AxisDisplayRange[0] = float.MaxValue;
-            primaryX.AxisDisplayRange[1] = float.MinValue;
-            primaryX.AxisDisplayRange[2] = 0;
-            foreach (DisplayDataSet dataSet in ChartOwner.dataSets)
+            bool xIsZoomable = ChartOwner.XChannelName == "Time" || ChartOwner.XChannelName == "Distance";
+            if (xIsZoomable)
             {
-                if (ChartOwner.XChannelName == "Time")
+                // For Time/Distance: compute full data range into locals only.
+                // AxisDisplayRange is the zoom window — do NOT overwrite it so zoom persists across repaints.
+                float fullXMin = float.MaxValue, fullXMax = float.MinValue;
+                foreach (DisplayDataSet dataSet in ChartOwner.dataSets)
                 {
-                    float tMin = dataSet.channels["Time"].XRange[0] + dataSet.TimeOffset;
-                    float tMax = dataSet.channels["Time"].XRange[1] + dataSet.TimeOffset;
-                    if (tMin < primaryX.AxisDisplayRange[0]) primaryX.AxisDisplayRange[0] = tMin;
-                    if (tMax > primaryX.AxisDisplayRange[1]) primaryX.AxisDisplayRange[1] = tMax;
-                    primaryX.AxisDisplayRange[2] = dataSet.channels["Time"].XRange[1] - dataSet.channels["Time"].XRange[0];
+                    if (ChartOwner.XChannelName == "Time")
+                    {
+                        float tMin = dataSet.channels["Time"].XRange[0] + dataSet.TimeOffset;
+                        float tMax = dataSet.channels["Time"].XRange[1] + dataSet.TimeOffset;
+                        if (tMin < fullXMin) fullXMin = tMin;
+                        if (tMax > fullXMax) fullXMax = tMax;
+                    }
+                    else
+                    {
+                        float dMin = dataSet.channels["xDistance"].XRange[0];
+                        float dMax = dataSet.channels["xDistance"].XRange[1];
+                        if (dMin < fullXMin) fullXMin = dMin;
+                        if (dMax > fullXMax) fullXMax = dMax;
+                    }
                 }
-                else if (ChartOwner.XChannelName == "Distance")
+                // Initialise AxisDisplayRange only when it hasn't been set yet (zero range).
+                if (primaryX.AxisDisplayRange[2] == 0 && fullXMax > fullXMin)
                 {
-                    float dMin = dataSet.channels["xDistance"].XRange[0];
-                    float dMax = dataSet.channels["xDistance"].XRange[1];
-                    if (dMin < primaryX.AxisDisplayRange[0]) primaryX.AxisDisplayRange[0] = dMin;
-                    if (dMax > primaryX.AxisDisplayRange[1]) primaryX.AxisDisplayRange[1] = dMax;
-                    primaryX.AxisDisplayRange[2] = dMax - dMin;
+                    primaryX.AxisDisplayRange[0] = fullXMin;
+                    primaryX.AxisDisplayRange[1] = fullXMax;
+                    primaryX.AxisDisplayRange[2] = fullXMax - fullXMin;
                 }
-                else
+            }
+            else
+            {
+                // For other axes (gX, Longitude, …): always recompute from data YRange, as the original code did.
+                primaryX.AxisDisplayRange[0] = float.MaxValue;
+                primaryX.AxisDisplayRange[1] = float.MinValue;
+                primaryX.AxisDisplayRange[2] = 0;
+                foreach (DisplayDataSet dataSet in ChartOwner.dataSets)
                 {
                     float xMin = dataSet.channels[ChartOwner.XChannelName].YRange[0];
                     float xMax = dataSet.channels[ChartOwner.XChannelName].YRange[1];
@@ -475,41 +492,86 @@ namespace YamuraViewControls
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
+        internal void chartPanel_MouseDoubleClick(object sender, MouseEventArgs e)
+        {
+            if (ChartOwner == null || ChartOwner.X_Axes == null || ChartOwner.X_Axes.Count == 0) return;
+            if (ChartOwner.XChannelName != "Time" && ChartOwner.XChannelName != "Distance") return;
+            Axis xAxis = ChartOwner.X_Axes.ElementAtOrDefault(0).Value;
+            if (xAxis == null) return;
+            xAxis.AxisDisplayRange[0] = xAxis.AxisValueRange[0];
+            xAxis.AxisDisplayRange[1] = xAxis.AxisValueRange[1];
+            xAxis.AxisDisplayRange[2] = xAxis.AxisValueRange[2];
+            UpdateScrollbarFromAxis(xAxis);
+            chartPanel.Invalidate();
+        }
+        internal void chartPanel_MouseDown(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Left && ChartOwner != null && ChartOwner.AllowDrag && displayScale[0] != 0 &&
+                (ChartOwner.XChannelName == "Time" || ChartOwner.XChannelName == "Distance"))
+            {
+                StartMouseDrag[0] = true;
+                ChartStartCursorPos[0] = e.Location;
+                ChartLastCursorPos[0] = e.Location;
+                _dragFeedbackEnd = e.Location;
+            }
+        }
         internal void chartPanel_MouseUp(object sender, MouseEventArgs e)
         {
             if ((StartMouseDrag[0]) && ChartOwner.AllowDrag)
             {
-                // original scaling
-                //float[] displayScale = new float[] { 1.0F, 1.0F };
-                //displayScale[0] = (float)ChartOwner.ChartWidth / xAxis.AxisDisplayRange[2];
+                // erase the last feedback rectangle
+                if (_dragFeedbackEnd != ChartStartCursorPos[0])
+                {
+                    DrawSelectArea(ChartStartCursorPos[0].X, ChartOwner.ChartBorder,
+                                   _dragFeedbackEnd.X, ChartOwner.ChartHeight - ChartOwner.ChartBorder);
+                }
+
                 Axis xAxis = ChartOwner.X_Axes["X Axis"];
+                int border = ChartOwner.ChartBorder;
 
-                PointF scaledStart = ChartStartCursorPos[0];
-                PointF scaledEnd = ChartLastCursorPos[0];
-                scaledStart = ScaleDisplayToData(scaledStart,
-                                    displayScale[0],
-                                    displayScale[1],
-                                    0.0F,
-                                    0.0F,
-                                    ChartOwner.ChartBounds);
-                scaledEnd = ScaleDisplayToData(scaledEnd,
-                                    displayScale[0],
-                                    displayScale[1],
-                                    0.0F,
-                                    0.0F,
-                                    ChartOwner.ChartBounds);
+                // convert screen X → data X:  dataX = (screenX - border) / scaleX + displayRangeStart
+                float dataXStart = (ChartStartCursorPos[0].X - border) / displayScale[0] + xAxis.AxisDisplayRange[0];
+                float dataXEnd   = (e.Location.X - border)             / displayScale[0] + xAxis.AxisDisplayRange[0];
 
-                xAxis.AxisDisplayRange[0] = scaledStart.X < scaledEnd.X ? scaledStart.X : scaledEnd.X;
-                xAxis.AxisDisplayRange[1] = scaledStart.X < scaledEnd.X ? scaledEnd.X : scaledStart.X;
-                xAxis.AxisDisplayRange[2] = xAxis.AxisDisplayRange[1] - xAxis.AxisDisplayRange[0];
+                float newMin = Math.Min(dataXStart, dataXEnd);
+                float newMax = Math.Max(dataXStart, dataXEnd);
+                // guard against zero-width selection
+                if (newMax - newMin < 0.001f)
+                {
+                    StartMouseDrag[0] = false;
+                    _dragFeedbackEnd = Point.Empty;
+                    chartPanel.Invalidate();
+                    return;
+                }
 
-                hScrollBar.Minimum = (int)xAxis.AxisValueRange[0];
-                hScrollBar.Maximum = (int)xAxis.AxisValueRange[1];
-                hScrollBar.Value = (int)xAxis.AxisDisplayRange[0];
-                hScrollBar.LargeChange = (int)xAxis.AxisDisplayRange[2];
+                xAxis.AxisDisplayRange[0] = newMin;
+                xAxis.AxisDisplayRange[1] = newMax;
+                xAxis.AxisDisplayRange[2] = newMax - newMin;
+
+                UpdateScrollbarFromAxis(xAxis);
                 StartMouseDrag[0] = false;
+                _dragFeedbackEnd = Point.Empty;
                 chartPanel.Invalidate();
             }
+        }
+        private void UpdateScrollbarFromAxis(Axis xAxis)
+        {
+            // scrollbar uses integer positions; scale by 1000 to preserve sub-second precision
+            const int scale = 1000;
+            hScrollBar.Minimum = (int)(xAxis.AxisValueRange[0] * scale);
+            hScrollBar.Maximum = (int)(xAxis.AxisValueRange[1] * scale);
+            int largeChange = Math.Max(1, (int)(xAxis.AxisDisplayRange[2] * scale));
+            hScrollBar.LargeChange = largeChange;
+            hScrollBar.Value = Math.Max(hScrollBar.Minimum,
+                               Math.Min(hScrollBar.Maximum - largeChange, (int)(xAxis.AxisDisplayRange[0] * scale)));
+            hScrollBar.SmallChange = Math.Max(1, largeChange / 20);
+        }
+        public void InitScrollbar()
+        {
+            if (ChartOwner == null || ChartOwner.X_Axes == null || ChartOwner.X_Axes.Count == 0) return;
+            Axis xAxis = ChartOwner.X_Axes.ElementAtOrDefault(0).Value;
+            if (xAxis == null) return;
+            UpdateScrollbarFromAxis(xAxis);
         }
         #endregion
 
@@ -517,10 +579,11 @@ namespace YamuraViewControls
         internal void HScrollBar_Scroll(object sender, ScrollEventArgs e)
         {
             Axis xAxis = ChartOwner.X_Axes["X Axis"];
-            xAxis.AxisDisplayRange[0] = e.NewValue;
-            xAxis.AxisDisplayRange[1] = e.NewValue + xAxis.AxisDisplayRange[2];
+            const float scale = 1000f;
+            float newStart = e.NewValue / scale;
+            xAxis.AxisDisplayRange[0] = newStart;
+            xAxis.AxisDisplayRange[1] = newStart + xAxis.AxisDisplayRange[2];
             chartPanel.Invalidate();
-
         }
         #endregion
 
@@ -808,6 +871,19 @@ namespace YamuraViewControls
                 #region cursor track in local view
                 // Mouse position relative to chartPanel
                 Point mousePt = chartPanel.PointToClient(Cursor.Position);
+
+                if (StartMouseDrag[0] && ChartOwner.AllowDrag)
+                {
+                    // erase old feedback rect, draw new one spanning full chart height
+                    int rectTop    = ChartOwner.ChartBorder;
+                    int rectBottom = ChartOwner.ChartHeight - ChartOwner.ChartBorder;
+                    if (_dragFeedbackEnd != ChartStartCursorPos[0])
+                        DrawSelectArea(ChartStartCursorPos[0].X, rectTop, _dragFeedbackEnd.X, rectBottom);
+                    DrawSelectArea(ChartStartCursorPos[0].X, rectTop, mousePt.X, rectBottom);
+                    _dragFeedbackEnd = mousePt;
+                    ChartLastCursorPos[0] = mousePt;
+                    return;
+                }
 
                 // erase previous XOR cursor
                 if (StartMouseMove[0])
