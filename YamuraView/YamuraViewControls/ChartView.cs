@@ -149,13 +149,13 @@ namespace YamuraViewControls
 
         // cursor overlay state
         private SortedList<string, SortedList<string, float>> _cursorValues = null;
-        private float _cursorDataX = float.NaN;
-        private Panel _overlayPanel;
-        private bool _hasCursorPos = false;
-        private Point _savedCursorPos = Point.Empty;
+        private float cursorDataX = float.NaN;
+        private Panel overlayPanel;
+        private bool hasCursorPos = false;
+        private Point savedCursorPos = Point.Empty;
         static public SolidBrush overlayBrush = new SolidBrush(Color.White);
         ChartControlMouseTrackEventArgs outArgs = new ChartControlMouseTrackEventArgs();
-        private Point _dragFeedbackEnd = Point.Empty;
+        private Point dragFeedbackEnd = Point.Empty;
         #endregion
         /// <summary>
         /// 
@@ -173,10 +173,10 @@ namespace YamuraViewControls
             StartMouseDrag.Add(false);
             hScrollBar.Scroll += HScrollBar_Scroll;
             chartPanel.MouseLeave += ChartPanel_MouseLeave;
-            _overlayPanel = new Panel { BackColor = Color.Black, Visible = false, Enabled = false };
-            _overlayPanel.Paint += OverlayPanel_Paint;
-            chartPanel.Controls.Add(_overlayPanel);
-            _overlayPanel.BringToFront();
+            overlayPanel = new Panel { BackColor = Color.Black, Visible = false, Enabled = false, Font = new Font("Segoe UI", 12F) };
+            overlayPanel.Paint += OverlayPanel_Paint;
+            chartPanel.Controls.Add(overlayPanel);
+            overlayPanel.BringToFront();
             // double buffer for draw speed
             // removed now for cursor ghosting when update panel moves 
             //chartPanel.GetType()
@@ -211,11 +211,11 @@ namespace YamuraViewControls
             DrawChartView(e.Graphics);
             // after every repaint, restore XOR cursor if mouse is still over chart
             // DrawChartView resets ChartLastCursorPos to (0,0), so use _savedCursorPos
-            if (_hasCursorPos && StartMouseMove.Count > 0)
+            if (hasCursorPos && StartMouseMove.Count > 0)
             {
-                DrawCursorAtScreenPoint(_savedCursorPos);
+                DrawCursorAtScreenPoint(savedCursorPos);
                 StartMouseMove[0] = true;
-                ChartLastCursorPos[0] = _savedCursorPos;
+                ChartLastCursorPos[0] = savedCursorPos;
             }
         }
         /// <summary>
@@ -483,7 +483,8 @@ namespace YamuraViewControls
 
                             chartGraphics.TranslateTransform((float)border + adjustXBorder, (float)subBottom + adjustYBorder);
                             chartGraphics.ScaleTransform(localScaleX, negScaleY);
-                            pathPen.Width = 0;
+                            pathPen.Width = curChanInfo.ChannelPenWidth;
+                            pathPen.ScaleTransform(1 / localScaleX, 1 / -negScaleY);
                             chartGraphics.DrawPath(pathPen, curChanInfo.ChannelPath);
                             if (ChartOwner.ChartName == "Traction Circle")
                             {
@@ -510,13 +511,11 @@ namespace YamuraViewControls
         {
             if (ChartOwner != null)
             {
-                // update the paintable area
                 ChartOwner.SetChartBounds(ChartOwner.ChartBorder,
                                           ChartOwner.ChartBorder,
-                                          Width - (2 * ChartOwner.ChartBorder),
-                                          Height - (2 * ChartOwner.ChartBorder));
+                                          chartPanel.Width - (2 * ChartOwner.ChartBorder),
+                                          chartPanel.Height - (2 * ChartOwner.ChartBorder));
             }
-            // redraw
             chartPanel.Invalidate();
         }
         /// <summary>
@@ -551,7 +550,7 @@ namespace YamuraViewControls
                 StartMouseDrag[0] = true;
                 ChartStartCursorPos[0] = e.Location;
                 ChartLastCursorPos[0] = e.Location;
-                _dragFeedbackEnd = e.Location;
+                dragFeedbackEnd = e.Location;
             }
         }
         internal void chartPanel_MouseUp(object sender, MouseEventArgs e)
@@ -559,10 +558,10 @@ namespace YamuraViewControls
             if ((StartMouseDrag[0]) && ChartOwner.AllowDrag)
             {
                 // erase the last feedback rectangle
-                if (_dragFeedbackEnd != ChartStartCursorPos[0])
+                if (dragFeedbackEnd != ChartStartCursorPos[0])
                 {
                     DrawSelectArea(ChartStartCursorPos[0].X, ChartOwner.ChartBorder,
-                                   _dragFeedbackEnd.X, ChartOwner.ChartHeight - ChartOwner.ChartBorder);
+                                   dragFeedbackEnd.X, ChartOwner.ChartHeight - ChartOwner.ChartBorder);
                 }
 
                 Axis xAxis = ChartOwner.X_Axes["X Axis"];
@@ -578,7 +577,7 @@ namespace YamuraViewControls
                 if (newMax - newMin < 0.001f)
                 {
                     StartMouseDrag[0] = false;
-                    _dragFeedbackEnd = Point.Empty;
+                    dragFeedbackEnd = Point.Empty;
                     chartPanel.Invalidate();
                     return;
                 }
@@ -596,7 +595,7 @@ namespace YamuraViewControls
                     IsReset = false
                 });
                 StartMouseDrag[0] = false;
-                _dragFeedbackEnd = Point.Empty;
+                dragFeedbackEnd = Point.Empty;
                 chartPanel.Invalidate();
             }
         }
@@ -724,12 +723,12 @@ namespace YamuraViewControls
                 {
                     Point point1 = new Point(drawPoint.X - (ChartOwner.CursorBoxSize / 2), drawPoint.Y - (ChartOwner.CursorBoxSize / 2));
                     Size boxSize = new Size(ChartOwner.CursorBoxSize, ChartOwner.CursorBoxSize);
-                    //locationBox = new Rectangle(drawPoint.X - (ChartOwner.CursorBoxSize / 2), 
-                    //                            drawPoint.Y - (ChartOwner.CursorBoxSize / 2), 
-                    //                            ChartOwner.CursorBoxSize, 
-                    //                            ChartOwner.CursorBoxSize);
-                    locationBox = new Rectangle(point1, boxSize);
-                    Gdi32.Rectangle(hDC, locationBox.Left, locationBox.Top, locationBox.Right, locationBox.Bottom);// locationBox.Left + ChartOwner.CursorBoxSize, locationBox.Top + ChartOwner.CursorBoxSize);
+                    locationBox = new Rectangle(drawPoint.X - (ChartOwner.CursorBoxSize / 2), 
+                                                drawPoint.Y - (ChartOwner.CursorBoxSize / 2), 
+                                                ChartOwner.CursorBoxSize, 
+                                                ChartOwner.CursorBoxSize);
+                    //locationBox = new Rectangle(point1, boxSize);
+                    Gdi32.Rectangle(hDC, locationBox.Left, locationBox.Top, locationBox.Right, locationBox.Bottom);
                 }
                 #endregion
                 #region circle
@@ -883,40 +882,28 @@ namespace YamuraViewControls
         #endregion
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public void UpdateElementPositions()
         {
-            Rectangle chartRect = new Rectangle();
-            // default shown positions
-            hScrollBar.Height = 17;
-            hScrollBar.Width = Width - 17;
-            hScrollBar.Location = new Point(17, Height - 17);
-
-            vScrollBar.Height = Height - 17;
-            vScrollBar.Width = 17;
-            vScrollBar.Location = new Point(0, 0);
-
-            chartRect.X = 17;
-            chartRect.Y = 0;
-            chartRect.Width = Width - 17;
-            chartRect.Height = Height - 17;
-
-            if (!showHScroll)
+            int scrollH = 17;
+            if (showHScroll)
+            {
+                hScrollBar.Visible = true;
+                hScrollBar.Location = new Point(0, Height - scrollH);
+                hScrollBar.Width = Width;
+                hScrollBar.Height = scrollH;
+                chartPanel.Location = new Point(0, 0);
+                chartPanel.Width = Width;
+                chartPanel.Height = Height - scrollH;
+            }
+            else
             {
                 hScrollBar.Visible = false;
-                chartRect.Height = Height;
+                chartPanel.Location = new Point(0, 0);
+                chartPanel.Width = Width;
+                chartPanel.Height = Height;
             }
-            if (!showVScroll)
-            {
-                vScrollBar.Visible = false;
-                chartRect.X = 0;
-                chartRect.Width = Width;
-            }
-
-            chartPanel.Location = chartRect.Location;
-            chartPanel.Width = chartRect.Width;
-            chartPanel.Height = chartRect.Height;
         }
         /// <summary>
         /// 
@@ -950,10 +937,10 @@ namespace YamuraViewControls
                     // erase old feedback rect, draw new one spanning full chart height
                     int rectTop    = ChartOwner.ChartBorder;
                     int rectBottom = ChartOwner.ChartHeight - ChartOwner.ChartBorder;
-                    if (_dragFeedbackEnd != ChartStartCursorPos[0])
-                        DrawSelectArea(ChartStartCursorPos[0].X, rectTop, _dragFeedbackEnd.X, rectBottom);
+                    if (dragFeedbackEnd != ChartStartCursorPos[0])
+                        DrawSelectArea(ChartStartCursorPos[0].X, rectTop, dragFeedbackEnd.X, rectBottom);
                     DrawSelectArea(ChartStartCursorPos[0].X, rectTop, mousePt.X, rectBottom);
-                    _dragFeedbackEnd = mousePt;
+                    dragFeedbackEnd = mousePt;
                     ChartLastCursorPos[0] = mousePt;
                     return;
                 }
@@ -971,8 +958,8 @@ namespace YamuraViewControls
                     DrawCursorAtScreenPoint(mousePt);
                     StartMouseMove[0] = true;
                     ChartLastCursorPos[0] = mousePt;
-                    _hasCursorPos = true;
-                    _savedCursorPos = mousePt;
+                    hasCursorPos = true;
+                    savedCursorPos = mousePt;
                 }
                 #endregion
 
@@ -1071,7 +1058,7 @@ namespace YamuraViewControls
                     }
                 }
                 // update overlay panel (only the small panel repaints, not the main chart)
-                _cursorDataX = dataX;
+                cursorDataX = dataX;
                 _cursorValues = outArgs.YAxisValues;
                 UpdateOverlayPanel(mousePt);
                 // Raise event for listeners (other charts) with mapped X and channel values
@@ -1120,9 +1107,9 @@ namespace YamuraViewControls
         /// <param name="e"></param>
         private void ChartPanel_MouseLeave(object sender, EventArgs e)
         {
-            _hasCursorPos = false;
+            hasCursorPos = false;
             _cursorValues = null;
-            _overlayPanel.Visible = false;
+            overlayPanel.Visible = false;
             if (StartMouseMove.Count > 0 && StartMouseMove[0])
             {
                 DrawCursorAtScreenPoint(ChartLastCursorPos[0]);
@@ -1139,7 +1126,7 @@ namespace YamuraViewControls
             if (ChartOwner == null) return;
             if (!ChartOwner.ShowOverlay)
             {
-                _overlayPanel.Visible = false;
+                overlayPanel.Visible = false;
                 return;
             }
             int border = ChartOwner.ChartBorder;
@@ -1152,21 +1139,26 @@ namespace YamuraViewControls
                             foreach (var chan in axis.AssociatedChannels)
                                 if (chan.DataSetName == ds.Key && chan.ChannelName == ch.Key && chan.ShowChannel)
                                     lineCount++;
-            int panelW = 195;
+            int panelW = 250;
             int panelH = (int)(lineHeight * lineCount) + 6;
             // place on right side when cursor is in left half, left side when in right half
             int x = cursorPt.X < chartPanel.Width / 2
                 ? chartPanel.Width - border - 4 - panelW
                 : border + 4;
+            // same with top/bottom
+            int y = cursorPt.Y < chartPanel.Height / 2
+                ? chartPanel.Height - border - 4 - panelH
+                : border - + 4;
+
             bool overlayPanelMoved = false;
-            if (_overlayPanel.Location.X != x)
+            if ((overlayPanel.Location.X != x) || (overlayPanel.Location.Y != y))
             {
                 overlayPanelMoved = true;
             }
-            _overlayPanel.Location = new Point(x, border + 4);
-            _overlayPanel.Size = new Size(panelW, panelH);
-            _overlayPanel.Visible = true;
-            _overlayPanel.Invalidate();
+            overlayPanel.Location = new Point(x, y);// border + 4);
+            overlayPanel.Size = new Size(panelW, panelH);
+            overlayPanel.Visible = true;
+            overlayPanel.Invalidate();
             // removing this ghosts the cursor
             // cursor ghosts when chartPanel is set to double buffer
             if (overlayPanelMoved)
@@ -1190,9 +1182,9 @@ namespace YamuraViewControls
             float x = 3f;
             float y = 3f;
 
-            string xLabel = float.IsNaN(_cursorDataX) ? "" :
-                ChartOwner.XChannelName == "Distance" ? $"Dist: {_cursorDataX:F2} ft" :
-                                                         $"Time: {_cursorDataX:F3} s";
+            string xLabel = float.IsNaN(cursorDataX) ? "" :
+                ChartOwner.XChannelName == "Distance" ? $"Dist: {cursorDataX:F2} ft" :
+                                                         $"Time: {cursorDataX:F3} s";
 
             //using (Brush w = new SolidBrush(Color.White))
             overlayBrush.Color = Color.White;

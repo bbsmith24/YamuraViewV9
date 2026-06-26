@@ -431,19 +431,17 @@ namespace YamuraViewControls
             if (axisChannelTree.SelectedNode?.Parent == null)// return;
             {
                 channelName = axisChannelTree.SelectedNode.Name;
+                if (ChartOwner != null)
+                    foreach (var axis in ChartOwner.Y_Axes.Values)
+                        foreach (var chan in axis.AssociatedChannels)
+                            if (chan.ChannelName == channelName)
+                                chan.GraphIndex = graphIndex;
             }
             else
             {
-                channelName = axisChannelTree.SelectedNode.Parent.Name;
+                (axisChannelTree.SelectedNode.Tag as ChartChannel).GraphIndex = graphIndex;
             }
-            //string channelName = axisChannelTree.SelectedNode.Parent.Name;
-            if (ChartOwner != null)
-                foreach (var axis in ChartOwner.Y_Axes.Values)
-                    foreach (var chan in axis.AssociatedChannels)
-                        if (chan.ChannelName == channelName)
-                            chan.GraphIndex = graphIndex;
             ClearGraphicsPathEvent?.Invoke(this, EventArgs.Empty);
-
         }
         /// <summary>
         /// set trace color for selected channel
@@ -460,45 +458,87 @@ namespace YamuraViewControls
             }
             ((ChartChannel)axisChannelTree.SelectedNode.Tag).ChannelColor = colorDialog1.Color;
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void btnResetDistanceALign_Click(object sender, EventArgs e)
         {
 
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void cmbChartDefaultPenWidth_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            foreach (var axis in ChartOwner.Y_Axes.Values)
+            {
+                foreach (var chan in axis.AssociatedChannels)
+                {
+                    chan.ChannelPenWidth = (float)cmbChartDefaultPenWidth.SelectedIndex;
+                }
+            }
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void penWidth0MenuItem_Click(object sender, EventArgs e)
+        {
+            SetPenWidth(0);
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void penWidth1MenuItem_Click(object sender, EventArgs e)
+        {
+            SetPenWidth(1);
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void penWidth2MenuItem_Click(object sender, EventArgs e)
+        {
+            SetPenWidth(2);
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void penWidth3MenuItem_Click(object sender, EventArgs e)
+        {
+            SetPenWidth(3);
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="penWidth"></param>
+        public void SetPenWidth(float penWidth)
+        {
+            string channelName = "";
+            if (axisChannelTree.SelectedNode?.Parent == null)// return;
+            {
+                channelName = axisChannelTree.SelectedNode.Name;
+                if (ChartOwner != null)
+                    foreach (var axis in ChartOwner.Y_Axes.Values)
+                        foreach (var chan in axis.AssociatedChannels)
+                            if (chan.ChannelName == channelName)
+                                chan.ChannelPenWidth = penWidth;
+            }
+            else
+            {
+                channelName = axisChannelTree.SelectedNode.Parent.Name;
+                (axisChannelTree.SelectedNode.Tag as ChartChannel).ChannelPenWidth = penWidth;
+            }
+        }
     }
-    //public class AxisOffsetUpdateEventArgs : EventArgs
-    //{
-    //    string channelName;
-    //    public string ChannelName
-    //    {
-    //        get { return channelName; }
-    //        set { channelName = value; }
-    //    }
-    //    int axisIdx;
-    //    public int AxisIdx
-    //    {
-    //        get { return axisIdx; }
-    //        set { axisIdx = value; }
-    //    }
-    //    int runIdx;
-    //    public int RunIdx
-    //    {
-    //        get { return runIdx; }
-    //        set { runIdx = value; }
-    //    }
-    //    float offsetVal;
-    //    public float OffsetVal
-    //    {
-    //        get { return offsetVal; }
-    //        set { offsetVal = value; }
-    //    }
-
-    //    public AxisOffsetUpdateEventArgs(string name, int run, int axis, float offset)
-    //    {
-    //        ChannelName = name;
-    //        RunIdx = run;
-    //        AxisIdx = axis;
-    //        OffsetVal = offset;
-    //    }
-    //}
 }

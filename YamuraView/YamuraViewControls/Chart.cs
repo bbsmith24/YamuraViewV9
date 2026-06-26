@@ -92,7 +92,7 @@ namespace YamuraViewControls
             get { return cursorMode; }
             set { cursorMode = value; }
         }
-        int cursorBoxSize = 10;
+        int cursorBoxSize = 20;
         /// <summary>
         /// size of box and circle cursor
         /// </summary>
@@ -153,13 +153,13 @@ namespace YamuraViewControls
         Dictionary<string, int> pendingGraphIndices = new Dictionary<string, int>();
         HashSet<string> pendingInvertChannels = new HashSet<string>();
 
-        List<Color> autoColors = new List<Color> { Color.Red,
-                                                   Color.Green,
-                                                   Color.Blue,
+        List<Color> autoColors = new List<Color> { Color.Pink,
+                                                   Color.LightSkyBlue,
+                                                   Color.LightGreen,
+                                                   Color.LightPink,
                                                    Color.Yellow,
                                                    Color.Cyan,
-                                                   Color.Magenta,
-                                                   Color.Gray };
+                                                   Color.LightGray };
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public List<Color> AutoColors
         {
@@ -541,6 +541,7 @@ namespace YamuraViewControls
             get { return channelColor; }
             set { channelColor = value; }
         }
+        public float ChannelPenWidth = 0;
         public ChartChannel(String name, String desc, String src, string dataSet, float scale)
         {
             channelName = name;

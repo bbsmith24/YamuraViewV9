@@ -64,14 +64,23 @@ namespace YamuraView
             StripChart.ChartViewType = YamuraViewControls.Chart.ChartType.Stripchart;
             StripChart.ChartName = "Strip Chart";
             StripChart.EqualScale = false;
+            StripChart.chartProperties1.channelsContext.Items[StripChart.chartProperties1.channelsContext.Items.IndexOf(StripChart.chartProperties1.penWidthMenuItem)].Enabled = true;
+            StripChart.chartProperties1.cmbChartDefaultPenWidth.Enabled = true;
+            StripChart.Dock = DockStyle.Fill;
 
             TrackMap.ChartViewType = YamuraViewControls.Chart.ChartType.XYChart;
             TrackMap.ChartName = "Track Map";
             TrackMap.EqualScale = true;
+            TrackMap.chartProperties1.channelsContext.Items[StripChart.chartProperties1.channelsContext.Items.IndexOf(StripChart.chartProperties1.penWidthMenuItem)].Enabled = false;
+            TrackMap.chartProperties1.cmbChartDefaultPenWidth.Enabled = false;
+            TrackMap.Dock = DockStyle.Fill;
 
             TractionCircle.ChartViewType = YamuraViewControls.Chart.ChartType.XYChart;
             TractionCircle.ChartName = "Traction Circle";
             TractionCircle.EqualScale = true;
+            TractionCircle.chartProperties1.channelsContext.Items[StripChart.chartProperties1.channelsContext.Items.IndexOf(StripChart.chartProperties1.penWidthMenuItem)].Enabled = false;
+            TractionCircle.chartProperties1.cmbChartDefaultPenWidth.Enabled = false;
+            TractionCircle.Dock = DockStyle.Fill;
             #endregion
 
             #region add chart controls
@@ -1283,7 +1292,7 @@ namespace YamuraView
                     int associatedChannelIdx = chartControls[chartIdx].Y_Axes[yAxisName].AssociatedChannels.Count - 1;
                     chartControls[chartIdx].Y_Axes[yAxisName].AssociatedChannels[associatedChannelIdx].DataSetName = curRun.runName;
                     chartControls[chartIdx].Y_Axes[yAxisName].AssociatedChannels[associatedChannelIdx].DataSetIndex = dataSetIdx;
-                    chartControls[chartIdx].Y_Axes[yAxisName].AssociatedChannels[associatedChannelIdx].ChannelColor = chartControls[chartIdx].AutoColors[(dataLogger.runData.Count - 1) % 7];//Color.Red/* penColors[channelIdx % penColors.Count]*/;
+                    chartControls[chartIdx].Y_Axes[yAxisName].AssociatedChannels[associatedChannelIdx].ChannelColor = chartControls[chartIdx].AutoColors[(dataLogger.runData.Count - 1) % 7];
                     chartControls[chartIdx].Y_Axes[yAxisName].AssociatedChannels[associatedChannelIdx].ShowChannel = false;
                     chartControls[chartIdx].Y_Axes[yAxisName].AssociatedChannels[associatedChannelIdx].XRange[0] = curChannel.Value.XRange[0];
                     chartControls[chartIdx].Y_Axes[yAxisName].AssociatedChannels[associatedChannelIdx].XRange[1] = curChannel.Value.XRange[1];
@@ -1373,7 +1382,7 @@ namespace YamuraView
         {
             if (!File.Exists(fileName))
             {
-                MessageBox.Show($"Default settings file not found:\n{fileName}\n\nStarting with no chart configuration.", "Settings File Not Found", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Default configuration file not found:\n" + fileName + "\n\nStarting with no chart configuration.", "Configuration File Not Found", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
             ConfigurationFile = fileName;
@@ -1395,16 +1404,21 @@ namespace YamuraView
         public void LoadInitFile()
         {
             XDocument setupDoc;
-            if (!File.Exists(FolderToWatch + @"\YamuraView.ini"))
+            String fullPath = Path.GetFullPath(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\YamuraView.ini");
+            if (!File.Exists(fullPath))
             {
-                MessageBox.Show("Initialization file\n" + FolderToWatch + "\\YamuraView.ini\nnot found.\nUsing default settings.", "INI File Not Found", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Initialization file\n" + fullPath + "\nnot found.\nUsing default settings.", "INI File Not Found", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 SaveInitFile();
                 return;
             }
-            setupDoc = XDocument.Load(FolderToWatch + @"\YamuraView.ini");
+            setupDoc = XDocument.Load(fullPath);
             XElement root = setupDoc.Element("Setup");
             FolderToWatch = (string?)root?.Attribute("FolderToWatch") ?? @"C:\ftp_transfer";
-            ConfigurationFile = (string)root?.Attribute("Config") ?? @"C:\ftp_transfer\YamuraView.xml";
+            ConfigurationFile = (string)root?.Attribute("Config");// ?? @"C:\ftp_transfer\YamuraView.xml";
+            if((ConfigurationFile == null) || (ConfigurationFile.Length == 0))
+            {
+                ConfigurationFile = @"C:\ftp_transfer\YamuraView.xml";
+            }
             LoadConfigFile(ConfigurationFile);
         }
         /// <summary>
@@ -1413,11 +1427,12 @@ namespace YamuraView
         public void SaveInitFile()
         {
             XDocument setupDoc;
+            String fullPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\YamuraView.ini";
             setupDoc = new XDocument(new XDeclaration("1.0", "utf-8", "yes"),
                                             new XElement("Setup",
                                                 new XAttribute("FolderToWatch", FolderToWatch),
                                                 new XAttribute("Config", ConfigurationFile)));
-            setupDoc.Save(FolderToWatch + @"\YamuraView.ini");
+            setupDoc.Save(fullPath);
         }
         #endregion
 

@@ -43,6 +43,7 @@
             ChartTabs.Controls.Add(tabPage1);
             ChartTabs.Controls.Add(tabPage2);
             ChartTabs.Dock = DockStyle.Fill;
+            ChartTabs.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
             ChartTabs.Location = new Point(0, 0);
             ChartTabs.Name = "ChartTabs";
             ChartTabs.SelectedIndex = 0;
@@ -53,10 +54,10 @@
             // 
             tabPage1.BackColor = Color.Transparent;
             tabPage1.Controls.Add(chartView1);
-            tabPage1.Location = new Point(4, 24);
+            tabPage1.Location = new Point(4, 30);
             tabPage1.Name = "tabPage1";
             tabPage1.Padding = new Padding(3);
-            tabPage1.Size = new Size(843, 503);
+            tabPage1.Size = new Size(843, 497);
             tabPage1.TabIndex = 0;
             tabPage1.Text = "Chart";
             // 
@@ -65,27 +66,29 @@
             chartView1.Dock = DockStyle.Fill;
             chartView1.Location = new Point(3, 3);
             chartView1.Name = "chartView1";
-            //chartView1.Size = new Size(837, 497);
+            chartView1.Size = new Size(837, 491);
             chartView1.TabIndex = 0;
             // 
             // tabPage2
             // 
             tabPage2.BackColor = Color.Transparent;
             tabPage2.Controls.Add(chartProperties1);
-            tabPage2.Location = new Point(4, 24);
+            tabPage2.Location = new Point(4, 30);
             tabPage2.Name = "tabPage2";
             tabPage2.Padding = new Padding(3);
-            //tabPage2.Size = new Size(843, 503);
+            tabPage2.Size = new Size(843, 497);
             tabPage2.TabIndex = 1;
             tabPage2.Text = "Properties";
             // 
             // chartProperties1
             // 
+            chartProperties1.AutoScroll = true;
             chartProperties1.Dock = DockStyle.Fill;
+            chartProperties1.ForeColor = SystemColors.ControlText;
             chartProperties1.Location = new Point(3, 3);
             chartProperties1.Margin = new Padding(4, 3, 4, 3);
             chartProperties1.Name = "chartProperties1";
-            //chartProperties1.Size = new Size(837, 497);
+            chartProperties1.Size = new Size(837, 491);
             chartProperties1.TabIndex = 0;
             // 
             // Chart
