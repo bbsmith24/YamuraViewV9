@@ -15,8 +15,164 @@
     {
         "Entry"
         {
-        "MsmKey" = "8:_05EEE772A39A443CA321DE6A7A777B53"
+        "MsmKey" = "8:_04840B045210446787B3E26978827DA0"
         "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_0CFD8FD0F34346E38A21CBEA99CB8E6B"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_168833F8148D0BF5901EDE02BC9B8E89"
+        "OwnerKey" = "8:_04840B045210446787B3E26978827DA0"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_168833F8148D0BF5901EDE02BC9B8E89"
+        "OwnerKey" = "8:_F98CC932AA4D331CC8060153F6A0B93F"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_202CA22D663E4042B0B3EB56AB681F02"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_329A74F8095D49BC85E2DE0318CC7ABA"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_47D5A420115245FCAE9A189E7B547C75"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_4907951E6B1C4274BD527C622D126AC6"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_533CC60D8F70F7595DB7EC5F4F55C276"
+        "OwnerKey" = "8:_D08A08E6DCFA4F4087A290409CA7BF84"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_6720BAC2895C4AA68EC016D269CD054F"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_89E3BE1C6A20488A9544B252C305B13D"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_8EAD553D51A44EC4BDB670FAAB001D10"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_9EB94FA84CC748CB95460B1B780657A1"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_A640B78A13CC48DFAF8993D565E1D81C"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_ADA268905B58472E8DAAA1897B68D133"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_D08A08E6DCFA4F4087A290409CA7BF84"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_DC96E25851AC424BBFB067849FFE8F39"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_F73AC680237E4F7FB864339F2B388754"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_F98CC932AA4D331CC8060153F6A0B93F"
+        "OwnerKey" = "8:_533CC60D8F70F7595DB7EC5F4F55C276"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_F98CC932AA4D331CC8060153F6A0B93F"
+        "OwnerKey" = "8:_8EAD553D51A44EC4BDB670FAAB001D10"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_168833F8148D0BF5901EDE02BC9B8E89"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_8EAD553D51A44EC4BDB670FAAB001D10"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_D08A08E6DCFA4F4087A290409CA7BF84"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_533CC60D8F70F7595DB7EC5F4F55C276"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_F98CC932AA4D331CC8060153F6A0B93F"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_47D5A420115245FCAE9A189E7B547C75"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_04840B045210446787B3E26978827DA0"
         "MsmSig" = "8:_UNDEFINED"
         }
     }
@@ -44,6 +200,14 @@
             "PrerequisitesLocation" = "2:1"
             "Url" = "8:"
             "ComponentsUrl" = "8:"
+                "Items"
+                {
+                    "{EDC2488A-8267-493A-A98E-7D9C3B36CDF3}:.NETFramework,Version=v4.7.2"
+                    {
+                    "Name" = "8:Microsoft .NET Framework 4.7.2 (x86 and x64)"
+                    "ProductCode" = "8:.NETFramework,Version=v4.7.2"
+                    }
+                }
             }
         }
         "Release"
@@ -93,23 +257,459 @@
                 {
                 "Name" = "8:.NET Core"
                 "Message" = "8:[VSDNETCOREMSG]"
+                "FrameworkVersion" = "8:9.0"
                 "AllowLaterVersions" = "11:TRUE"
                 "InstallUrl" = "8:https://dotnet.microsoft.com/download/dotnet/9.0"
                 "IsNETCore" = "11:TRUE"
                 "Architecture" = "2:2"
                 "Runtime" = "2:0"
-                "Version" = "8:9.0"
+                }
+                "{A06ECF26-33A3-4562-8140-9B0E340D4F24}:_EA8C5E8ADA46437BA6DE5E108D70839F"
+                {
+                "Name" = "8:.NET Framework"
+                "Message" = "8:[VSDNETMSG]"
+                "FrameworkVersion" = "8:.NETFramework,Version=v4.7.2"
+                "AllowLaterVersions" = "11:FALSE"
+                "InstallUrl" = "8:http://go.microsoft.com/fwlink/?LinkId=863262"
                 }
             }
         }
         "File"
         {
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_04840B045210446787B3E26978827DA0"
+            {
+            "AssemblyRegister" = "3:1"
+            "AssemblyIsInGAC" = "11:FALSE"
+            "AssemblyAsmDisplayName" = "8:Win32Interop.Gdi32, Version=1.0.1.0, Culture=neutral, processorArchitecture=MSIL"
+                "ScatterAssemblies"
+                {
+                    "_04840B045210446787B3E26978827DA0"
+                    {
+                    "Name" = "8:Win32Interop.Gdi32.dll"
+                    "Attributes" = "3:512"
+                    }
+                }
+            "SourcePath" = "8:..\\YamuraView\\bin\\x64\\Release\\net9.0-windows\\Win32Interop.Gdi32.dll"
+            "TargetName" = "8:"
+            "Tag" = "8:"
+            "Folder" = "8:_70110CBA594142C98C72FB853FF245AC"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_0CFD8FD0F34346E38A21CBEA99CB8E6B"
+            {
+            "SourcePath" = "8:..\\YamuraView\\YamuraView.ini"
+            "TargetName" = "8:YamuraView.ini"
+            "Tag" = "8:"
+            "Folder" = "8:_2BD48657EF0841BA82023CCBA34DB06E"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_168833F8148D0BF5901EDE02BC9B8E89"
+            {
+            "AssemblyRegister" = "3:1"
+            "AssemblyIsInGAC" = "11:FALSE"
+            "AssemblyAsmDisplayName" = "8:Win32Interop.User32, Version=1.0.1.0, Culture=neutral, processorArchitecture=MSIL"
+                "ScatterAssemblies"
+                {
+                    "_168833F8148D0BF5901EDE02BC9B8E89"
+                    {
+                    "Name" = "8:Win32Interop.User32.dll"
+                    "Attributes" = "3:512"
+                    }
+                }
+            "SourcePath" = "8:Win32Interop.User32.dll"
+            "TargetName" = "8:"
+            "Tag" = "8:"
+            "Folder" = "8:_70110CBA594142C98C72FB853FF245AC"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:TRUE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_202CA22D663E4042B0B3EB56AB681F02"
+            {
+            "SourcePath" = "8:..\\YamuraView\\bin\\x64\\Release\\net9.0-windows\\YamuraView.exe"
+            "TargetName" = "8:YamuraView.exe"
+            "Tag" = "8:"
+            "Folder" = "8:_70110CBA594142C98C72FB853FF245AC"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_329A74F8095D49BC85E2DE0318CC7ABA"
+            {
+            "SourcePath" = "8:C:\\ftp_transfer_XXX\\sdLog027.yl5"
+            "TargetName" = "8:sdLog027.yl5"
+            "Tag" = "8:"
+            "Folder" = "8:_5DEDD109094E4032828420E001B82721"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_47D5A420115245FCAE9A189E7B547C75"
+            {
+            "AssemblyRegister" = "3:1"
+            "AssemblyIsInGAC" = "11:FALSE"
+            "AssemblyAsmDisplayName" = "8:Win32Interop.User32, Version=1.0.1.0, Culture=neutral, processorArchitecture=MSIL"
+                "ScatterAssemblies"
+                {
+                    "_47D5A420115245FCAE9A189E7B547C75"
+                    {
+                    "Name" = "8:Win32Interop.User32.dll"
+                    "Attributes" = "3:512"
+                    }
+                }
+            "SourcePath" = "8:..\\YamuraView\\bin\\x64\\Release\\net9.0-windows\\Win32Interop.User32.dll"
+            "TargetName" = "8:"
+            "Tag" = "8:"
+            "Folder" = "8:_70110CBA594142C98C72FB853FF245AC"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_4907951E6B1C4274BD527C622D126AC6"
+            {
+            "SourcePath" = "8:..\\YamuraView\\YamuraView.ini"
+            "TargetName" = "8:YamuraView.ini"
+            "Tag" = "8:"
+            "Folder" = "8:_70110CBA594142C98C72FB853FF245AC"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_533CC60D8F70F7595DB7EC5F4F55C276"
+            {
+            "AssemblyRegister" = "3:1"
+            "AssemblyIsInGAC" = "11:FALSE"
+            "AssemblyAsmDisplayName" = "8:YamuraViewControls, Version=1.0.0.0, Culture=neutral, processorArchitecture=AMD64"
+                "ScatterAssemblies"
+                {
+                    "_533CC60D8F70F7595DB7EC5F4F55C276"
+                    {
+                    "Name" = "8:YamuraViewControls.dll"
+                    "Attributes" = "3:512"
+                    }
+                }
+            "SourcePath" = "8:YamuraViewControls.dll"
+            "TargetName" = "8:"
+            "Tag" = "8:"
+            "Folder" = "8:_70110CBA594142C98C72FB853FF245AC"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:TRUE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_6720BAC2895C4AA68EC016D269CD054F"
+            {
+            "SourcePath" = "8:C:\\ftp_transfer_XXX\\sdLog028.yl5"
+            "TargetName" = "8:sdLog028.yl5"
+            "Tag" = "8:"
+            "Folder" = "8:_5DEDD109094E4032828420E001B82721"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_89E3BE1C6A20488A9544B252C305B13D"
+            {
+            "SourcePath" = "8:C:\\ftp_transfer_XXX\\YamuraView.xml"
+            "TargetName" = "8:YamuraView.xml"
+            "Tag" = "8:"
+            "Folder" = "8:_5DEDD109094E4032828420E001B82721"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_8EAD553D51A44EC4BDB670FAAB001D10"
+            {
+            "AssemblyRegister" = "3:1"
+            "AssemblyIsInGAC" = "11:FALSE"
+            "AssemblyAsmDisplayName" = "8:YamuraViewControls, Version=1.0.0.0, Culture=neutral, processorArchitecture=AMD64"
+                "ScatterAssemblies"
+                {
+                    "_8EAD553D51A44EC4BDB670FAAB001D10"
+                    {
+                    "Name" = "8:YamuraViewControls.dll"
+                    "Attributes" = "3:512"
+                    }
+                }
+            "SourcePath" = "8:..\\YamuraView\\bin\\x64\\Release\\net9.0-windows\\YamuraViewControls.dll"
+            "TargetName" = "8:"
+            "Tag" = "8:"
+            "Folder" = "8:_70110CBA594142C98C72FB853FF245AC"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_9EB94FA84CC748CB95460B1B780657A1"
+            {
+            "SourcePath" = "8:C:\\ftp_transfer_XXX\\sdLog030.yl5"
+            "TargetName" = "8:sdLog030.yl5"
+            "Tag" = "8:"
+            "Folder" = "8:_5DEDD109094E4032828420E001B82721"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_A640B78A13CC48DFAF8993D565E1D81C"
+            {
+            "SourcePath" = "8:C:\\ftp_transfer_XXX\\sdLog029.yl5"
+            "TargetName" = "8:sdLog029.yl5"
+            "Tag" = "8:"
+            "Folder" = "8:_5DEDD109094E4032828420E001B82721"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_D08A08E6DCFA4F4087A290409CA7BF84"
+            {
+            "AssemblyRegister" = "3:1"
+            "AssemblyIsInGAC" = "11:FALSE"
+            "AssemblyAsmDisplayName" = "8:YamuraView, Version=1.0.0.0, Culture=neutral, processorArchitecture=AMD64"
+                "ScatterAssemblies"
+                {
+                    "_D08A08E6DCFA4F4087A290409CA7BF84"
+                    {
+                    "Name" = "8:YamuraView.dll"
+                    "Attributes" = "3:512"
+                    }
+                }
+            "SourcePath" = "8:..\\YamuraView\\bin\\x64\\Release\\net9.0-windows\\YamuraView.dll"
+            "TargetName" = "8:"
+            "Tag" = "8:"
+            "Folder" = "8:_70110CBA594142C98C72FB853FF245AC"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_DC96E25851AC424BBFB067849FFE8F39"
+            {
+            "SourcePath" = "8:C:\\ftp_transfer_XXX\\sdLog031.yl5"
+            "TargetName" = "8:sdLog031.yl5"
+            "Tag" = "8:"
+            "Folder" = "8:_5DEDD109094E4032828420E001B82721"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_F73AC680237E4F7FB864339F2B388754"
+            {
+            "SourcePath" = "8:..\\YamuraView\\japan_flag.ico"
+            "TargetName" = "8:japan_flag.ico"
+            "Tag" = "8:"
+            "Folder" = "8:_70110CBA594142C98C72FB853FF245AC"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_F98CC932AA4D331CC8060153F6A0B93F"
+            {
+            "AssemblyRegister" = "3:1"
+            "AssemblyIsInGAC" = "11:FALSE"
+            "AssemblyAsmDisplayName" = "8:Win32Interop.Gdi32, Version=1.0.1.0, Culture=neutral, processorArchitecture=MSIL"
+                "ScatterAssemblies"
+                {
+                    "_F98CC932AA4D331CC8060153F6A0B93F"
+                    {
+                    "Name" = "8:Win32Interop.Gdi32.dll"
+                    "Attributes" = "3:512"
+                    }
+                }
+            "SourcePath" = "8:Win32Interop.Gdi32.dll"
+            "TargetName" = "8:"
+            "Tag" = "8:"
+            "Folder" = "8:_70110CBA594142C98C72FB853FF245AC"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:TRUE"
+            "IsolateTo" = "8:"
+            }
         }
         "FileType"
         {
         }
         "Folder"
         {
+            "{1525181F-901A-416C-8A58-119130FE478E}:_2BD48657EF0841BA82023CCBA34DB06E"
+            {
+            "Name" = "8:#1915"
+            "AlwaysCreate" = "11:FALSE"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Property" = "8:AppDataFolder"
+                "Folders"
+                {
+                }
+            }
             "{1525181F-901A-416C-8A58-119130FE478E}:_41E3F5B793274F159050C2820774E9DD"
             {
             "Name" = "8:#1916"
@@ -117,6 +717,17 @@
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Property" = "8:DesktopFolder"
+                "Folders"
+                {
+                }
+            }
+            "{1525181F-901A-416C-8A58-119130FE478E}:_5DEDD109094E4032828420E001B82721"
+            {
+            "Name" = "8:#1918"
+            "AlwaysCreate" = "11:FALSE"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Property" = "8:PersonalFolder"
                 "Folders"
                 {
                 }
@@ -161,7 +772,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:YamuraView"
         "ProductCode" = "8:{9E41C72A-2F28-4492-A09A-7953236680D5}"
-        "PackageCode" = "8:{72B7C9F8-4DE0-4743-89DE-D7B9A9782C88}"
+        "PackageCode" = "8:{8E218EBF-F0F3-4F8A-AC4B-011D04954343}"
         "UpgradeCode" = "8:{36231B09-2B03-4C83-9BFD-752B0BE9C64A}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
@@ -281,32 +892,32 @@
         }
         "Shortcut"
         {
-            "{970C0BB2-C7D0-45D7-ABFA-7EC378858BC0}:_8815B78203324983A6538E94A4347F10"
+            "{970C0BB2-C7D0-45D7-ABFA-7EC378858BC0}:_246275EBC4D94D34B2808290D9F5EEC9"
             {
-            "Name" = "8:Shortcut to YamuraView (Active)"
+            "Name" = "8:YamuraView"
             "Arguments" = "8:"
             "Description" = "8:"
             "ShowCmd" = "3:1"
             "IconIndex" = "3:0"
             "Transitive" = "11:FALSE"
-            "Target" = "8:_05EEE772A39A443CA321DE6A7A777B53"
-            "Folder" = "8:_CD96352701EF49FD83A62F67F3D08646"
-            "WorkingFolder" = "8:_70110CBA594142C98C72FB853FF245AC"
-            "Icon" = "8:"
-            "Feature" = "8:"
-            }
-            "{970C0BB2-C7D0-45D7-ABFA-7EC378858BC0}:_BB48ADF23C864530B971CF383FE18A0B"
-            {
-            "Name" = "8:Shortcut to YamuraView (Active)"
-            "Arguments" = "8:"
-            "Description" = "8:"
-            "ShowCmd" = "3:1"
-            "IconIndex" = "3:0"
-            "Transitive" = "11:FALSE"
-            "Target" = "8:_05EEE772A39A443CA321DE6A7A777B53"
+            "Target" = "8:_202CA22D663E4042B0B3EB56AB681F02"
             "Folder" = "8:_41E3F5B793274F159050C2820774E9DD"
             "WorkingFolder" = "8:_70110CBA594142C98C72FB853FF245AC"
-            "Icon" = "8:"
+            "Icon" = "8:_F73AC680237E4F7FB864339F2B388754"
+            "Feature" = "8:"
+            }
+            "{970C0BB2-C7D0-45D7-ABFA-7EC378858BC0}:_EB833EE26A064F5F99C4B7BCF36A3382"
+            {
+            "Name" = "8:YamuraView"
+            "Arguments" = "8:"
+            "Description" = "8:"
+            "ShowCmd" = "3:1"
+            "IconIndex" = "3:0"
+            "Transitive" = "11:FALSE"
+            "Target" = "8:_202CA22D663E4042B0B3EB56AB681F02"
+            "Folder" = "8:_CD96352701EF49FD83A62F67F3D08646"
+            "WorkingFolder" = "8:_70110CBA594142C98C72FB853FF245AC"
+            "Icon" = "8:_F73AC680237E4F7FB864339F2B388754"
             "Feature" = "8:"
             }
         }
@@ -708,9 +1319,9 @@
         }
         "ProjectOutput"
         {
-            "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_05EEE772A39A443CA321DE6A7A777B53"
+            "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_ADA268905B58472E8DAAA1897B68D133"
             {
-            "SourcePath" = "8:..\\YamuraView\\obj\\Release\\net9.0-windows\\apphost.exe"
+            "SourcePath" = "8:..\\YamuraView\\obj\\x64\\Release\\net9.0-windows\\YamuraView.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_70110CBA594142C98C72FB853FF245AC"
@@ -729,7 +1340,7 @@
             "IsolateTo" = "8:"
             "ProjectOutputGroupRegister" = "3:1"
             "OutputConfiguration" = "8:"
-            "OutputGroupCanonicalName" = "8:PublishItems"
+            "OutputGroupCanonicalName" = "8:Built"
             "OutputProjectGuid" = "8:{307DFF32-1565-4813-86B5-6B283D008BBE}"
             "ShowKeyOutput" = "11:TRUE"
                 "ExcludeFilters"
