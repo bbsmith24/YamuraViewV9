@@ -501,48 +501,6 @@
         }
         "Shortcut"
         {
-            "{970C0BB2-C7D0-45D7-ABFA-7EC378858BC0}:_794B93C7588E4CD89197FFEC81A5A557"
-            {
-            "Name" = "8:Shortcut to %sPublish Items from YamuraView (Active)"
-            "Arguments" = "8:"
-            "Description" = "8:"
-            "ShowCmd" = "3:1"
-            "IconIndex" = "3:0"
-            "Transitive" = "11:FALSE"
-            "Target" = "8:_654F62516F4E4F458FD6987D32A7E237"
-            "Folder" = "8:_41E3F5B793274F159050C2820774E9DD"
-            "WorkingFolder" = "8:_70110CBA594142C98C72FB853FF245AC"
-            "Icon" = "8:"
-            "Feature" = "8:"
-            }
-            "{970C0BB2-C7D0-45D7-ABFA-7EC378858BC0}:_95EC21CF3A004CAAB46558FF54C552E3"
-            {
-            "Name" = "8:Shortcut to %sUser's Desktop"
-            "Arguments" = "8:"
-            "Description" = "8:"
-            "ShowCmd" = "3:1"
-            "IconIndex" = "3:0"
-            "Transitive" = "11:FALSE"
-            "Target" = "8:_41E3F5B793274F159050C2820774E9DD"
-            "Folder" = "8:_41E3F5B793274F159050C2820774E9DD"
-            "WorkingFolder" = "8:_41E3F5B793274F159050C2820774E9DD"
-            "Icon" = "8:"
-            "Feature" = "8:"
-            }
-            "{970C0BB2-C7D0-45D7-ABFA-7EC378858BC0}:_F324A4F8BF6E49629A3B7086832436CF"
-            {
-            "Name" = "8:Shortcut to %sUser's Programs Menu"
-            "Arguments" = "8:"
-            "Description" = "8:"
-            "ShowCmd" = "3:1"
-            "IconIndex" = "3:0"
-            "Transitive" = "11:FALSE"
-            "Target" = "8:_CD96352701EF49FD83A62F67F3D08646"
-            "Folder" = "8:_CD96352701EF49FD83A62F67F3D08646"
-            "WorkingFolder" = "8:_CD96352701EF49FD83A62F67F3D08646"
-            "Icon" = "8:"
-            "Feature" = "8:"
-            }
         }
         "UserInterface"
         {
