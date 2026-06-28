@@ -154,12 +154,13 @@ namespace YamuraViewControls
         HashSet<string> pendingInvertChannels = new HashSet<string>();
 
         List<Color> autoColors = new List<Color> { Color.Pink,
-                                                   Color.LightSkyBlue,
-                                                   Color.LightGreen,
-                                                   Color.LightPink,
-                                                   Color.Yellow,
+                                                   Color.LimeGreen,
                                                    Color.Cyan,
-                                                   Color.LightGray };
+                                                   Color.Yellow,
+                                                   Color.LightSkyBlue,
+                                                   Color.LightGray,
+                                                   Color.LightPink
+                                                 };
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public List<Color> AutoColors
         {

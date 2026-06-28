@@ -67,8 +67,31 @@ namespace GDI
         SYSTEM_FIXED_FONT = 16,
     }
     #endregion enumerations
+
+    public static class Gdi32
+    {
+        [System.Runtime.InteropServices.DllImport("gdi32.dll")]
+        public static extern IntPtr CreatePen(int fnPenStyle, int nWidth, uint crColor);
+        [System.Runtime.InteropServices.DllImport("gdi32.dll")]
+        public static extern IntPtr GetStockObject(int fnObject);
+        [System.Runtime.InteropServices.DllImport("gdi32.dll")]
+        public static extern IntPtr SelectObject(IntPtr hdc, IntPtr hgdiobj);
+        [System.Runtime.InteropServices.DllImport("gdi32.dll")]
+        public static extern int SetROP2(IntPtr hdc, int fnDrawMode);
+        [System.Runtime.InteropServices.DllImport("gdi32.dll")]
+        public static extern bool MoveToEx(IntPtr hdc, int x, int y, IntPtr lpPoint);
+        [System.Runtime.InteropServices.DllImport("gdi32.dll")]
+        public static extern bool LineTo(IntPtr hdc, int nXEnd, int nYEnd);
+        [System.Runtime.InteropServices.DllImport("gdi32.dll")]
+        public static extern bool Rectangle(IntPtr hdc, int nLeftRect, int nTopRect, int nRightRect, int nBottomRect);
+        [System.Runtime.InteropServices.DllImport("gdi32.dll")]
+        public static extern bool Ellipse(IntPtr hdc, int nLeftRect, int nTopRect, int nRightRect, int nBottomRect);
+        [System.Runtime.InteropServices.DllImport("gdi32.dll")]
+        public static extern bool DeleteObject(IntPtr hObject);
+    }
+
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public class GDI32
     {

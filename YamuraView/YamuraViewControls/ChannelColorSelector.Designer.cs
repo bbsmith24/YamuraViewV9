@@ -5,7 +5,7 @@
         /// <summary>
         /// Required designer variable.
         /// </summary>
-        private System.ComponentModel.IContainer components = null;
+        //private System.ComponentModel.IContainer components = null;
 
         /// <summary>
         /// Clean up any resources being used.
@@ -119,13 +119,5 @@
         }
 
         #endregion
-
-        //public System.Windows.Forms.Panel color1;
-        //public System.Windows.Forms.Panel color2;
-        //public System.Windows.Forms.Panel color3;
-        //public System.Windows.Forms.Panel color4;
-        //public System.Windows.Forms.Panel color5;
-        //public System.Windows.Forms.Panel color6;
-        //public System.Windows.Forms.Panel color0;
     }
 }

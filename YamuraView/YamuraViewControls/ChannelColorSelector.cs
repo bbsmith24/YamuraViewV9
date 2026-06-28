@@ -14,7 +14,7 @@ namespace YamuraViewControls
 
     public partial class ChannelColorSelector : Form
     {
-        public event ColorSelect ColorSelectEvent;
+        //public event ColorSelect ColorSelectEvent;
 
         public Color selectedColor;
         public ChannelColorSelector()

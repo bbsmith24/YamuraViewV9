@@ -11,8 +11,6 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows.Forms.PropertyGridInternal;
-using Win32Interop.Methods;
-using Win32Interop.Structs;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace YamuraViewControls

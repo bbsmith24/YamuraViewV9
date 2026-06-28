@@ -142,7 +142,7 @@ namespace YamuraViewControls
 
             ChannelColorSelector embeddedColorDialog = new ChannelColorSelector();
 
-            embeddedColorDialog.ColorSelectEvent += EmbeddedColorDialog_ColorSelectEvent;
+            //embeddedColorDialog.ColorSelectEvent += EmbeddedColorDialog_ColorSelectEvent;
 
             //ToolStripControlHost colorDialogHost = new ToolStripControlHost(embeddedColorDialog as Control);
             //colorDialogHost.Text = "Channel Color";
@@ -158,12 +158,12 @@ namespace YamuraViewControls
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void EmbeddedColorDialog_ColorSelectEvent(object sender, ColorSelectEventArgs e)
-        {
-            //String axisName = axisChannelTree.SelectedNode.Parent.Text;
-            //String channelName = axisChannelTree.SelectedNode.Text;
-            //ChartOwner.Y_Axes[axisName].AssociatedChannels[channelName].ChannelColor = e.SelectedColor;
-        }
+        //private void EmbeddedColorDialog_ColorSelectEvent(object sender, ColorSelectEventArgs e)
+        //{
+        //    //String axisName = axisChannelTree.SelectedNode.Parent.Text;
+        //    //String channelName = axisChannelTree.SelectedNode.Text;
+        //    //ChartOwner.Y_Axes[axisName].AssociatedChannels[channelName].ChannelColor = e.SelectedColor;
+        //}
         /// <summary>
         /// 
         /// </summary>
