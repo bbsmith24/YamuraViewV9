@@ -6,13 +6,14 @@ using System.Text;
 using System.Xml;
 using System.Xml.Linq;
 using YamuraViewControls;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace YamuraView
 {
     public partial class YamuraView : Form
     {
         #region members
-        private Button colorButton = new Button();
+        //private Button colorButton = new Button();
         List<Color> penColors = new List<Color>();
         private List<Task> tasks = new List<Task>();
 
@@ -46,7 +47,7 @@ namespace YamuraView
             InitializeComponent();
             ConfigurationFile = "";
             FolderToWatch = @"C:\ftp_transfer";
-            if(!Directory.Exists(FolderToWatch))
+            if (!Directory.Exists(FolderToWatch))
             {
                 MessageBox.Show("Select autoload folder", "Autoload", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 if (selectAutoAddFolder.ShowDialog() != DialogResult.Cancel)
@@ -852,7 +853,7 @@ namespace YamuraView
                 }
             }
 
-            dataLogger.runData[runIdx].AddChannel("DeltaTime", "DeltaTime", "Calculated", dataLogger.runData[runIdx].runName, 1.0F); 
+            dataLogger.runData[runIdx].AddChannel("DeltaTime", "DeltaTime", "Calculated", dataLogger.runData[runIdx].runName, 1.0F);
             /// restore default cursor
             /// show any errors encountered during parsing
             if (errStr.Length > 0)
@@ -1415,7 +1416,7 @@ namespace YamuraView
             XElement root = setupDoc.Element("Setup");
             FolderToWatch = (string?)root?.Attribute("FolderToWatch") ?? @"C:\ftp_transfer";
             ConfigurationFile = (string)root?.Attribute("Config");// ?? @"C:\ftp_transfer\YamuraView.xml";
-            if((ConfigurationFile == null) || (ConfigurationFile.Length == 0))
+            if ((ConfigurationFile == null) || (ConfigurationFile.Length == 0))
             {
                 ConfigurationFile = @"C:\ftp_transfer\YamuraView.xml";
             }
@@ -1655,8 +1656,8 @@ namespace YamuraView
                 runSelect.cmbSelectRun.Items.Add(run.runName);
             }
             if (runSelect.ShowDialog() != DialogResult.OK)
-            { 
-                return; 
+            {
+                return;
             }
             Cursor = Cursors.WaitCursor;
             int selectedBaseRun = runSelect.cmbSelectRun.SelectedIndex;
@@ -1716,6 +1717,12 @@ namespace YamuraView
             }
             Cursor = Cursors.Default;
         }
+
         #endregion
+
+        private void btnZoomAll_Click(object sender, EventArgs e)
+        {
+            chartControls[0].chartView1.ZoomAll();
+        }
     }
 }

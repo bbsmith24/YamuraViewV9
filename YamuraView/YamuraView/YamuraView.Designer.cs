@@ -31,6 +31,7 @@
             components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(YamuraView));
             splitContainer1 = new SplitContainer();
+            btnZoomAll = new Button();
             StripChart = new YamuraViewControls.Chart();
             splitContainer2 = new SplitContainer();
             TrackMap = new YamuraViewControls.Chart();
@@ -47,13 +48,13 @@
             toolStripSeparator3 = new ToolStripSeparator();
             timeAlignSetupToolStripMenuItem = new ToolStripMenuItem();
             distanceAlignSetupToolStripMenuItem = new ToolStripMenuItem();
+            addDeltaTimeToolStripMenuItem = new ToolStripMenuItem();
             toolStripSeparator1 = new ToolStripSeparator();
             exitToolStripMenuItem = new ToolStripMenuItem();
             checkAutoAddTimer = new System.Windows.Forms.Timer(components);
             selectAutoAddFolder = new FolderBrowserDialog();
             saveConfigFileDialog = new SaveFileDialog();
             openConfigFileDialog = new OpenFileDialog();
-            addDeltaTimeToolStripMenuItem = new ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)splitContainer1).BeginInit();
             splitContainer1.Panel1.SuspendLayout();
             splitContainer1.Panel2.SuspendLayout();
@@ -75,6 +76,7 @@
             // 
             // splitContainer1.Panel1
             // 
+            splitContainer1.Panel1.Controls.Add(btnZoomAll);
             splitContainer1.Panel1.Controls.Add(StripChart);
             // 
             // splitContainer1.Panel2
@@ -84,6 +86,18 @@
             splitContainer1.SplitterDistance = 554;
             splitContainer1.SplitterWidth = 5;
             splitContainer1.TabIndex = 0;
+            // 
+            // btnZoomAll
+            // 
+            btnZoomAll.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            btnZoomAll.ForeColor = SystemColors.ActiveCaptionText;
+            btnZoomAll.Location = new Point(472, 3);
+            btnZoomAll.Name = "btnZoomAll";
+            btnZoomAll.Size = new Size(75, 23);
+            btnZoomAll.TabIndex = 1;
+            btnZoomAll.Text = "Zoom All";
+            btnZoomAll.UseVisualStyleBackColor = true;
+            btnZoomAll.Click += btnZoomAll_Click;
             // 
             // StripChart
             // 
@@ -214,6 +228,13 @@
             distanceAlignSetupToolStripMenuItem.Size = new Size(221, 26);
             distanceAlignSetupToolStripMenuItem.Text = "Distance Align setup";
             // 
+            // addDeltaTimeToolStripMenuItem
+            // 
+            addDeltaTimeToolStripMenuItem.Name = "addDeltaTimeToolStripMenuItem";
+            addDeltaTimeToolStripMenuItem.Size = new Size(221, 26);
+            addDeltaTimeToolStripMenuItem.Text = "Add Delta Time";
+            addDeltaTimeToolStripMenuItem.Click += AddDeltaTimeToolStripMenuItem_Click;
+            // 
             // toolStripSeparator1
             // 
             toolStripSeparator1.Name = "toolStripSeparator1";
@@ -241,13 +262,6 @@
             // 
             openConfigFileDialog.FileName = "YamuraView.xml";
             openConfigFileDialog.Filter = "YamuraView Config|*.xml";
-            // 
-            // addDeltaTimeToolStripMenuItem
-            // 
-            addDeltaTimeToolStripMenuItem.Name = "addDeltaTimeToolStripMenuItem";
-            addDeltaTimeToolStripMenuItem.Size = new Size(221, 26);
-            addDeltaTimeToolStripMenuItem.Text = "Add Delta Time";
-            addDeltaTimeToolStripMenuItem.Click += AddDeltaTimeToolStripMenuItem_Click;
             // 
             // YamuraView
             // 
@@ -303,5 +317,6 @@
         private SaveFileDialog saveConfigFileDialog;
         private OpenFileDialog openConfigFileDialog;
         private ToolStripMenuItem addDeltaTimeToolStripMenuItem;
+        private Button btnZoomAll;
     }
 }

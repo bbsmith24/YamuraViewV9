@@ -21,26 +21,14 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_202CA22D663E4042B0B3EB56AB681F02"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_329A74F8095D49BC85E2DE0318CC7ABA"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
-        "MsmKey" = "8:_4907951E6B1C4274BD527C622D126AC6"
+        "MsmKey" = "8:_654F62516F4E4F458FD6987D32A7E237"
         "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_533CC60D8F70F7595DB7EC5F4F55C276"
-        "OwnerKey" = "8:_D08A08E6DCFA4F4087A290409CA7BF84"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -52,12 +40,6 @@
         "Entry"
         {
         "MsmKey" = "8:_89E3BE1C6A20488A9544B252C305B13D"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_8EAD553D51A44EC4BDB670FAAB001D10"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -75,25 +57,7 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_ADA268905B58472E8DAAA1897B68D133"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_D08A08E6DCFA4F4087A290409CA7BF84"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_DC96E25851AC424BBFB067849FFE8F39"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_F73AC680237E4F7FB864339F2B388754"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -179,7 +143,7 @@
                 {
                 "Name" = "8:.NET Core"
                 "Message" = "8:[VSDNETCOREMSG]"
-                "FrameworkVersion" = "8:9.0 "
+                "FrameworkVersion" = "8:9.0  "
                 "AllowLaterVersions" = "11:TRUE"
                 "InstallUrl" = "8:https://dotnet.microsoft.com/download/dotnet/9.0"
                 "IsNETCore" = "11:TRUE"
@@ -218,26 +182,6 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_202CA22D663E4042B0B3EB56AB681F02"
-            {
-            "SourcePath" = "8:..\\YamuraView\\bin\\x64\\Release\\net9.0-windows\\YamuraView.exe"
-            "TargetName" = "8:YamuraView.exe"
-            "Tag" = "8:"
-            "Folder" = "8:_70110CBA594142C98C72FB853FF245AC"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_329A74F8095D49BC85E2DE0318CC7ABA"
             {
             "SourcePath" = "8:C:\\ftp_transfer_XXX\\sdLog027.yl5"
@@ -256,57 +200,6 @@
             "Register" = "3:1"
             "Exclude" = "11:FALSE"
             "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_4907951E6B1C4274BD527C622D126AC6"
-            {
-            "SourcePath" = "8:..\\YamuraView\\YamuraView.ini"
-            "TargetName" = "8:YamuraView.ini"
-            "Tag" = "8:"
-            "Folder" = "8:_70110CBA594142C98C72FB853FF245AC"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
-            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_533CC60D8F70F7595DB7EC5F4F55C276"
-            {
-            "AssemblyRegister" = "3:1"
-            "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:YamuraViewControls, Version=1.0.0.0, Culture=neutral, processorArchitecture=AMD64"
-                "ScatterAssemblies"
-                {
-                    "_533CC60D8F70F7595DB7EC5F4F55C276"
-                    {
-                    "Name" = "8:YamuraViewControls.dll"
-                    "Attributes" = "3:512"
-                    }
-                }
-            "SourcePath" = "8:YamuraViewControls.dll"
-            "TargetName" = "8:"
-            "Tag" = "8:"
-            "Folder" = "8:_70110CBA594142C98C72FB853FF245AC"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_6720BAC2895C4AA68EC016D269CD054F"
@@ -335,37 +228,6 @@
             "TargetName" = "8:YamuraView.xml"
             "Tag" = "8:"
             "Folder" = "8:_5DEDD109094E4032828420E001B82721"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
-            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_8EAD553D51A44EC4BDB670FAAB001D10"
-            {
-            "AssemblyRegister" = "3:1"
-            "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:YamuraViewControls, Version=1.0.0.0, Culture=neutral, processorArchitecture=AMD64"
-                "ScatterAssemblies"
-                {
-                    "_8EAD553D51A44EC4BDB670FAAB001D10"
-                    {
-                    "Name" = "8:YamuraViewControls.dll"
-                    "Attributes" = "3:512"
-                    }
-                }
-            "SourcePath" = "8:..\\YamuraView\\bin\\x64\\Release\\net9.0-windows\\YamuraViewControls.dll"
-            "TargetName" = "8:"
-            "Tag" = "8:"
-            "Folder" = "8:_70110CBA594142C98C72FB853FF245AC"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -420,63 +282,12 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_D08A08E6DCFA4F4087A290409CA7BF84"
-            {
-            "AssemblyRegister" = "3:1"
-            "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:YamuraView, Version=1.0.0.0, Culture=neutral, processorArchitecture=AMD64"
-                "ScatterAssemblies"
-                {
-                    "_D08A08E6DCFA4F4087A290409CA7BF84"
-                    {
-                    "Name" = "8:YamuraView.dll"
-                    "Attributes" = "3:512"
-                    }
-                }
-            "SourcePath" = "8:..\\YamuraView\\bin\\x64\\Release\\net9.0-windows\\YamuraView.dll"
-            "TargetName" = "8:"
-            "Tag" = "8:"
-            "Folder" = "8:_70110CBA594142C98C72FB853FF245AC"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_DC96E25851AC424BBFB067849FFE8F39"
             {
             "SourcePath" = "8:C:\\ftp_transfer_XXX\\sdLog031.yl5"
             "TargetName" = "8:sdLog031.yl5"
             "Tag" = "8:"
             "Folder" = "8:_5DEDD109094E4032828420E001B82721"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_F73AC680237E4F7FB864339F2B388754"
-            {
-            "SourcePath" = "8:..\\YamuraView\\japan_flag.ico"
-            "TargetName" = "8:japan_flag.ico"
-            "Tag" = "8:"
-            "Folder" = "8:_70110CBA594142C98C72FB853FF245AC"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -570,7 +381,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:YamuraView"
         "ProductCode" = "8:{9E41C72A-2F28-4492-A09A-7953236680D5}"
-        "PackageCode" = "8:{AE4AE4A6-5929-4C29-B1C6-7DAAE6049131}"
+        "PackageCode" = "8:{FC169906-CF7E-4230-A565-259A1329C3E4}"
         "UpgradeCode" = "8:{36231B09-2B03-4C83-9BFD-752B0BE9C64A}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
@@ -690,59 +501,45 @@
         }
         "Shortcut"
         {
-            "{970C0BB2-C7D0-45D7-ABFA-7EC378858BC0}:_246275EBC4D94D34B2808290D9F5EEC9"
+            "{970C0BB2-C7D0-45D7-ABFA-7EC378858BC0}:_794B93C7588E4CD89197FFEC81A5A557"
             {
-            "Name" = "8:YamuraView"
-            "Arguments" = "8:"
-            "Description" = "8:"
-            "ShowCmd" = "3:1"
-            "IconIndex" = "3:0"
-            "Transitive" = "11:TRUE"
-            "Target" = "8:_202CA22D663E4042B0B3EB56AB681F02"
-            "Folder" = "8:_41E3F5B793274F159050C2820774E9DD"
-            "WorkingFolder" = "8:_70110CBA594142C98C72FB853FF245AC"
-            "Icon" = "8:"
-            "Feature" = "8:"
-            }
-            "{970C0BB2-C7D0-45D7-ABFA-7EC378858BC0}:_7EBC5408382F46AD896302CA9A028F0A"
-            {
-            "Name" = "8:Shortcut to %sYamuraView.exe"
+            "Name" = "8:Shortcut to %sPublish Items from YamuraView (Active)"
             "Arguments" = "8:"
             "Description" = "8:"
             "ShowCmd" = "3:1"
             "IconIndex" = "3:0"
             "Transitive" = "11:FALSE"
-            "Target" = "8:_202CA22D663E4042B0B3EB56AB681F02"
-            "Folder" = "8:_CD96352701EF49FD83A62F67F3D08646"
-            "WorkingFolder" = "8:_70110CBA594142C98C72FB853FF245AC"
-            "Icon" = "8:"
-            "Feature" = "8:"
-            }
-            "{970C0BB2-C7D0-45D7-ABFA-7EC378858BC0}:_AFAD18AF60B34D2E99C29E61A6282EFB"
-            {
-            "Name" = "8:Shortcut to %sYamuraView.exe"
-            "Arguments" = "8:"
-            "Description" = "8:"
-            "ShowCmd" = "3:1"
-            "IconIndex" = "3:0"
-            "Transitive" = "11:FALSE"
-            "Target" = "8:_202CA22D663E4042B0B3EB56AB681F02"
+            "Target" = "8:_654F62516F4E4F458FD6987D32A7E237"
             "Folder" = "8:_41E3F5B793274F159050C2820774E9DD"
             "WorkingFolder" = "8:_70110CBA594142C98C72FB853FF245AC"
             "Icon" = "8:"
             "Feature" = "8:"
             }
-            "{970C0BB2-C7D0-45D7-ABFA-7EC378858BC0}:_EB833EE26A064F5F99C4B7BCF36A3382"
+            "{970C0BB2-C7D0-45D7-ABFA-7EC378858BC0}:_95EC21CF3A004CAAB46558FF54C552E3"
             {
-            "Name" = "8:YamuraView"
+            "Name" = "8:Shortcut to %sUser's Desktop"
             "Arguments" = "8:"
             "Description" = "8:"
             "ShowCmd" = "3:1"
             "IconIndex" = "3:0"
-            "Transitive" = "11:TRUE"
-            "Target" = "8:_202CA22D663E4042B0B3EB56AB681F02"
+            "Transitive" = "11:FALSE"
+            "Target" = "8:_41E3F5B793274F159050C2820774E9DD"
+            "Folder" = "8:_41E3F5B793274F159050C2820774E9DD"
+            "WorkingFolder" = "8:_41E3F5B793274F159050C2820774E9DD"
+            "Icon" = "8:"
+            "Feature" = "8:"
+            }
+            "{970C0BB2-C7D0-45D7-ABFA-7EC378858BC0}:_F324A4F8BF6E49629A3B7086832436CF"
+            {
+            "Name" = "8:Shortcut to %sUser's Programs Menu"
+            "Arguments" = "8:"
+            "Description" = "8:"
+            "ShowCmd" = "3:1"
+            "IconIndex" = "3:0"
+            "Transitive" = "11:FALSE"
+            "Target" = "8:_CD96352701EF49FD83A62F67F3D08646"
             "Folder" = "8:_CD96352701EF49FD83A62F67F3D08646"
-            "WorkingFolder" = "8:_70110CBA594142C98C72FB853FF245AC"
+            "WorkingFolder" = "8:_CD96352701EF49FD83A62F67F3D08646"
             "Icon" = "8:"
             "Feature" = "8:"
             }
@@ -1145,9 +942,9 @@
         }
         "ProjectOutput"
         {
-            "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_ADA268905B58472E8DAAA1897B68D133"
+            "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_654F62516F4E4F458FD6987D32A7E237"
             {
-            "SourcePath" = "8:..\\YamuraView\\obj\\x64\\Release\\net9.0-windows\\YamuraView.dll"
+            "SourcePath" = "8:..\\YamuraView\\obj\\x64\\Release\\net9.0-windows\\apphost.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_70110CBA594142C98C72FB853FF245AC"
@@ -1166,7 +963,7 @@
             "IsolateTo" = "8:"
             "ProjectOutputGroupRegister" = "3:1"
             "OutputConfiguration" = "8:"
-            "OutputGroupCanonicalName" = "8:Built"
+            "OutputGroupCanonicalName" = "8:PublishItems"
             "OutputProjectGuid" = "8:{307DFF32-1565-4813-86B5-6B283D008BBE}"
             "ShowKeyOutput" = "11:TRUE"
                 "ExcludeFilters"

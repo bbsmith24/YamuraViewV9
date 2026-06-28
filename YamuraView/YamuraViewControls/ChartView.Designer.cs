@@ -31,9 +31,9 @@
             chartPanel = new Panel();
             hScrollBar = new HScrollBar();
             SuspendLayout();
-            //
+            // 
             // chartPanel
-            //
+            // 
             chartPanel.BackColor = Color.Black;
             chartPanel.Location = new Point(0, 0);
             chartPanel.Name = "chartPanel";
@@ -45,27 +45,26 @@
             chartPanel.MouseMove += OnChartMouseMove;
             chartPanel.MouseUp += chartPanel_MouseUp;
             chartPanel.Resize += chartPanel_Resize;
-            //
+            // 
             // hScrollBar
-            //
+            // 
             hScrollBar.Location = new Point(0, 128);
             hScrollBar.Name = "hScrollBar";
             hScrollBar.Size = new Size(150, 17);
             hScrollBar.TabIndex = 2;
-            //
+            // 
             // ChartView
-            //
+            // 
             AutoScaleMode = AutoScaleMode.None;
             Controls.Add(hScrollBar);
             Controls.Add(chartPanel);
             Name = "ChartView";
-            this.Resize += ChartView_Resize;
+            Resize += ChartView_Resize;
             ResumeLayout(false);
         }
 
         #endregion
-
-        private Panel chartPanel;
         private HScrollBar hScrollBar;
+        public Panel chartPanel;
     }
 }

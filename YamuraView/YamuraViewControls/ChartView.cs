@@ -523,22 +523,22 @@ namespace YamuraViewControls
         /// <param name="e"></param>
         internal void chartPanel_MouseDoubleClick(object sender, MouseEventArgs e)
         {
-            if (ChartOwner == null || ChartOwner.X_Axes == null || ChartOwner.X_Axes.Count == 0) return;
-            if (ChartOwner.XChannelName != "Time" && ChartOwner.XChannelName != "Distance") return;
-            Axis xAxis = ChartOwner.X_Axes.ElementAtOrDefault(0).Value;
-            if (xAxis == null) return;
-            xAxis.AxisDisplayRange[0] = xAxis.AxisValueRange[0];
-            xAxis.AxisDisplayRange[1] = xAxis.AxisValueRange[1];
-            xAxis.AxisDisplayRange[2] = xAxis.AxisValueRange[2];
-            UpdateScrollbarFromAxis(xAxis);
-            ChartZoomChangeEvent?.Invoke(this, new ChartZoomChangeEventArgs
-            {
-                RangeMin = xAxis.AxisValueRange[0],
-                RangeMax = xAxis.AxisValueRange[1],
-                XChannelName = ChartOwner.XChannelName,
-                IsReset = true
-            });
-            chartPanel.Invalidate();
+            //if (ChartOwner == null || ChartOwner.X_Axes == null || ChartOwner.X_Axes.Count == 0) return;
+            //if (ChartOwner.XChannelName != "Time" && ChartOwner.XChannelName != "Distance") return;
+            //Axis xAxis = ChartOwner.X_Axes.ElementAtOrDefault(0).Value;
+            //if (xAxis == null) return;
+            //xAxis.AxisDisplayRange[0] = xAxis.AxisValueRange[0];
+            //xAxis.AxisDisplayRange[1] = xAxis.AxisValueRange[1];
+            //xAxis.AxisDisplayRange[2] = xAxis.AxisValueRange[2];
+            //UpdateScrollbarFromAxis(xAxis);
+            //ChartZoomChangeEvent?.Invoke(this, new ChartZoomChangeEventArgs
+            //{
+            //    RangeMin = xAxis.AxisValueRange[0],
+            //    RangeMax = xAxis.AxisValueRange[1],
+            //    XChannelName = ChartOwner.XChannelName,
+            //    IsReset = true
+            //});
+            //chartPanel.Invalidate();
         }
         internal void chartPanel_MouseDown(object sender, MouseEventArgs e)
         {
@@ -597,7 +597,7 @@ namespace YamuraViewControls
                 chartPanel.Invalidate();
             }
         }
-        private void UpdateScrollbarFromAxis(Axis xAxis)
+        public void UpdateScrollbarFromAxis(Axis xAxis)
         {
             // scrollbar uses integer positions; scale by 1000 to preserve sub-second precision
             const int scale = 1000;
@@ -1290,6 +1290,29 @@ namespace YamuraViewControls
                 }
             }
             return found;
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        public void ZoomAll()
+        {
+            if (ChartOwner == null || ChartOwner.X_Axes == null || ChartOwner.X_Axes.Count == 0) return;
+            if (ChartOwner.XChannelName != "Time" && ChartOwner.XChannelName != "Distance") return;
+            Axis xAxis = ChartOwner.X_Axes.ElementAtOrDefault(0).Value;
+            if (xAxis == null) return;
+            xAxis.AxisDisplayRange[0] = xAxis.AxisValueRange[0];
+            xAxis.AxisDisplayRange[1] = xAxis.AxisValueRange[1];
+            xAxis.AxisDisplayRange[2] = xAxis.AxisValueRange[2];
+            UpdateScrollbarFromAxis(xAxis);
+            ChartZoomChangeEvent?.Invoke(this, new ChartZoomChangeEventArgs
+            {
+                RangeMin = xAxis.AxisValueRange[0],
+                RangeMax = xAxis.AxisValueRange[1],
+                XChannelName = ChartOwner.XChannelName,
+                IsReset = true
+            });
+            chartPanel.Invalidate();
+
         }
     }
     /// <summary>
