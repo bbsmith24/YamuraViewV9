@@ -51,7 +51,7 @@ namespace YamuraView
             if (!Directory.Exists(FolderToWatch))
             {
                 MessageBox.Show("Select autoload folder", "Autoload", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                if (selectAutoAddFolder.ShowDialog() != DialogResult.Cancel)
+                if (selectAutoAddFolder.ShowDialog(this) != DialogResult.Cancel)
                 {
                     FolderToWatch = selectAutoAddFolder.SelectedPath;
                 }
@@ -142,6 +142,10 @@ namespace YamuraView
             checkAutoAddTimer.Interval = 30000;
             checkAutoAddTimer.Start();
             #endregion
+
+            var dialog = new AutoCloseDialog("YamuraView", "Welcome to YamuraView\nFull Send, Full Time!");
+            dialog.ShowDialog(this); // Suspends main window until the timer completes
+
         }
         #endregion
 
@@ -507,7 +511,7 @@ namespace YamuraView
             {
                 FileInfo errInfo = new FileInfo();
                 errInfo.FileInfoText = errStr.ToString();
-                errInfo.ShowDialog();
+                errInfo.ShowDialog(this);
             }
             AddLatestDataToCharts();
             Cursor = Cursors.Default;
@@ -861,7 +865,7 @@ namespace YamuraView
             {
                 FileInfo errInfo = new FileInfo();
                 errInfo.FileInfoText = errStr.ToString();
-                errInfo.ShowDialog();
+                errInfo.ShowDialog(this);
             }
             AlignGPS();
             AlignTime();
@@ -1446,7 +1450,7 @@ namespace YamuraView
         /// <param name="e"></param>
         private void AddRunsMenuItem_Click(object sender, EventArgs e)
         {
-            if (openLogFile.ShowDialog() != DialogResult.OK)
+            if (openLogFile.ShowDialog(this) != DialogResult.OK)
             {
                 return;
             }
@@ -1465,7 +1469,7 @@ namespace YamuraView
                 catch
                 {
                     dialog = new AutoCloseDialog("YamuraView", "Unable to open " + fileName + "\ntry again later");
-                    dialog.ShowDialog(); // Suspends main window until the timer completes
+                    dialog.ShowDialog(this); // Suspends main window until the timer completes
                     continue;
                 }
                 #endregion
@@ -1497,7 +1501,7 @@ namespace YamuraView
                 else
                 {
                     dialog = new AutoCloseDialog("YamuraView", "Unknown file type\n" + fileName);
-                    dialog.ShowDialog(); // Suspends main window until the timer completes
+                    dialog.ShowDialog(this); // Suspends main window until the timer completes
                     continue;
                 }
             }
@@ -1548,7 +1552,7 @@ namespace YamuraView
             catch
             {
                 dialog = new AutoCloseDialog("YamuraView", "Unable to open " + loadFileName + "\ntry again later");
-                dialog.ShowDialog(); // Suspends main window until the timer completes
+                dialog.ShowDialog(this); // Suspends main window until the timer completes
                 return;
             }
             #endregion
@@ -1572,11 +1576,11 @@ namespace YamuraView
             else
             {
                 dialog = new AutoCloseDialog("YamuraView", "Unknown file type\n" + loadFileName);
-                dialog.ShowDialog(); // Suspends main window until the timer completes
+                dialog.ShowDialog(this); // Suspends main window until the timer completes
                 return;
             }
             dialog = new AutoCloseDialog("YamuraView", "Loaded\n" + loadFileName);
-            dialog.ShowDialog(); // Suspends main window until the timer completes
+            dialog.ShowDialog(this); // Suspends main window until the timer completes
 
             #endregion
         }
@@ -1595,7 +1599,7 @@ namespace YamuraView
 
             timeAlignDialog.SetState(timeAlign, timeAlignChannel, timeAlignThreshold, timeAlignRisingEdge);
 
-            if (timeAlignDialog.ShowDialog() != DialogResult.OK)
+            if (timeAlignDialog.ShowDialog(this) != DialogResult.OK)
                 return;
 
             timeAlign = timeAlignDialog.timeAligned;
@@ -1615,7 +1619,7 @@ namespace YamuraView
         /// <param name="e"></param>
         private void SetAutoLoadFolder_Click(object sender, EventArgs e)
         {
-            if (selectAutoAddFolder.ShowDialog() == DialogResult.Cancel)
+            if (selectAutoAddFolder.ShowDialog(this) == DialogResult.Cancel)
             { return; }
             FolderToWatch = selectAutoAddFolder.SelectedPath;
             folderToWatchFiles.Clear();
@@ -1638,7 +1642,7 @@ namespace YamuraView
         /// <param name="e"></param>
         private void SaveConfigurationToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (saveConfigFileDialog.ShowDialog() == DialogResult.Cancel)
+            if (saveConfigFileDialog.ShowDialog(this) == DialogResult.Cancel)
             {
                 return;
             }
@@ -1651,7 +1655,7 @@ namespace YamuraView
         /// <param name="e"></param>
         private void LoadConfigurationToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (openConfigFileDialog.ShowDialog() == DialogResult.Cancel)
+            if (openConfigFileDialog.ShowDialog(this) == DialogResult.Cancel)
             {
                 return;
             }
@@ -1707,7 +1711,7 @@ namespace YamuraView
             {
                 runSelect.cmbSelectRun.Items.Add(run.runName);
             }
-            if (runSelect.ShowDialog() != DialogResult.OK)
+            if (runSelect.ShowDialog(this) != DialogResult.OK)
             {
                 return;
             }

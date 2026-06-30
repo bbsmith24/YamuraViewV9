@@ -455,7 +455,7 @@ namespace YamuraViewControls
         {
             if ((axisChannelTree.SelectedNode == null) ||
                (axisChannelTree.SelectedNode.Tag == null) ||
-               (colorDialog1.ShowDialog() != DialogResult.OK))
+               (colorDialog1.ShowDialog(this) != DialogResult.OK))
             {
                 return;
             }
