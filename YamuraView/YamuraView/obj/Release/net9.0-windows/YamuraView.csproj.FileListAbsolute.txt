@@ -3,8 +3,6 @@ E:\GitHub\YamuraViewV9\YamuraViewV9\YamuraView\YamuraView\bin\Release\net9.0-win
 E:\GitHub\YamuraViewV9\YamuraViewV9\YamuraView\YamuraView\bin\Release\net9.0-windows\YamuraView.runtimeconfig.json
 E:\GitHub\YamuraViewV9\YamuraViewV9\YamuraView\YamuraView\bin\Release\net9.0-windows\YamuraView.dll
 E:\GitHub\YamuraViewV9\YamuraViewV9\YamuraView\YamuraView\bin\Release\net9.0-windows\YamuraView.pdb
-E:\GitHub\YamuraViewV9\YamuraViewV9\YamuraView\YamuraView\bin\Release\net9.0-windows\Win32Interop.Gdi32.dll
-E:\GitHub\YamuraViewV9\YamuraViewV9\YamuraView\YamuraView\bin\Release\net9.0-windows\Win32Interop.User32.dll
 E:\GitHub\YamuraViewV9\YamuraViewV9\YamuraView\YamuraView\bin\Release\net9.0-windows\YamuraViewControls.dll
 E:\GitHub\YamuraViewV9\YamuraViewV9\YamuraView\YamuraView\bin\Release\net9.0-windows\YamuraViewControls.pdb
 E:\GitHub\YamuraViewV9\YamuraViewV9\YamuraView\YamuraView\obj\Release\net9.0-windows\YamuraView.csproj.AssemblyReference.cache
@@ -25,3 +23,4 @@ E:\GitHub\YamuraViewV9\YamuraViewV9\YamuraView\YamuraView\obj\Release\net9.0-win
 E:\GitHub\YamuraViewV9\YamuraViewV9\YamuraView\YamuraView\obj\Release\net9.0-windows\ref\YamuraView.dll
 E:\GitHub\YamuraViewV9\YamuraViewV9\YamuraView\YamuraView\obj\Release\net9.0-windows\YamuraView.Properties.Resource1.resources
 E:\GitHub\YamuraViewV9\YamuraViewV9\YamuraView\YamuraView\obj\Release\net9.0-windows\YamuraView.SelectBaseRun.resources
+E:\GitHub\YamuraViewV9\YamuraViewV9\YamuraView\YamuraView\obj\Release\net9.0-windows\YamuraView.AutoCloseDialog.resources

@@ -241,14 +241,17 @@ namespace YamuraViewControls
             ChartControlXAxisChangeEventArgs changeEventArgs = new ChartControlXAxisChangeEventArgs();
             changeEventArgs.XAxisName = cmbXAxis.Text;
             ChartOwner.X_Axes["X Axis"].AssociatedChannels.Clear();
+            // "Distance" channel keys are timestamps; use "xDistance" (keyed by distance) for axis range
+            string xRangeKey = cmbXAxis.Text == "Distance" ? "xDistance" : cmbXAxis.Text;
             foreach (DisplayDataSet dataSet in ChartOwner.dataSets)
             {
-                ChartOwner.X_Axes["X Axis"].AxisDisplayRange[0] = dataSet.channels[cmbXAxis.Text].XRange[0];
-                ChartOwner.X_Axes["X Axis"].AxisDisplayRange[1] = dataSet.channels[cmbXAxis.Text].XRange[1];
-                ChartOwner.X_Axes["X Axis"].AxisDisplayRange[2] = dataSet.channels[cmbXAxis.Text].XRange[2];
-                ChartOwner.X_Axes["X Axis"].AxisValueRange[0] = dataSet.channels[cmbXAxis.Text].XRange[0];
-                ChartOwner.X_Axes["X Axis"].AxisValueRange[1] = dataSet.channels[cmbXAxis.Text].XRange[1];
-                ChartOwner.X_Axes["X Axis"].AxisValueRange[2] = dataSet.channels[cmbXAxis.Text].XRange[2];
+                if (!dataSet.channels.TryGetValue(xRangeKey, out ChartChannel xRangeChan)) continue;
+                ChartOwner.X_Axes["X Axis"].AxisDisplayRange[0] = xRangeChan.XRange[0];
+                ChartOwner.X_Axes["X Axis"].AxisDisplayRange[1] = xRangeChan.XRange[1];
+                ChartOwner.X_Axes["X Axis"].AxisDisplayRange[2] = xRangeChan.XRange[2];
+                ChartOwner.X_Axes["X Axis"].AxisValueRange[0] = xRangeChan.XRange[0];
+                ChartOwner.X_Axes["X Axis"].AxisValueRange[1] = xRangeChan.XRange[1];
+                ChartOwner.X_Axes["X Axis"].AxisValueRange[2] = xRangeChan.XRange[2];
                 ChartOwner.X_Axes["X Axis"].AssociatedChannels.Add(dataSet.channels[cmbXAxis.Text]);
             }
 

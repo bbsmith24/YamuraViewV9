@@ -17,10 +17,13 @@ namespace YamuraView
         {
             TitleText = caption;
             Text = TitleText;
-            Width = 400;
-            Height = 150;
+            FormBorderStyle = FormBorderStyle.FixedDialog;
+            MaximizeBox = false;
+            MinimizeBox = false;
+            StartPosition = FormStartPosition.CenterScreen;
+            ClientSize = new Size(380, 100);
 
-            Label label = new Label() { Text = message, Left = 10, Top = 10, Width = 380, Height = 130 };
+            Label label = new Label() { Text = message, Left = 10, Top = 10, Width = 360, Height = 80 };
             Controls.Add(label);
 
             // Trigger the automatic close when the form loads
