@@ -7,6 +7,7 @@ using System.Xml;
 using System.Xml.Linq;
 using YamuraViewControls;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.Window;
 
 namespace YamuraView
 {
@@ -1449,8 +1450,26 @@ namespace YamuraView
             {
                 return;
             }
+            var dialog = new AutoCloseDialog("title", "message");
+
             foreach (String fileName in openLogFile.FileNames)
             {
+                #region test open
+                // try opening first. May be locked if in the middle of an FTP upload. If so, skip this one
+                try
+                {
+                    BinaryReader testFile;
+                    testFile = new BinaryReader(File.Open(fileName, FileMode.Open));
+                    testFile.Close();
+                }
+                catch
+                {
+                    dialog = new AutoCloseDialog("YamuraView", "Unable to open " + fileName + "\ntry again later");
+                    dialog.ShowDialog(); // Suspends main window until the timer completes
+                    continue;
+                }
+                #endregion
+
                 if (fileName.EndsWith("TXT", StringComparison.CurrentCultureIgnoreCase))
                 {
                     ReadTXTFile(fileName);
@@ -1474,6 +1493,12 @@ namespace YamuraView
                     {
                         FolderToWatchFiles.Add(fileName, fileName);
                     }
+                }
+                else
+                {
+                    dialog = new AutoCloseDialog("YamuraView", "Unknown file type\n" + fileName);
+                    dialog.ShowDialog(); // Suspends main window until the timer completes
+                    continue;
                 }
             }
         }
@@ -1510,6 +1535,24 @@ namespace YamuraView
                 return;
             }
             #endregion
+
+            #region test open
+            var dialog = new AutoCloseDialog("title", "message");
+            // try opening first. May be locked if in the middle of an FTP upload. If so, skip this one
+            try
+            {
+                BinaryReader testFile;
+                testFile = new BinaryReader(File.Open(loadFileName, FileMode.Open));
+                testFile.Close();
+            }
+            catch
+            {
+                dialog = new AutoCloseDialog("YamuraView", "Unable to open " + loadFileName + "\ntry again later");
+                dialog.ShowDialog(); // Suspends main window until the timer completes
+                return;
+            }
+            #endregion
+
             #region load various file formats
             if (loadFileName.EndsWith("TXT", StringComparison.CurrentCultureIgnoreCase))
             {
@@ -1526,6 +1569,15 @@ namespace YamuraView
                 ReadYL5File(loadFileName);
                 FolderToWatchFiles.Add(loadFileName, loadFileName);
             }
+            else
+            {
+                dialog = new AutoCloseDialog("YamuraView", "Unknown file type\n" + loadFileName);
+                dialog.ShowDialog(); // Suspends main window until the timer completes
+                return;
+            }
+            dialog = new AutoCloseDialog("YamuraView", "Loaded\n" + loadFileName);
+            dialog.ShowDialog(); // Suspends main window until the timer completes
+
             #endregion
         }
         /// <summary>
