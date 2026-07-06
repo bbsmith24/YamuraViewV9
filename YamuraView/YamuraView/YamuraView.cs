@@ -1,5 +1,6 @@
 ﻿using Microsoft.Win32;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Diagnostics.Eventing.Reader;
 using System.Drawing.Imaging.Effects;
 using System.Text;
@@ -24,6 +25,9 @@ namespace YamuraView
         float gpsDist = 0.0F;
         public String FolderToWatch { get; private set; }
         public String ConfigurationFile { get; private set; }
+        public String WifiSSID { get; private set; } = "";
+        public String WifiPassword { get; private set; } = "";
+        public String FileZillaServerPath { get; private set; } = "";
         public SortedList<String, String> folderToWatchFiles = new System.Collections.Generic.SortedList<String, String>();
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public SortedList<String, String> FolderToWatchFiles
@@ -46,6 +50,8 @@ namespace YamuraView
         public YamuraView()
         {
             InitializeComponent();
+            AppLogger.Init();
+            AppLogger.Log("Application started");
             ConfigurationFile = "";
             FolderToWatch = @"C:\ftp_transfer";
             if (!Directory.Exists(FolderToWatch))
@@ -132,7 +138,10 @@ namespace YamuraView
                 String[] files = Directory.GetFiles(FolderToWatch);
                 foreach (String file in files)
                 {
-                    FolderToWatchFiles.Add(file, file);
+                    if (!FolderToWatchFiles.ContainsKey(file))
+                    {
+                        FolderToWatchFiles.Add(file, file);
+                    }
                 }
             }
             else
@@ -371,8 +380,9 @@ namespace YamuraView
                     {
                         b[0] = (char)inFile.ReadByte();
                     }
-                    catch
+                    catch (Exception ex)
                     {
+                        AppLogger.Log($"ReadYLGFile: error reading record type byte from {fileName}: {ex.Message}");
                         continue;
                     }
                     #endregion
@@ -398,8 +408,9 @@ namespace YamuraView
                         b[1] = (char)inFile.ReadByte();
                         b[2] = (char)inFile.ReadByte();
                     }
-                    catch
+                    catch (Exception ex)
                     {
+                        AppLogger.Log($"ReadYLGFile: error reading channel type from {fileName}: {ex.Message}");
                         break;
                     }
                     #endregion
@@ -760,8 +771,16 @@ namespace YamuraView
                             timestamps.Add(absTime);
                         }
                     }
-                    catch
+                    catch (Exception ex)
                     {
+                        if (ex is EndOfStreamException)
+                        {
+                            AppLogger.Log($"ReadYL5File: read log file {fileName}");
+                        }
+                        else
+                        {
+                            AppLogger.Log($"ReadYL5File: error reading record from {fileName}: {ex.Message}");
+                        }
                         break;
                     }
                 }
@@ -976,9 +995,10 @@ namespace YamuraView
                 {
                     receivedChecksum = Convert.ToInt32(dataSentence.Substring(dataSentence.IndexOf('*') + 1), 16);
                 }
-                catch
+                catch (Exception ex)
                 {
                     errStr.AppendFormat("error reading checksum from NMEA sentance {0}{1}", dataSentence, System.Environment.NewLine);
+                    AppLogger.Log($"ParseGPS_NMEA: error reading checksum from \"{dataSentence}\": {ex.Message}");
                     continue;
                 }
                 // calculate checksum for characters between $ and *
@@ -1088,6 +1108,7 @@ namespace YamuraView
                 catch (Exception e)
                 {
                     errStr.AppendFormat("ParseNMEA error reading sentence from {0} error: {1}{2}", dataSentence, e.Message, System.Environment.NewLine);
+                    AppLogger.Log($"ParseGPS_NMEA: error reading sentence \"{dataSentence}\": {e.Message}");
                 }
             }
             if (latDeg == -1)
@@ -1147,6 +1168,7 @@ namespace YamuraView
             float distance2 = 0.0F;
             int lastRunIdx = dataLogger.runData.Count - 1;
             bool distanceOffsetSet = false;
+            int gpsIndexErrorCount = 0;
             // GPS points from first data set
             for (int gps1Idx = 0; gps1Idx < dataLogger.runData[0].channels["Latitude"].DataPoints.Count; gps1Idx++)
             {
@@ -1164,6 +1186,8 @@ namespace YamuraView
                     }
                     catch
                     {
+                        // logged once, in aggregate, below the loop - this runs in a tight O(n^2) loop
+                        gpsIndexErrorCount++;
                         continue;
                     }
                     distanceBetweenPositions = GPSDistance(gpsLat1, gpsLong1, gpsLat2, gpsLong2);
@@ -1187,9 +1211,13 @@ namespace YamuraView
                 }
             }
             dataLogger.runData[lastRunIdx].DistanceOffset = distanceOffset;
+            if (gpsIndexErrorCount > 0)
+            {
+                AppLogger.Log($"AlignGPS: skipped {gpsIndexErrorCount} mismatched GPS data point index(es).");
+            }
         }
         /// <summary>
-        /// align most recent added data set to first data set using accerlation data 
+        /// align most recent added data set to first data set using accerlation data
         /// first delta acceleration > threshold on defined axis is assumed to be the start of the run
         /// GPS data can't align time since there may be holds aafter the first matching location point
         /// </summary>
@@ -1425,7 +1453,66 @@ namespace YamuraView
             {
                 ConfigurationFile = @"C:\ftp_transfer\YamuraView.xml";
             }
+            WifiSSID = (string?)root?.Attribute("WifiSSID") ?? "";
+            WifiPassword = (string?)root?.Attribute("WifiPassword") ?? "";
+            FileZillaServerPath = (string?)root?.Attribute("FileZillaServerPath") ?? "";
+            EnsureWifiConnected();
+            EnsureFileZillaServerRunning();
             LoadConfigFile(ConfigurationFile);
+        }
+        /// <summary>
+        /// If a WiFi network is specified in the ini file, checks whether it is
+        /// already connected and, if not, connects to it using a saved Windows profile.
+        /// </summary>
+        private void EnsureWifiConnected()
+        {
+            if (string.IsNullOrWhiteSpace(WifiSSID))
+            {
+                return;
+            }
+            if (!WifiConnectionManager.EnsureConnected(WifiSSID, WifiPassword))
+            {
+                AppLogger.Log($"Failed to connect to WiFi network \"{WifiSSID}\".");
+                MessageBox.Show($"Could not connect to WiFi network \"{WifiSSID}\".\nContinuing with current network connection.",
+                    "WiFi Connection Failed", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+            else
+            {
+                AppLogger.Log($"Connected to WiFi network \"{WifiSSID}\".");
+            }
+        }
+        /// <summary>
+        /// If a FileZilla Server executable path is specified in the ini file, checks
+        /// whether the server process is already running and, if not, starts it.
+        /// </summary>
+        private void EnsureFileZillaServerRunning()
+        {
+            if (string.IsNullOrWhiteSpace(FileZillaServerPath))
+            {
+                return;
+            }
+            string processName = Path.GetFileNameWithoutExtension(FileZillaServerPath);
+            if (Process.GetProcessesByName(processName).Length > 0)
+            {
+                AppLogger.Log("FileZilla Server already running.");
+                return;
+            }
+            if (!File.Exists(FileZillaServerPath))
+            {
+                AppLogger.Log($"FileZilla Server not found: {FileZillaServerPath}");
+                MessageBox.Show($"FileZilla Server not found:\n{FileZillaServerPath}", "FileZilla Server", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+            try
+            {
+                Process.Start(new ProcessStartInfo(FileZillaServerPath) { UseShellExecute = true });
+                AppLogger.Log("FileZilla Server started.");
+            }
+            catch (Exception ex)
+            {
+                AppLogger.Log($"Failed to start FileZilla Server: {ex.Message}");
+                MessageBox.Show($"Could not start FileZilla Server:\n{ex.Message}", "FileZilla Server", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
         }
         /// <summary>
         /// write the ini file
@@ -1437,7 +1524,10 @@ namespace YamuraView
             setupDoc = new XDocument(new XDeclaration("1.0", "utf-8", "yes"),
                                             new XElement("Setup",
                                                 new XAttribute("FolderToWatch", FolderToWatch),
-                                                new XAttribute("Config", ConfigurationFile)));
+                                                new XAttribute("Config", ConfigurationFile),
+                                                new XAttribute("WifiSSID", WifiSSID),
+                                                new XAttribute("WifiPassword", WifiPassword),
+                                                new XAttribute("FileZillaServerPath", FileZillaServerPath)));
             setupDoc.Save(fullPath);
         }
         #endregion
@@ -1466,8 +1556,9 @@ namespace YamuraView
                     testFile = new BinaryReader(File.Open(fileName, FileMode.Open));
                     testFile.Close();
                 }
-                catch
+                catch (Exception ex)
                 {
+                    AppLogger.Log($"AddRunsMenuItem_Click: unable to open {fileName}: {ex.Message}");
                     dialog = new AutoCloseDialog("YamuraView", "Unable to open " + fileName + "\ntry again later");
                     dialog.ShowDialog(this); // Suspends main window until the timer completes
                     continue;
@@ -1549,8 +1640,9 @@ namespace YamuraView
                 testFile = new BinaryReader(File.Open(loadFileName, FileMode.Open));
                 testFile.Close();
             }
-            catch
+            catch (Exception ex)
             {
+                AppLogger.Log($"CheckAutoAddTimer_Tick: unable to open {loadFileName}: {ex.Message}");
                 dialog = new AutoCloseDialog("YamuraView", "Unable to open " + loadFileName + "\ntry again later");
                 dialog.ShowDialog(this); // Suspends main window until the timer completes
                 return;
@@ -1779,6 +1871,26 @@ namespace YamuraView
         private void btnZoomAll_Click(object sender, EventArgs e)
         {
             chartControls[0].chartView1.ZoomAll();
+        }
+
+        private void editSettingsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            SettingsDialog settingsDialog = new SettingsDialog();
+            settingsDialog.SetValues(FolderToWatch, ConfigurationFile, WifiSSID, WifiPassword, FileZillaServerPath);
+            if(settingsDialog.ShowDialog() == DialogResult.Cancel)
+            {
+                return;
+            }
+            FolderToWatch = settingsDialog.FolderToWatch;
+            ConfigurationFile = settingsDialog.ConfigurationFile;
+            WifiSSID = settingsDialog.WifiSSID;
+            WifiPassword = settingsDialog.WifiPassword;
+            FileZillaServerPath = settingsDialog.FileZillaServerPath;
+        }
+
+        private void viewLogToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            new LogViewerDialog().ShowDialog(this);
         }
     }
 }

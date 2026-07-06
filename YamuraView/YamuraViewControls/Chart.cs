@@ -326,6 +326,7 @@ namespace YamuraViewControls
                     }
                 }
                 Color runColor = runIdx < autoColors.Count ? autoColors[runIdx % autoColors.Count] : Color.White;
+                runColor = Color.FromArgb(runColor.ToArgb() ^ 0x00FFFFFF);
                 chartView1.DrawCursorAtScaledPoint(scaledPoint, runIdx, runColor);
                 runIdx++;
             }
