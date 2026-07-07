@@ -44,7 +44,9 @@
             toolStripSeparator2 = new ToolStripSeparator();
             saveConfigurationToolStripMenuItem = new ToolStripMenuItem();
             loadConfigurationToolStripMenuItem = new ToolStripMenuItem();
-            setAutoloadFolderToolStripMenuItem = new ToolStripMenuItem();
+            toolStripSeparator4 = new ToolStripSeparator();
+            editSettingsToolStripMenuItem = new ToolStripMenuItem();
+            viewLogToolStripMenuItem = new ToolStripMenuItem();
             toolStripSeparator3 = new ToolStripSeparator();
             timeAlignSetupToolStripMenuItem = new ToolStripMenuItem();
             distanceAlignSetupToolStripMenuItem = new ToolStripMenuItem();
@@ -55,8 +57,6 @@
             selectAutoAddFolder = new FolderBrowserDialog();
             saveConfigFileDialog = new SaveFileDialog();
             openConfigFileDialog = new OpenFileDialog();
-            editSettingsToolStripMenuItem = new ToolStripMenuItem();
-            viewLogToolStripMenuItem = new ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)splitContainer1).BeginInit();
             splitContainer1.Panel1.SuspendLayout();
             splitContainer1.Panel2.SuspendLayout();
@@ -166,7 +166,7 @@
             // 
             // fileToolStripMenuItem
             // 
-            fileToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { addRunsMenuItem, clearRunsToolStripMenuItem, toolStripSeparator2, saveConfigurationToolStripMenuItem, loadConfigurationToolStripMenuItem, setAutoloadFolderToolStripMenuItem, editSettingsToolStripMenuItem, viewLogToolStripMenuItem, toolStripSeparator3, timeAlignSetupToolStripMenuItem, distanceAlignSetupToolStripMenuItem, addDeltaTimeToolStripMenuItem, toolStripSeparator1, exitToolStripMenuItem });
+            fileToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { addRunsMenuItem, clearRunsToolStripMenuItem, toolStripSeparator2, saveConfigurationToolStripMenuItem, loadConfigurationToolStripMenuItem, toolStripSeparator4, editSettingsToolStripMenuItem, viewLogToolStripMenuItem, toolStripSeparator3, timeAlignSetupToolStripMenuItem, distanceAlignSetupToolStripMenuItem, addDeltaTimeToolStripMenuItem, toolStripSeparator1, exitToolStripMenuItem });
             fileToolStripMenuItem.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
             fileToolStripMenuItem.Name = "fileToolStripMenuItem";
             fileToolStripMenuItem.Size = new Size(46, 25);
@@ -184,7 +184,8 @@
             // 
             clearRunsToolStripMenuItem.Name = "clearRunsToolStripMenuItem";
             clearRunsToolStripMenuItem.Size = new Size(221, 26);
-            clearRunsToolStripMenuItem.Text = "Clear Runs";
+            clearRunsToolStripMenuItem.Text = "Delete Runs";
+            clearRunsToolStripMenuItem.Click += ClearRunsToolStripMenuItem_Click;
             // 
             // toolStripSeparator2
             // 
@@ -205,12 +206,24 @@
             loadConfigurationToolStripMenuItem.Text = "Load Configuration";
             loadConfigurationToolStripMenuItem.Click += LoadConfigurationToolStripMenuItem_Click;
             // 
-            // setAutoloadFolderToolStripMenuItem
+            // toolStripSeparator4
             // 
-            setAutoloadFolderToolStripMenuItem.Name = "setAutoloadFolderToolStripMenuItem";
-            setAutoloadFolderToolStripMenuItem.Size = new Size(221, 26);
-            setAutoloadFolderToolStripMenuItem.Text = "Set Autoload folder";
-            setAutoloadFolderToolStripMenuItem.Click += SetAutoLoadFolder_Click;
+            toolStripSeparator4.Name = "toolStripSeparator4";
+            toolStripSeparator4.Size = new Size(218, 6);
+            // 
+            // editSettingsToolStripMenuItem
+            // 
+            editSettingsToolStripMenuItem.Name = "editSettingsToolStripMenuItem";
+            editSettingsToolStripMenuItem.Size = new Size(221, 26);
+            editSettingsToolStripMenuItem.Text = "Edit Settings";
+            editSettingsToolStripMenuItem.Click += editSettingsToolStripMenuItem_Click;
+            // 
+            // viewLogToolStripMenuItem
+            // 
+            viewLogToolStripMenuItem.Name = "viewLogToolStripMenuItem";
+            viewLogToolStripMenuItem.Size = new Size(221, 26);
+            viewLogToolStripMenuItem.Text = "View Log";
+            viewLogToolStripMenuItem.Click += viewLogToolStripMenuItem_Click;
             // 
             // toolStripSeparator3
             // 
@@ -265,20 +278,6 @@
             openConfigFileDialog.FileName = "YamuraView.xml";
             openConfigFileDialog.Filter = "YamuraView Config|*.xml";
             // 
-            // editSettingsToolStripMenuItem
-            // 
-            editSettingsToolStripMenuItem.Name = "editSettingsToolStripMenuItem";
-            editSettingsToolStripMenuItem.Size = new Size(221, 26);
-            editSettingsToolStripMenuItem.Text = "Edit Settings";
-            editSettingsToolStripMenuItem.Click += editSettingsToolStripMenuItem_Click;
-            //
-            // viewLogToolStripMenuItem
-            //
-            viewLogToolStripMenuItem.Name = "viewLogToolStripMenuItem";
-            viewLogToolStripMenuItem.Size = new Size(221, 26);
-            viewLogToolStripMenuItem.Text = "View Log";
-            viewLogToolStripMenuItem.Click += viewLogToolStripMenuItem_Click;
-            // 
             // YamuraView
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -292,6 +291,7 @@
             MainMenuStrip = menuStrip1;
             Name = "YamuraView";
             Text = "YamuraView 9.x";
+            FormClosing += YamuraView_FormClosing;
             SizeChanged += YamuraView_SizeChanged;
             splitContainer1.Panel1.ResumeLayout(false);
             splitContainer1.Panel2.ResumeLayout(false);
@@ -316,7 +316,6 @@
         private ToolStripMenuItem fileToolStripMenuItem;
         private ToolStripMenuItem addRunsMenuItem;
         private ToolStripMenuItem clearRunsToolStripMenuItem;
-        private ToolStripMenuItem setAutoloadFolderToolStripMenuItem;
         private ToolStripMenuItem exitToolStripMenuItem;
         private YamuraViewControls.Chart StripChart;
         private YamuraViewControls.Chart TrackMap;
@@ -336,5 +335,6 @@
         private Button btnZoomAll;
         private ToolStripMenuItem editSettingsToolStripMenuItem;
         private ToolStripMenuItem viewLogToolStripMenuItem;
+        private ToolStripSeparator toolStripSeparator4;
     }
 }

@@ -1277,11 +1277,17 @@ namespace YamuraView
             {
                 return;
             }
-            int runIdx = dataLogger.runData.Count - 1;
+            AddRunToCharts(dataLogger.runData[dataLogger.runData.Count - 1], dataLogger.runData.Count - 1);
+        }
+        /// <summary>
+        /// adds a single run's channel data to all charts (dataSets, axes, and channel tree),
+        /// assigning trace color based on colorIdx. Used both when a new run is loaded and
+        /// when rebuilding all charts after runs are removed.
+        /// </summary>
+        private void AddRunToCharts(RunData curRun, int colorIdx, List<HashSet<(string runName, string channelName)>> preservedSelections = null)
+        {
             string xAxisName = "X Axis";
             string yAxisName = "Y Axis";
-            #region update display info
-            RunData curRun = dataLogger.runData[dataLogger.runData.Count - 1];
             for (int chartIdx = 0; chartIdx < chartControls.Count; chartIdx++)
             {
                 if (!chartControls[chartIdx].Y_Axes.ContainsKey(yAxisName))
@@ -1306,7 +1312,7 @@ namespace YamuraView
                                                                             curRun.runName,
                                                                             1.0F,
                                                                             curChannel.Value.dataPoints);
-                    chartControls[chartIdx].dataSets[dataSetIdx].channels[curChannel.Key].ChannelColor = chartControls[chartIdx].AutoColors[(dataLogger.runData.Count - 1) % 7];
+                    chartControls[chartIdx].dataSets[dataSetIdx].channels[curChannel.Key].ChannelColor = chartControls[chartIdx].AutoColors[colorIdx % 7];
                     chartControls[chartIdx].Y_Axes[yAxisName].AxisValueRange[0] = chartControls[chartIdx].Y_Axes[yAxisName].AxisValueRange[0] < curChannel.Value.YRange[0] ? chartControls[chartIdx].Y_Axes[yAxisName].AxisValueRange[0] : curChannel.Value.YRange[0];
                     chartControls[chartIdx].Y_Axes[yAxisName].AxisValueRange[1] = chartControls[chartIdx].Y_Axes[yAxisName].AxisValueRange[1] > curChannel.Value.YRange[1] ? chartControls[chartIdx].Y_Axes[yAxisName].AxisValueRange[1] : curChannel.Value.YRange[1];
                     chartControls[chartIdx].Y_Axes[yAxisName].AxisValueRange[2] = chartControls[chartIdx].Y_Axes[yAxisName].AxisValueRange[1] - chartControls[chartIdx].Y_Axes[yAxisName].AxisValueRange[0];
@@ -1321,13 +1327,15 @@ namespace YamuraView
                     chartControls[chartIdx].X_Axes[xAxisName].AxisDisplayRange[1] = chartControls[chartIdx].X_Axes[xAxisName].AxisValueRange[1];
                     chartControls[chartIdx].X_Axes[xAxisName].AxisDisplayRange[2] = chartControls[chartIdx].X_Axes[xAxisName].AxisValueRange[2];
 
-                    int associatedIdx = chartControls[chartIdx].Y_Axes[yAxisName].AssociatedChannels.Count > 0 ? chartControls[chartIdx].Y_Axes[yAxisName].AssociatedChannels.Count - 1 : 0;
                     chartControls[chartIdx].Y_Axes[yAxisName].AssociatedChannels.Add(chartControls[chartIdx].dataSets[dataSetIdx].channels[curChannel.Key]);
                     int associatedChannelIdx = chartControls[chartIdx].Y_Axes[yAxisName].AssociatedChannels.Count - 1;
                     chartControls[chartIdx].Y_Axes[yAxisName].AssociatedChannels[associatedChannelIdx].DataSetName = curRun.runName;
                     chartControls[chartIdx].Y_Axes[yAxisName].AssociatedChannels[associatedChannelIdx].DataSetIndex = dataSetIdx;
-                    chartControls[chartIdx].Y_Axes[yAxisName].AssociatedChannels[associatedChannelIdx].ChannelColor = chartControls[chartIdx].AutoColors[(dataLogger.runData.Count - 1) % 7];
-                    chartControls[chartIdx].Y_Axes[yAxisName].AssociatedChannels[associatedChannelIdx].ShowChannel = false;
+                    chartControls[chartIdx].Y_Axes[yAxisName].AssociatedChannels[associatedChannelIdx].ChannelColor = chartControls[chartIdx].AutoColors[colorIdx % 7];
+                    chartControls[chartIdx].Y_Axes[yAxisName].AssociatedChannels[associatedChannelIdx].ShowChannel =
+                        preservedSelections != null &&
+                        chartIdx < preservedSelections.Count &&
+                        preservedSelections[chartIdx].Contains((curRun.runName, curChannel.Key));
                     chartControls[chartIdx].Y_Axes[yAxisName].AssociatedChannels[associatedChannelIdx].XRange[0] = curChannel.Value.XRange[0];
                     chartControls[chartIdx].Y_Axes[yAxisName].AssociatedChannels[associatedChannelIdx].XRange[1] = curChannel.Value.XRange[1];
                     chartControls[chartIdx].Y_Axes[yAxisName].AssociatedChannels[associatedChannelIdx].XRange[2] = curChannel.Value.XRange[1] - curChannel.Value.XRange[0];
@@ -1337,7 +1345,48 @@ namespace YamuraView
                 }
                 chartControls[chartIdx].UpdateData();
             }
-            #endregion
+        }
+        /// <summary>
+        /// clears all chart display data (dataSets, axes, channel tree) and re-adds every
+        /// remaining run from dataLogger.runData. Used after runs are removed, since the
+        /// chart controls only support appending data, not removing a single run in place.
+        /// </summary>
+        private void RebuildAllChartData()
+        {
+            // capture which run/channel combinations are currently checked (shown) in each
+            // chart's channel tree, so remaining runs keep their display selections after rebuild
+            List<HashSet<(string runName, string channelName)>> preservedSelections = new List<HashSet<(string, string)>>();
+            foreach (YamuraViewControls.Chart chart in chartControls)
+            {
+                HashSet<(string, string)> selected = new HashSet<(string, string)>();
+                foreach (TreeNode parentNode in chart.chartProperties1.AxisChannelTree.Nodes)
+                {
+                    foreach (TreeNode leafNode in parentNode.Nodes)
+                    {
+                        if (leafNode.Checked && leafNode.Tag is YamuraViewControls.ChartChannel chartChannel)
+                        {
+                            selected.Add((chartChannel.DataSetName, chartChannel.ChannelName));
+                        }
+                    }
+                }
+                preservedSelections.Add(selected);
+            }
+
+            foreach (YamuraViewControls.Chart chart in chartControls)
+            {
+                chart.dataSets.Clear();
+                chart.X_Axes.Clear();
+                chart.Y_Axes.Clear();
+                chart.chartProperties1.AxisChannelTree.Nodes.Clear();
+            }
+            for (int i = 0; i < dataLogger.runData.Count; i++)
+            {
+                AddRunToCharts(dataLogger.runData[i], i, preservedSelections);
+            }
+            foreach (YamuraViewControls.Chart chart in chartControls)
+            {
+                chart.Invalidate(true);
+            }
         }
         #endregion
 
@@ -1558,9 +1607,7 @@ namespace YamuraView
                 }
                 catch (Exception ex)
                 {
-                    AppLogger.Log($"AddRunsMenuItem_Click: unable to open {fileName}: {ex.Message}");
-                    dialog = new AutoCloseDialog("YamuraView", "Unable to open " + fileName + "\ntry again later");
-                    dialog.ShowDialog(this); // Suspends main window until the timer completes
+                    AppLogger.Log($"AddRunsMenuItem_Click: unable to open {fileName} - uploading");
                     continue;
                 }
                 #endregion
@@ -1598,7 +1645,38 @@ namespace YamuraView
             }
         }
         /// <summary>
-        /// 
+        /// shows a dialog listing loaded runs, and removes the ones the user selects
+        /// from the log data and all charts.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void ClearRunsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (dataLogger.runData.Count == 0)
+            {
+                MessageBox.Show("No runs are loaded.", "Clear Runs", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+            ClearRunsDialog clearRunsDialog = new ClearRunsDialog();
+            clearRunsDialog.PopulateRuns(dataLogger.runData);
+            if (clearRunsDialog.ShowDialog(this) != DialogResult.OK)
+            {
+                return;
+            }
+            Cursor = Cursors.WaitCursor;
+            foreach (int idx in clearRunsDialog.SelectedIndices)
+            {
+                AppLogger.Log($"Removed run: {dataLogger.runData[idx].runName} ({dataLogger.runData[idx].fileName})");
+            }
+            foreach (int idx in clearRunsDialog.SelectedIndices.OrderByDescending(i => i))
+            {
+                dataLogger.runData.RemoveAt(idx);
+            }
+            RebuildAllChartData();
+            Cursor = Cursors.Default;
+        }
+        /// <summary>
+        ///
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -1709,24 +1787,24 @@ namespace YamuraView
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void SetAutoLoadFolder_Click(object sender, EventArgs e)
-        {
-            if (selectAutoAddFolder.ShowDialog(this) == DialogResult.Cancel)
-            { return; }
-            FolderToWatch = selectAutoAddFolder.SelectedPath;
-            folderToWatchFiles.Clear();
-            #region get list of files in folder to watch (for new files to process)
-            if (Directory.Exists(FolderToWatch))
-            {
-                String[] files = Directory.GetFiles(FolderToWatch);
-                foreach (String file in files)
-                {
-                    FolderToWatchFiles.Add(file, file);
-                }
-                SaveInitFile();
-            }
-            #endregion        
-        }
+        //private void SetAutoLoadFolder_Click(object sender, EventArgs e)
+        //{
+        //    if (selectAutoAddFolder.ShowDialog(this) == DialogResult.Cancel)
+        //    { return; }
+        //    FolderToWatch = selectAutoAddFolder.SelectedPath;
+        //    folderToWatchFiles.Clear();
+        //    #region get list of files in folder to watch (for new files to process)
+        //    if (Directory.Exists(FolderToWatch))
+        //    {
+        //        String[] files = Directory.GetFiles(FolderToWatch);
+        //        foreach (String file in files)
+        //        {
+        //            FolderToWatchFiles.Add(file, file);
+        //        }
+        //        SaveInitFile();
+        //    }
+        //    #endregion        
+        //}
         /// <summary>
         /// 
         /// </summary>
@@ -1779,7 +1857,6 @@ namespace YamuraView
         /// <param name="e"></param>
         private void ExitToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            SaveInitFile();
             Close();
         }
         /// <summary>
@@ -1865,19 +1942,25 @@ namespace YamuraView
             }
             Cursor = Cursors.Default;
         }
-
-        #endregion
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void btnZoomAll_Click(object sender, EventArgs e)
         {
             chartControls[0].chartView1.ZoomAll();
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void editSettingsToolStripMenuItem_Click(object sender, EventArgs e)
         {
             SettingsDialog settingsDialog = new SettingsDialog();
             settingsDialog.SetValues(FolderToWatch, ConfigurationFile, WifiSSID, WifiPassword, FileZillaServerPath);
-            if(settingsDialog.ShowDialog() == DialogResult.Cancel)
+            if (settingsDialog.ShowDialog() == DialogResult.Cancel)
             {
                 return;
             }
@@ -1886,11 +1969,37 @@ namespace YamuraView
             WifiSSID = settingsDialog.WifiSSID;
             WifiPassword = settingsDialog.WifiPassword;
             FileZillaServerPath = settingsDialog.FileZillaServerPath;
+            folderToWatchFiles.Clear();
+            #region get list of files in folder to watch (for new files to process)
+            if (Directory.Exists(FolderToWatch))
+            {
+                String[] files = Directory.GetFiles(FolderToWatch);
+                foreach (String file in files)
+                {
+                    FolderToWatchFiles.Add(file, file);
+                }
+                SaveInitFile();
+            }
+            #endregion
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void viewLogToolStripMenuItem_Click(object sender, EventArgs e)
         {
             new LogViewerDialog().ShowDialog(this);
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void YamuraView_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            SaveInitFile();
+        }
+        #endregion
     }
 }
