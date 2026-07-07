@@ -1131,12 +1131,24 @@ namespace YamuraViewControls
             float lineHeight = Font.Height + 3;
             int lineCount = 1; // x-axis header
             if (_cursorValues != null)
+            {
                 foreach (var ds in _cursorValues)
+                {
                     foreach (var ch in ds.Value)
+                    {
                         foreach (var axis in ChartOwner.Y_Axes.Values)
+                        {
                             foreach (var chan in axis.AssociatedChannels)
+                            {
                                 if (chan.DataSetName == ds.Key && chan.ChannelName == ch.Key && chan.ShowChannel)
+                                {
                                     lineCount++;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
             int panelW = 250;
             int panelH = (int)(lineHeight * lineCount) + 6;
             // place on right side when cursor is in left half, left side when in right half
@@ -1206,8 +1218,8 @@ namespace YamuraViewControls
                         continue;
                     string valueStr = float.IsNaN(ch.Value) ? "---" : ch.Value.ToString("G4");
                     string label = _cursorValues.Count > 1
-                        ? $"{ch.Key} ({ds.Key}): {valueStr}"
-                        : $"{ch.Key}: {valueStr}";
+                        ? $"{ch.Key} {valueStr} ({ds.Key})"
+                        : $"{ch.Key} {valueStr}";
                     //using (Brush overlaybrush = new SolidBrush(channelColor))
                         overlayBrush.Color = channelColor;
                         g.DrawString(label, Font, overlayBrush, x, y);
