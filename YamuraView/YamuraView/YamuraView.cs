@@ -1,6 +1,5 @@
 ﻿using Microsoft.Win32;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Diagnostics.Eventing.Reader;
 using System.Drawing.Imaging.Effects;
 using System.Text;
@@ -25,9 +24,6 @@ namespace YamuraView
         float gpsDist = 0.0F;
         public String FolderToWatch { get; private set; }
         public String ConfigurationFile { get; private set; }
-        public String WifiSSID { get; private set; } = "";
-        public String WifiPassword { get; private set; } = "";
-        public String FileZillaServerPath { get; private set; } = "";
         public SortedList<String, String> folderToWatchFiles = new System.Collections.Generic.SortedList<String, String>();
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public SortedList<String, String> FolderToWatchFiles
@@ -1450,7 +1446,9 @@ namespace YamuraView
                                                    new XAttribute("TimeAlign", timeAlign),
                                                    new XAttribute("TimeAlignChannel", timeAlignChannel ?? ""),
                                                    new XAttribute("TimeAlignThreshold", timeAlignThreshold),
-                                                   new XAttribute("TimeAlignRisingEdge", timeAlignRisingEdge)));
+                                                   new XAttribute("TimeAlignRisingEdge", timeAlignRisingEdge),
+                                                   new XElement("AutoColors",
+                                                       chartControls[0].AutoColors.Select(c => new XElement("Color", ColorTranslator.ToHtml(c))))));
             foreach (Chart curChart in chartControls)
             {
                 curChart.SaveSetup(setupDoc);
@@ -1475,6 +1473,29 @@ namespace YamuraView
             timeAlignChannel = (string)root?.Attribute("TimeAlignChannel") ?? "gX";
             timeAlignThreshold = (float?)root?.Attribute("TimeAlignThreshold") ?? 0.5f;
             timeAlignRisingEdge = (bool?)root?.Attribute("TimeAlignRisingEdge") ?? true;
+            XElement autoColorsElement = root?.Element("AutoColors");
+            if (autoColorsElement != null)
+            {
+                List<Color> loadedColors = new List<Color>();
+                foreach (XElement colorElement in autoColorsElement.Elements("Color"))
+                {
+                    try
+                    {
+                        loadedColors.Add(ColorTranslator.FromHtml(colorElement.Value));
+                    }
+                    catch (Exception ex)
+                    {
+                        AppLogger.Log($"LoadConfigFile: invalid AutoColors entry \"{colorElement.Value}\": {ex.Message}");
+                    }
+                }
+                if (loadedColors.Count > 0)
+                {
+                    foreach (Chart curChart in chartControls)
+                    {
+                        curChart.AutoColors = new List<Color>(loadedColors);
+                    }
+                }
+            }
             foreach (Chart curChart in chartControls)
             {
                 curChart.ApplySetup(setupDoc);
@@ -1502,66 +1523,7 @@ namespace YamuraView
             {
                 ConfigurationFile = @"C:\ftp_transfer\YamuraView.xml";
             }
-            WifiSSID = (string?)root?.Attribute("WifiSSID") ?? "";
-            WifiPassword = (string?)root?.Attribute("WifiPassword") ?? "";
-            FileZillaServerPath = (string?)root?.Attribute("FileZillaServerPath") ?? "";
-            EnsureWifiConnected();
-            EnsureFileZillaServerRunning();
             LoadConfigFile(ConfigurationFile);
-        }
-        /// <summary>
-        /// If a WiFi network is specified in the ini file, checks whether it is
-        /// already connected and, if not, connects to it using a saved Windows profile.
-        /// </summary>
-        private void EnsureWifiConnected()
-        {
-            if (string.IsNullOrWhiteSpace(WifiSSID))
-            {
-                return;
-            }
-            if (!WifiConnectionManager.EnsureConnected(WifiSSID, WifiPassword))
-            {
-                AppLogger.Log($"Failed to connect to WiFi network \"{WifiSSID}\".");
-                MessageBox.Show($"Could not connect to WiFi network \"{WifiSSID}\".\nContinuing with current network connection.",
-                    "WiFi Connection Failed", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            }
-            else
-            {
-                AppLogger.Log($"Connected to WiFi network \"{WifiSSID}\".");
-            }
-        }
-        /// <summary>
-        /// If a FileZilla Server executable path is specified in the ini file, checks
-        /// whether the server process is already running and, if not, starts it.
-        /// </summary>
-        private void EnsureFileZillaServerRunning()
-        {
-            if (string.IsNullOrWhiteSpace(FileZillaServerPath))
-            {
-                return;
-            }
-            string processName = Path.GetFileNameWithoutExtension(FileZillaServerPath);
-            if (Process.GetProcessesByName(processName).Length > 0)
-            {
-                AppLogger.Log("FileZilla Server already running.");
-                return;
-            }
-            if (!File.Exists(FileZillaServerPath))
-            {
-                AppLogger.Log($"FileZilla Server not found: {FileZillaServerPath}");
-                MessageBox.Show($"FileZilla Server not found:\n{FileZillaServerPath}", "FileZilla Server", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
-            try
-            {
-                Process.Start(new ProcessStartInfo(FileZillaServerPath) { UseShellExecute = true });
-                AppLogger.Log("FileZilla Server started.");
-            }
-            catch (Exception ex)
-            {
-                AppLogger.Log($"Failed to start FileZilla Server: {ex.Message}");
-                MessageBox.Show($"Could not start FileZilla Server:\n{ex.Message}", "FileZilla Server", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            }
         }
         /// <summary>
         /// write the ini file
@@ -1573,10 +1535,7 @@ namespace YamuraView
             setupDoc = new XDocument(new XDeclaration("1.0", "utf-8", "yes"),
                                             new XElement("Setup",
                                                 new XAttribute("FolderToWatch", FolderToWatch),
-                                                new XAttribute("Config", ConfigurationFile),
-                                                new XAttribute("WifiSSID", WifiSSID),
-                                                new XAttribute("WifiPassword", WifiPassword),
-                                                new XAttribute("FileZillaServerPath", FileZillaServerPath)));
+                                                new XAttribute("Config", ConfigurationFile)));
             setupDoc.Save(fullPath);
         }
         #endregion
@@ -1959,16 +1918,25 @@ namespace YamuraView
         private void editSettingsToolStripMenuItem_Click(object sender, EventArgs e)
         {
             SettingsDialog settingsDialog = new SettingsDialog();
-            settingsDialog.SetValues(FolderToWatch, ConfigurationFile, WifiSSID, WifiPassword, FileZillaServerPath);
+            settingsDialog.SetValues(FolderToWatch, ConfigurationFile, chartControls[0].AutoColors);
             if (settingsDialog.ShowDialog() == DialogResult.Cancel)
             {
                 return;
             }
             FolderToWatch = settingsDialog.FolderToWatch;
             ConfigurationFile = settingsDialog.ConfigurationFile;
-            WifiSSID = settingsDialog.WifiSSID;
-            WifiPassword = settingsDialog.WifiPassword;
-            FileZillaServerPath = settingsDialog.FileZillaServerPath;
+            foreach (Chart chart in chartControls)
+            {
+                chart.AutoColors = new List<Color>(settingsDialog.AutoColors);
+            }
+            if (dataLogger.runData.Count > 0)
+            {
+                RebuildAllChartData();
+            }
+            if (!string.IsNullOrWhiteSpace(ConfigurationFile))
+            {
+                SaveConfigFile(ConfigurationFile);
+            }
             folderToWatchFiles.Clear();
             #region get list of files in folder to watch (for new files to process)
             if (Directory.Exists(FolderToWatch))

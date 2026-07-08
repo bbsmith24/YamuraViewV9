@@ -21,36 +21,36 @@ namespace YamuraView
             lblConfig = new Label();
             txtConfig = new TextBox();
             btnBrowseConfig = new Button();
-            lblSSID = new Label();
-            txtSSID = new TextBox();
-            lblPassword = new Label();
-            txtPassword = new TextBox();
+            lblColors = new Label();
+            btnColor1 = new Button();
+            btnColor2 = new Button();
+            btnColor3 = new Button();
+            btnColor4 = new Button();
+            btnColor5 = new Button();
+            btnColor6 = new Button();
+            btnColor7 = new Button();
             btnOK = new Button();
             btnCancel = new Button();
-            btnTogglePasswordVis = new Button();
-            lblFileZilla = new Label();
-            txtFileZilla = new TextBox();
-            btnBrowseFileZilla = new Button();
             SuspendLayout();
-            // 
+            //
             // lblFolder
-            // 
+            //
             lblFolder.AutoSize = true;
             lblFolder.Location = new Point(12, 18);
             lblFolder.Name = "lblFolder";
             lblFolder.Size = new Size(92, 15);
             lblFolder.TabIndex = 0;
             lblFolder.Text = "Autoload Folder";
-            // 
+            //
             // txtFolder
-            // 
+            //
             txtFolder.Location = new Point(140, 14);
             txtFolder.Name = "txtFolder";
             txtFolder.Size = new Size(200, 23);
             txtFolder.TabIndex = 0;
-            // 
+            //
             // btnBrowseFolder
-            // 
+            //
             btnBrowseFolder.Location = new Point(348, 13);
             btnBrowseFolder.Name = "btnBrowseFolder";
             btnBrowseFolder.Size = new Size(30, 25);
@@ -58,25 +58,25 @@ namespace YamuraView
             btnBrowseFolder.Text = "...";
             btnBrowseFolder.UseVisualStyleBackColor = true;
             btnBrowseFolder.Click += btnBrowseFolder_Click;
-            // 
+            //
             // lblConfig
-            // 
+            //
             lblConfig.AutoSize = true;
             lblConfig.Location = new Point(12, 50);
             lblConfig.Name = "lblConfig";
             lblConfig.Size = new Size(102, 15);
             lblConfig.TabIndex = 2;
             lblConfig.Text = "Configuration File";
-            // 
+            //
             // txtConfig
-            // 
+            //
             txtConfig.Location = new Point(140, 46);
             txtConfig.Name = "txtConfig";
             txtConfig.Size = new Size(200, 23);
             txtConfig.TabIndex = 2;
-            // 
+            //
             // btnBrowseConfig
-            // 
+            //
             btnBrowseConfig.Location = new Point(348, 45);
             btnBrowseConfig.Name = "btnBrowseConfig";
             btnBrowseConfig.Size = new Size(30, 25);
@@ -84,92 +84,95 @@ namespace YamuraView
             btnBrowseConfig.Text = "...";
             btnBrowseConfig.UseVisualStyleBackColor = true;
             btnBrowseConfig.Click += btnBrowseConfig_Click;
-            // 
-            // lblSSID
-            // 
-            lblSSID.AutoSize = true;
-            lblSSID.Location = new Point(12, 82);
-            lblSSID.Name = "lblSSID";
-            lblSSID.Size = new Size(56, 15);
-            lblSSID.TabIndex = 4;
-            lblSSID.Text = "WiFi SSID";
-            // 
-            // txtSSID
-            // 
-            txtSSID.Location = new Point(140, 78);
-            txtSSID.Name = "txtSSID";
-            txtSSID.Size = new Size(238, 23);
-            txtSSID.TabIndex = 4;
-            // 
-            // lblPassword
-            // 
-            lblPassword.AutoSize = true;
-            lblPassword.Location = new Point(12, 114);
-            lblPassword.Name = "lblPassword";
-            lblPassword.Size = new Size(83, 15);
-            lblPassword.TabIndex = 5;
-            lblPassword.Text = "WiFi Password";
-            // 
-            // txtPassword
-            // 
-            txtPassword.Location = new Point(140, 110);
-            txtPassword.Name = "txtPassword";
-            txtPassword.Size = new Size(215, 23);
-            txtPassword.TabIndex = 5;
-            txtPassword.UseSystemPasswordChar = true;
-            // 
-            // btnTogglePasswordVis
             //
-            btnTogglePasswordVis.Location = new Point(361, 110);
-            btnTogglePasswordVis.Name = "btnTogglePasswordVis";
-            btnTogglePasswordVis.Size = new Size(21, 23);
-            btnTogglePasswordVis.TabIndex = 6;
-            btnTogglePasswordVis.Text = "S";
-            btnTogglePasswordVis.UseVisualStyleBackColor = true;
-            btnTogglePasswordVis.Click += btnTogglePasswordVis_Click;
+            // lblColors
             //
-            // lblFileZilla
+            lblColors.AutoSize = true;
+            lblColors.Location = new Point(12, 86);
+            lblColors.Name = "lblColors";
+            lblColors.Size = new Size(66, 15);
+            lblColors.TabIndex = 4;
+            lblColors.Text = "Run Colors";
             //
-            lblFileZilla.AutoSize = true;
-            lblFileZilla.Location = new Point(12, 146);
-            lblFileZilla.Name = "lblFileZilla";
-            lblFileZilla.Size = new Size(108, 15);
-            lblFileZilla.TabIndex = 7;
-            lblFileZilla.Text = "FileZilla Server Exe";
+            // btnColor1
             //
-            // txtFileZilla
+            btnColor1.Location = new Point(140, 82);
+            btnColor1.Name = "btnColor1";
+            btnColor1.Size = new Size(28, 24);
+            btnColor1.TabIndex = 5;
+            btnColor1.UseVisualStyleBackColor = false;
+            btnColor1.Click += btnColor_Click;
             //
-            txtFileZilla.Location = new Point(140, 142);
-            txtFileZilla.Name = "txtFileZilla";
-            txtFileZilla.Size = new Size(200, 23);
-            txtFileZilla.TabIndex = 8;
+            // btnColor2
             //
-            // btnBrowseFileZilla
+            btnColor2.Location = new Point(170, 82);
+            btnColor2.Name = "btnColor2";
+            btnColor2.Size = new Size(28, 24);
+            btnColor2.TabIndex = 6;
+            btnColor2.UseVisualStyleBackColor = false;
+            btnColor2.Click += btnColor_Click;
             //
-            btnBrowseFileZilla.Location = new Point(348, 141);
-            btnBrowseFileZilla.Name = "btnBrowseFileZilla";
-            btnBrowseFileZilla.Size = new Size(30, 25);
-            btnBrowseFileZilla.TabIndex = 9;
-            btnBrowseFileZilla.Text = "...";
-            btnBrowseFileZilla.UseVisualStyleBackColor = true;
-            btnBrowseFileZilla.Click += btnBrowseFileZilla_Click;
+            // btnColor3
+            //
+            btnColor3.Location = new Point(200, 82);
+            btnColor3.Name = "btnColor3";
+            btnColor3.Size = new Size(28, 24);
+            btnColor3.TabIndex = 7;
+            btnColor3.UseVisualStyleBackColor = false;
+            btnColor3.Click += btnColor_Click;
+            //
+            // btnColor4
+            //
+            btnColor4.Location = new Point(230, 82);
+            btnColor4.Name = "btnColor4";
+            btnColor4.Size = new Size(28, 24);
+            btnColor4.TabIndex = 8;
+            btnColor4.UseVisualStyleBackColor = false;
+            btnColor4.Click += btnColor_Click;
+            //
+            // btnColor5
+            //
+            btnColor5.Location = new Point(260, 82);
+            btnColor5.Name = "btnColor5";
+            btnColor5.Size = new Size(28, 24);
+            btnColor5.TabIndex = 9;
+            btnColor5.UseVisualStyleBackColor = false;
+            btnColor5.Click += btnColor_Click;
+            //
+            // btnColor6
+            //
+            btnColor6.Location = new Point(290, 82);
+            btnColor6.Name = "btnColor6";
+            btnColor6.Size = new Size(28, 24);
+            btnColor6.TabIndex = 10;
+            btnColor6.UseVisualStyleBackColor = false;
+            btnColor6.Click += btnColor_Click;
+            //
+            // btnColor7
+            //
+            btnColor7.Location = new Point(320, 82);
+            btnColor7.Name = "btnColor7";
+            btnColor7.Size = new Size(28, 24);
+            btnColor7.TabIndex = 11;
+            btnColor7.UseVisualStyleBackColor = false;
+            btnColor7.Click += btnColor_Click;
             //
             // btnOK
             //
-            btnOK.Location = new Point(140, 182);
+            btnOK.Location = new Point(140, 118);
             btnOK.Name = "btnOK";
             btnOK.Size = new Size(80, 30);
-            btnOK.TabIndex = 10;
+            btnOK.TabIndex = 12;
             btnOK.Text = "OK";
             btnOK.UseVisualStyleBackColor = true;
             btnOK.Click += btnOK_Click;
             //
             // btnCancel
             //
-            btnCancel.Location = new Point(230, 182);
+            btnCancel.Location = new Point(230, 118);
             btnCancel.Name = "btnCancel";
             btnCancel.Size = new Size(80, 30);
-            btnCancel.TabIndex = 11;
+            btnCancel.TabIndex = 13;
             btnCancel.Text = "Cancel";
             btnCancel.UseVisualStyleBackColor = true;
             btnCancel.Click += btnCancel_Click;
@@ -180,21 +183,21 @@ namespace YamuraView
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             CancelButton = btnCancel;
-            ClientSize = new Size(396, 228);
-            Controls.Add(btnTogglePasswordVis);
+            ClientSize = new Size(396, 160);
             Controls.Add(lblFolder);
             Controls.Add(txtFolder);
             Controls.Add(btnBrowseFolder);
             Controls.Add(lblConfig);
             Controls.Add(txtConfig);
             Controls.Add(btnBrowseConfig);
-            Controls.Add(lblSSID);
-            Controls.Add(txtSSID);
-            Controls.Add(lblPassword);
-            Controls.Add(txtPassword);
-            Controls.Add(lblFileZilla);
-            Controls.Add(txtFileZilla);
-            Controls.Add(btnBrowseFileZilla);
+            Controls.Add(lblColors);
+            Controls.Add(btnColor1);
+            Controls.Add(btnColor2);
+            Controls.Add(btnColor3);
+            Controls.Add(btnColor4);
+            Controls.Add(btnColor5);
+            Controls.Add(btnColor6);
+            Controls.Add(btnColor7);
             Controls.Add(btnOK);
             Controls.Add(btnCancel);
             FormBorderStyle = FormBorderStyle.FixedDialog;
@@ -214,15 +217,15 @@ namespace YamuraView
         private Label lblConfig;
         private TextBox txtConfig;
         private Button btnBrowseConfig;
-        private Label lblSSID;
-        private TextBox txtSSID;
-        private Label lblPassword;
-        private TextBox txtPassword;
+        private Label lblColors;
+        private Button btnColor1;
+        private Button btnColor2;
+        private Button btnColor3;
+        private Button btnColor4;
+        private Button btnColor5;
+        private Button btnColor6;
+        private Button btnColor7;
         private Button btnOK;
         private Button btnCancel;
-        private Button btnTogglePasswordVis;
-        private Label lblFileZilla;
-        private TextBox txtFileZilla;
-        private Button btnBrowseFileZilla;
     }
 }
