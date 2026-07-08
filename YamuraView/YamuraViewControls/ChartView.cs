@@ -1220,9 +1220,8 @@ namespace YamuraViewControls
                     string label = _cursorValues.Count > 1
                         ? $"{ch.Key} {valueStr} ({ds.Key})"
                         : $"{ch.Key} {valueStr}";
-                    //using (Brush overlaybrush = new SolidBrush(channelColor))
-                        overlayBrush.Color = channelColor;
-                        g.DrawString(label, Font, overlayBrush, x, y);
+                    overlayBrush.Color = channelColor;
+                    g.DrawString(label, Font, overlayBrush, x, y);
                     y += lineHeight;
                 }
             }
